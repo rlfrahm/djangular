@@ -1,0 +1,8 @@
+django-widget-tweaks==1.4.1
+django-ratings==0.3.7
+django-positions==0.5.2
+django-model-utils==2.3.1
+Pint==0.5.2
+Pillow==2.9.0
+django-haystack==2.4.0
+pysolr==3.3.2

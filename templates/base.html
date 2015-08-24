@@ -1,0 +1,23 @@
+{% load staticfiles %}
+
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Page Title</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootswatch/3.3.5/lumen/bootstrap.min.css">
+    <link rel="stylesheet" href="{% static "css/style.css" %}">
+  </head>
+  <body ng-app="App">
+    <div class="page">
+      {% block page %}{% endblock %}
+    </div>
+  </body>
+  <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.4.4/angular.min.js"></script>
+  <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/angular-ui-bootstrap/0.13.3/ui-bootstrap-tpls.min.js"></script>
+  <script type="text/javascript" src="{% static "js/app.js" %}"></script>
+  {% if request.user.email %}
+  <script type="text/javascript">
+  var email = '{{ request.user.email }}';
+  </script>
+  {% endif %}
+</html>

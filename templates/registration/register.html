@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% load widget_tweaks %}
+
+{% block page %}
+<div class="col-xs-12 col-sm-4 col-md-3 col-centered">
+  <div style="margin-top:20%">
+    <div class="panel panel-default">
+      <div class="panel-body">
+        <form action="{% url 'user:register' %}" method="post">
+          {% csrf_token %}
+          {{ form.non_field_errors }}
+          <div class="form-group">
+            {{ form.username.errors }}
+            <label for="{{ form.username.id_for_label }}">Username</label>
+            {{ form.username|add_class:"form-control" }}
+          </div>
+          <div class="form-group">
+            {{ form.email.errors }}
+            <label for="{{ form.email.id_for_label }}">Email</label>
+            {{ form.email|add_class:"form-control" }}
+          </div>
+          <div class="form-group">
+            {{ form.password.errors }}
+            <label for="{{ form.password.id_for_label }}">Password</label>
+            {{ form.password|add_class:"form-control" }}
+          </div>
+          <div class="form-group">
+            {{ form.dob.errors }}
+            <label for="{{ form.dob.id_for_label }}">Date of birth</label>
+            {{ form.dob|add_class:"form-control"|attr:"type:date" }}
+          </div>
+          <button type="submit" class="btn btn-primary">Register</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
