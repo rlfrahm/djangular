@@ -41,6 +41,7 @@ INSTALLED_APPS = (
     # Added
     'haystack',
     'widget_tweaks',
+    'rest_framework',
 
     # App
     'core',
@@ -122,4 +123,12 @@ HAYSTACK_CONNECTIONS = {
         # ...or for multicore...
         # 'URL': 'http://127.0.0.1:8983/solr/mysite',
     },
+}
+
+REST_FRAMEWORK = {
+    # Use Django's standard `django.contrib.auth` permissions,
+    # or allow read-only access for unauthenticated users.
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly'
+    ]
 }

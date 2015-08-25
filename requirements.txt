@@ -6,3 +6,4 @@ Pint==0.5.2
 Pillow==2.9.0
 django-haystack==2.4.0
 pysolr==3.3.2
+djangorestframework==3.2.3
