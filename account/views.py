@@ -4,7 +4,7 @@ from django.http import HttpResponseRedirect
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
 
-from .forms import LoginForm, RegisterForm
+from .forms import LoginForm, RegisterForm, ProfileForm
 
 def loginHandler(request):
   form = None
@@ -59,3 +59,7 @@ def registerHandler(request):
 def logoutHandler(request):
   logout(request)
   return HttpResponseRedirect('/')
+
+def profileHandler(request):
+  form = ProfileForm()
+  return render(request, 'user/user_settings_profile.html', {'form': form})

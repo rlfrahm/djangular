@@ -1,0 +1,17 @@
+{% extends "page.html" %}
+
+{% block content %}
+<div class="row">
+  <div class="col-xs-12 col-sm-4 col-md-3">
+    <div class="list-group">
+      <a href class="list-group-item{% if 'user' in request.path %} active{% endif %}">Profile</a>
+      <a href class="list-group-item">Bar</a>
+      <a href class="list-group-item">Billing</a>
+    </div>
+  </div>
+  <div class="col-xs-12 col-sm-8 col-md-9">
+    {% block body %}
+    {% endblock %}
+  </div>
+</div>
+{% endblock %}
