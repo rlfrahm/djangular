@@ -4,18 +4,19 @@
 {% block page %}
 <div class="col-xs-12 col-sm-4 col-md-3 col-centered">
   <div style="margin-top:20%">
+    <h1 class="text-center">My Drink Nation</h1>
     <div class="panel panel-default">
       <div class="panel-body">
         {% if form.errors %}
           <p>Your username and password didn't match. Please try again.</p>
         {% endif %}
-        <form action="{% url 'user:login' %}" method="post">
+        <form action="{% url 'user:login' %}?{{ request.GET.urlencode }}" method="post">
           {% csrf_token %}
           {{ form.non_field_errors }}
           <div class="form-group">
             {{ form.username.errors }}
             <label for="{{ form.username.id_for_label }}">Username</label>
-            {{ form.username|add_class:"form-control" }}
+            {{ form.username|add_class:"form-control"|attr:"focus" }}
           </div>
           {% comment %}
           <div class="form-group">
@@ -29,10 +30,11 @@
             <label for="{{ form.password.id_for_label }}">Password</label>
             {{ form.password|add_class:"form-control" }}
           </div>
-          <button type="submit" class="btn btn-primary">Log in</button>
+          <button type="submit" class="btn btn-primary btn-lg">Log in</button>
         </form>
       </div>
     </div>
+    <p class="text-center">Don't have an account? <a href="{% url 'user:register' %}?{{ request.GET.urlencode }}">Register</a></p>
   </div>
 </div>
 {% endblock %}
