@@ -27,6 +27,9 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
+# Django cors headers
+CORS_ORIGIN_ALLOW_ALL = True
+
 
 # Application definition
 
@@ -43,15 +46,18 @@ INSTALLED_APPS = (
     'widget_tweaks',
     'rest_framework',
     'rest_framework.authtoken',
+    'corsheaders',
 
     # App
     'core',
     'recipes',
     'account',
+    'bars',
 )
 
 MIDDLEWARE_CLASSES = (
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',

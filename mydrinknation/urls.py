@@ -19,9 +19,8 @@ from django.contrib import admin
 urlpatterns = [
     url(r'^admin/', include(admin.site.urls)),
     url(r'^recipes', include('recipes.urls', namespace='recipes')),
-    url(r'^api-auth/', include('rest_framework.urls', namespace='rest_framework')),
+    url(r'^api/v1/', include('api.urls', namespace='api')),
     url(r'^', include('account.urls', namespace='user')),
     url(r'^', include('core.urls', namespace='core')),
-    url(r'^api/v1/', include('api.urls', namespace='api')),
     # url('^', include('django.contrib.auth.urls')),
 ]

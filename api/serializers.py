@@ -5,7 +5,7 @@ class RegisterSerializer(serializers.Serializer):
   username = serializers.CharField(max_length=255)
   email = serializers.EmailField()
   password = serializers.CharField(max_length=255)
-  dob = serializers.DateField()
+  dob = serializers.DateField(required=False)
 
   def create(self, validated_data):
     """
