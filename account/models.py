@@ -11,12 +11,11 @@ class UserProfile(models.Model):
 
 
     user = models.OneToOneField(User, related_name="profile")
-    ref_id = models.CharField(max_length=60, default='BABEVUSER', unique=True)
     created = models.DateTimeField(auto_now_add=True, auto_now=False)
     updated = models.DateTimeField(auto_now_add=False, auto_now=True)
     location = models.CharField(max_length=100, blank=True)
     # age = models.PositiveIntegerField(blank=True,null=True)
-    birthday = models.DateField()
+    # birthday = models.DateField()
     email= models.EmailField('email', unique=False, db_index=True)
     ip_address = models.CharField(max_length=120, default='ABC')
     picture = models.ImageField(upload_to='profile_images', blank=True)
@@ -56,4 +55,4 @@ class UserProfile(models.Model):
         return self.user.username
 
     class Meta:
-        unique_together = ("email", "ref_id",)
+        unique_together = ("email", "user",)

@@ -7,6 +7,7 @@ from . import views
 urlpatterns = [
   url(r'^register', csrf_exempt(views.RegisterHandler.as_view()), name='register'),
   url(r'^login', csrf_exempt(views.LoginHandler.as_view()), name='login'),
+  url(r'^user', csrf_exempt(views.UserHandler.as_view()), name='user'),
 ]
 
 urlpatterns = format_suffix_patterns(urlpatterns)
