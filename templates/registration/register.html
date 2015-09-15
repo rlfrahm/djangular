@@ -1,6 +1,8 @@
 {% extends "base.html" %}
 {% load widget_tweaks %}
 
+{% block title %}Register{% endblock %}
+
 {% block page %}
 <div class="col-xs-12 col-sm-4 col-md-3 col-centered">
   <div style="margin-top:20%">
@@ -12,20 +14,25 @@
           {{ form.non_field_errors }}
           <div class="form-group">
             {{ form.username.errors }}
-            <label for="{{ form.username.id_for_label }}">Username</label>
+            {{ form.username.label }}
             {{ form.username|add_class:"form-control"|attr:"focus" }}
           </div>
           <div class="form-group">
             {{ form.email.errors }}
-            <label for="{{ form.email.id_for_label }}">Email</label>
+            {{ form.email.label }}
             {{ form.email|add_class:"form-control" }}
           </div>
           <div class="form-group">
             {{ form.password.errors }}
-            <label for="{{ form.password.id_for_label }}">Password</label>
+            {{ form.password.label }}
             {{ form.password|add_class:"form-control" }}
           </div>
-          <button type="submit" class="btn btn-primary">Register</button>
+          <div class="form-group">
+            {{ form.dob.errors }}
+            {{ form.dob.label }}
+            {% render_field form.dob class="form-control" type="date" %}
+          </div>
+          <button type="submit" class="btn btn-primary btn-block btn-lg">Register</button>
         </form>
       </div>
     </div>

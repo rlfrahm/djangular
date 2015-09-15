@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% load widget_tweaks %}
+
+{% block title %}Register Bar{% endblock %}
+
+{% block page %}
+<div class="col-xs-12 col-sm-4 col-md-3 col-centered">
+  <div style="margin-top:20%">
+    <h1 class="text-center">My Drink Nation</h1>
+    <div class="panel panel-default">
+      <div class="panel-body">
+        <form enctype="multipart/form-data" action="{% url 'bars:register-bar' %}?{{ request.GET.urlencode }}" method="post">
+          {% csrf_token %}
+          {{ form.non_field_errors }}
+          <div class="form-group">
+            {{ form.name.errors }}
+            {{ form.name.label }}
+            {{ form.name|add_class:"form-control"|attr:"focus" }}
+          </div>
+          <fieldset>
+            <legend>Address</legend>
+            <div class="form-group">
+              {{ form.street.errors }}
+              {{ form.street.label }}
+              {{ form.street|add_class:"form-control" }}
+            </div>
+            <div class="form-group">
+              {{ form.city.errors }}
+              {{ form.city.label }}
+              {{ form.city|add_class:"form-control" }}
+            </div>
+            <div class="form-group">
+              {{ form.province.errors }}
+              {{ form.province.label }}
+              {{ form.province|add_class:"form-control" }}
+            </div>
+          </fieldset>
+          <button type="submit" class="btn btn-primary btn-lg btn-block">Register</button>
+        </form>
+      </div>
+    </div>
+    <p class="text-center"><a href="{% url 'core:home' %}?{{ request.GET.urlencode }}">Cancel</a></p>
+  </div>
+</div>
+{% endblock %}

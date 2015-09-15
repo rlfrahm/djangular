@@ -1,6 +1,8 @@
 from django.db import models
 from django.contrib.auth.models import User
 
+import datetime
+
 # Create your models here.
 class UserProfile(models.Model):
     DRINKER = 'Drinker'
@@ -16,6 +18,7 @@ class UserProfile(models.Model):
     location = models.CharField(max_length=100, blank=True)
     # age = models.PositiveIntegerField(blank=True,null=True)
     # birthday = models.DateField()
+    dob = models.DateField(default=datetime.date.today)
     email= models.EmailField('email', unique=False, db_index=True)
     ip_address = models.CharField(max_length=120, default='ABC')
     picture = models.ImageField(upload_to='profile_images', blank=True)

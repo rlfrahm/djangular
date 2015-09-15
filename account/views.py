@@ -1,10 +1,10 @@
-from django.shortcuts import render
 from django.shortcuts import get_object_or_404, render
 from django.http import HttpResponseRedirect
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
 
 from .forms import LoginForm, RegisterForm, ProfileForm
+from .models import UserProfile
 
 def loginHandler(request):
   form = None
@@ -43,8 +43,12 @@ def registerHandler(request):
       email = request.POST['email']
       password = request.POST['password']
       dob = request.POST['dob']
+
       user = User.objects.create_user(username, email, password)
       user.save()
+
+      profile = UserProfile(user=user, dob=dob)
+
       user = authenticate(username=username, password=password)
       login(request, user)
       return HttpResponseRedirect('/')
@@ -63,3 +67,7 @@ def logoutHandler(request):
 def profileHandler(request):
   form = ProfileForm()
   return render(request, 'user/user_settings_profile.html', {'form': form})
+
+def userHandler(request, user_id):
+  user = get_object_or_404(User, pk=user_id)
+  return render(request, 'user/user.html', {'user': user})

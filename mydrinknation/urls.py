@@ -20,6 +20,7 @@ urlpatterns = [
     url(r'^admin/', include(admin.site.urls)),
     url(r'^recipes', include('recipes.urls', namespace='recipes')),
     url(r'^api/v1/', include('api.urls', namespace='api')),
+    url(r'^', include('bars.urls', namespace='bars')),
     url(r'^', include('account.urls', namespace='user')),
     url(r'^', include('core.urls', namespace='core')),
     # url('^', include('django.contrib.auth.urls')),
