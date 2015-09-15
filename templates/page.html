@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load staticfiles %}
 
 {% block page %}
 <nav class="navbar navbar-default">
@@ -14,18 +15,21 @@
     </div>
 
     <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+      <ul class="nav navbar-nav navbar-left">
+        <li><a ui-sref="bars">Bars</a></li>
+      </ul>
       <ul class="nav navbar-nav navbar-right">
         <li>
           <p class="navbar-btn">
-            <a ui-sref="tabs" class="btn btn-primary">Buy a Tab</a>
+            <a ui-sref="tabs" class="btn btn-primary">Open a Tab</a>
           </p>
         </li>
         <li class="dropdown" dropdown>
           <a href="#" dropdown-toggle>{{ user }} <span class="caret"></span></a>
           <ul class="dropdown-menu" dropdown-menu>
-            <li><a href="{% url 'bars:register-bar' %}">Register Bar</a></li>
+            <li><a ui-sref="bars-mine">My bars</a></li>
             <li><a ui-sref="profile">Profile</a></li>
-            <li><a href="{% url 'user:logout' %}">Logout</a></li>
+            <li><a ui-sref="logout">Logout</a></li>
           </ul>
         </li>
       </ul>
@@ -35,4 +39,14 @@
 <div class="container">
   <div ui-view></div>
 </div>
+{% endblock %}
+
+{% block scripts %}
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.4.4/angular.min.js"></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.4.5/angular-resource.min.js"></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/angular-ui-router/0.2.15/angular-ui-router.min.js"></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/angular-ui-bootstrap/0.13.3/ui-bootstrap-tpls.min.js"></script>
+<script type="text/javascript" src="{% static "js/api.js" %}"></script>
+<script type="text/javascript" src="{% static "js/app.js" %}"></script>
+<script type="text/javascript" src="{% static "js/controllers.js" %}"></script>
 {% endblock %}

@@ -11,16 +11,13 @@
     <meta name="author" content="">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootswatch/3.3.5/lumen/bootstrap.min.css">
     <link rel="stylesheet" href="{% static "css/style.css" %}">
+    <base href="/">
   </head>
   <body ng-app="App">
     <div class="page">
       {% block page %}{% endblock %}
     </div>
   </body>
-  <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.4.4/angular.min.js"></script>
-  <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.4.5/angular-resource.min.js"></script>
-  <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/angular-ui-router/0.2.15/angular-ui-router.min.js"></script>
-  <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/angular-ui-bootstrap/0.13.3/ui-bootstrap-tpls.min.js"></script>
   <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/fastclick/1.0.6/fastclick.min.js"></script>
   <script type="text/javascript">
   if ('addEventListener' in document) {
@@ -29,8 +26,7 @@
       }, false);
   }
   </script>
-  <script type="text/javascript" src="{% static "js/api.js" %}"></script>
-  <script type="text/javascript" src="{% static "js/app.js" %}"></script>
+  {% block scripts %}{% endblock %}
   {% if request.user.email %}
   <script type="text/javascript">
   var email = '{{ request.user.email }}';

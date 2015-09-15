@@ -3,6 +3,7 @@ from django.contrib.auth.models import User
 from django.contrib.auth import authenticate
 
 from account.models import UserProfile
+from bars.models import Bar
 
 class LoginSerializer(serializers.Serializer):
   username = serializers.CharField(max_length=255)
@@ -30,3 +31,19 @@ class RegisterSerializer(serializers.Serializer):
     profile = UserProfile(user=user)
     profile.save()
     return user
+
+class BarSerializer(serializers.ModelSerializer):
+  class Meta:
+    model = Bar
+    exclude = ('image', 'code')
+
+  def create(self, validated_data):
+    bar = Bar()
+    bar.name = validated_data.get('name')
+    bar.street = validated_data.get('street')
+    bar.city = validated_data.get('city')
+    bar.province = validated_data.get('province')
+    print self.context
+    bar.owner = self.context['request'].user
+    bar.save()
+    return bar

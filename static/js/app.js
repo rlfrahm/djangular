@@ -1,7 +1,14 @@
 angular.module('App', ['Api', 'ui.bootstrap', 'ui.router'])
 
-.config(['$interpolateProvider', '$stateProvider', '$urlRouterProvider', function($interpolateProvider, $stateProvider, $urlRouterProvider) {
+.config(['$interpolateProvider', '$stateProvider', '$urlRouterProvider', '$locationProvider', '$httpProvider', function($interpolateProvider, $stateProvider, $urlRouterProvider, $locationProvider, $httpProvider) {
   $interpolateProvider.startSymbol('{[{').endSymbol('}]}');
+
+  // Remove hashbang
+  $locationProvider.html5Mode(true)
+
+  // Add csrf token security
+  $httpProvider.defaults.xsrfCookieName = 'csrftoken';
+  $httpProvider.defaults.xsrfHeaderName = 'X-CSRFToken';
 
   // For any unmatched url
   $urlRouterProvider.otherwise('/');
@@ -12,6 +19,13 @@ angular.module('App', ['Api', 'ui.bootstrap', 'ui.router'])
       url: '/',
       templateUrl: 'static/partials/home.html'
     })
+    .state('logout', {
+      url: '/logout',
+      templateUrl: 'static/partials/user/logout.html',
+      controller: function($scope) {
+        $scope.logout();
+      }
+    })
     .state('profile', {
       url: '/profile',
       templateUrl: 'static/partials/user/profile.html'
@@ -19,15 +33,42 @@ angular.module('App', ['Api', 'ui.bootstrap', 'ui.router'])
     .state('tabs', {
       url: '/tabs/open',
       templateUrl: 'static/partials/drinks/open-tab.html'
+    })
+    .state('bars', {
+      url: '/bars',
+      templateUrl: 'static/partials/bars/search.html'
+    })
+    .state('bars-mine', {
+      url: '/bars/mine',
+      templateUrl: 'static/partials/bars/mine.html',
+      controller: 'UserBarsCtrl'
+    })
+    .state('bars-mine-detail', {
+      url: '/bars/mine/:id',
+      templateUrl: 'static/partials/bars/mine.html',
+      controller: 'UserBarsCtrl'
+    })
+    .state('bars-add', {
+      url: '/bars/mine/add',
+      templateUrl: 'static/partials/bars/add.html',
+      controller: 'BarAddCtrl'
     });
 }])
 
-.run(['$rootScope', 'Me', function($rootScope, Me) {
+.run(['$rootScope', '$state', 'Auth', 'Me', function($rootScope, $state, Auth, Me) {
   if (!$rootScope.user) {
     $rootScope.user = Me.get(function() {
       console.log($rootScope.user);
     });
   }
+
+  $rootScope.logout = function() {
+    var status = Auth.logout(function() {
+      document.cookie = "sessionid=; expires=Thu, 01 Jan 1970 00:00:00 UTC";
+      // window.location.reload(true);
+      $state.go($state.current.name, $state.params, { reload: true });
+    });
+  };
 }])
 
 .directive('buyDrinks', [function() {
@@ -62,6 +103,29 @@ angular.module('App', ['Api', 'ui.bootstrap', 'ui.router'])
           scope.order.emails = [''];
         scope.setState(1);
       };
+    }
+  };
+}])
+
+.directive('tabs', [function() {
+  return {
+    scope: true,
+    link: function(scope) {
+      scope.state = 0;
+      scope.setState = function(s) {
+        scope.state = s;
+      };
+      scope.isState = function(s) {
+        return (s == scope.state);
+      };
+    }
+  };
+}])
+
+.directive('focus', [function() {
+  return {
+    link: function(scope, element) {
+      element[0].focus();
     }
   };
 }]);

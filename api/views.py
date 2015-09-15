@@ -3,9 +3,10 @@ from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.authtoken.models import Token
 from django.contrib.auth.models import User
-from django.contrib.auth import authenticate
+from django.contrib.auth import authenticate, login, logout
+from rest_framework.authentication import SessionAuthentication
 
-from .serializers import RegisterSerializer, LoginSerializer
+from .serializers import RegisterSerializer, LoginSerializer, BarSerializer
 
 from account.models import UserProfile
 
@@ -58,3 +59,46 @@ class UserHandler(APIView):
       'username': request.user.username,
       'email': request.user.email
       })
+
+class UserBarsHandler(APIView):
+  """
+  Get all bars owned by user
+  """
+  def get(self, request, format=None):
+    bs = request.user.bar_set.all()
+    print bs
+    bars = []
+    for bar in bs:
+      print bar.name
+      bars.append({
+        'id': bar.pk,
+        'name': bar.name,
+        'street': bar.street,
+        'city': bar.city,
+        'province': bar.province,
+        'owner': bar.owner.pk,
+        })
+    return Response(bars)
+
+
+class AuthHandler(APIView):
+  """
+  Login, register, logout users
+  """
+  def delete(self, request, format=None):
+    logout(request.user)
+    return Response({
+      'logout': True
+      })
+
+class BarsHandler(APIView):
+  """
+  CRUD for Bar
+  """
+  def post(self, request, format=None):
+    serializer = BarSerializer(data=request.data, context={'request': request})
+    if serializer.is_valid():
+      bar = serializer.save()
+      return Response(serializer.data)
+    else:
+      return Response({'error': True})
