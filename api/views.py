@@ -5,10 +5,12 @@ from rest_framework.authtoken.models import Token
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login, logout
 from rest_framework.authentication import SessionAuthentication
+from django.shortcuts import get_object_or_404
 
 from .serializers import RegisterSerializer, LoginSerializer, BarSerializer
 
 from account.models import UserProfile
+from bars.models import Bar
 
 # Create your views here.
 class LoginHandler(APIView):
@@ -57,7 +59,8 @@ class UserHandler(APIView):
   def get(self, request, format=None):
     return Response({
       'username': request.user.username,
-      'email': request.user.email
+      'email': request.user.email,
+      'id': request.user.pk,
       })
 
 class UserBarsHandler(APIView):
@@ -90,6 +93,33 @@ class AuthHandler(APIView):
     return Response({
       'logout': True
       })
+
+class BarHandler(APIView):
+  """
+  CRUD on bar
+  """
+  def get(self, request, bar_id, format=None):
+    b = get_object_or_404(Bar, pk=self.kwargs.get('bar_id'))
+    bar = {
+      'name': b.name,
+      'street': b.street,
+      'city': b.city,
+      'province': b.province,
+      'id': b.pk,
+      'owner': b.owner.pk
+    }
+    # bars = []
+    # for bar in bs:
+    #   print bar.name
+    #   bar.append({
+    #     'id': bar.pk,
+    #     'name': bar.name,
+    #     'street': bar.street,
+    #     'city': bar.city,
+    #     'province': bar.province,
+    #     'owner': bar.owner.pk,
+    #     })
+    return Response(bar)
 
 class BarsHandler(APIView):
   """

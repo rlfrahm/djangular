@@ -3,5 +3,5 @@
 	<a ui-sref="bars-add" class="btn btn-danger btn-lg pull-right">New Bar</a>
 </div>
 <div class="list-group">
-	<a ui-sref="bars-mine-detail({id: bar.id})" class="list-group-item" ng-repeat="bar in bars">{[{ bar.name }]}</a>
+	<a ui-sref="bar-detail({id: bar.id})" class="list-group-item" ng-repeat="bar in bars">{[{ bar.name }]}</a>
 </div>

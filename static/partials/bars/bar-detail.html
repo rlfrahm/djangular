@@ -1,0 +1,16 @@
+<iframe width="100%" height="450" frameborder="0" style="border:0"
+src="https://www.google.com/maps/embed/v1/place?q=Ames,IA&key=AIzaSyAyJXdPAlRBVqqTqgrWodd11IqCg_-J68w" allowfullscreen></iframe>
+<div class="page-header clearfix">
+	<h1 class="pull-left">{[{ bar.name }]}&nbsp;<em><small>{[{ bar.street }]}, {[{ bar.city }]}, {[{ bar.province }]}</small></em></h1>
+	<ul class="list-inline list-unstyled pull-right">
+		<li><button type="button" class="btn btn-danger btn-lg">Check-in</button></li>
+		<li ng-if="bar.owner==user.id"><a ui-sref="bar-settings({id: bar.id})" class="btn btn-default btn-lg"><i class="fa fa-cog"></i></a></li>
+	</ul>
+</div>
+<div class="row">
+	<div class="col-xs-12">
+		<div class="panel panel-default">
+			
+		</div>
+	</div>
+</div>

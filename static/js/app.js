@@ -43,15 +43,20 @@ angular.module('App', ['Api', 'ui.bootstrap', 'ui.router'])
       templateUrl: 'static/partials/bars/mine.html',
       controller: 'UserBarsCtrl'
     })
-    .state('bars-mine-detail', {
-      url: '/bars/mine/:id',
-      templateUrl: 'static/partials/bars/mine.html',
-      controller: 'UserBarsCtrl'
+    .state('bar-detail', {
+      url: '/bars/:id',
+      templateUrl: 'static/partials/bars/bar-detail.html',
+      controller: 'BarCtrl'
     })
     .state('bars-add', {
       url: '/bars/mine/add',
       templateUrl: 'static/partials/bars/add.html',
       controller: 'BarAddCtrl'
+    })
+    .state('bar-settings', {
+      url: '/bars/:id/settings',
+      templateUrl: 'static/partials/bars/bar-settings.html',
+      controller: 'BarSettingsCtrl'
     });
 }])
 

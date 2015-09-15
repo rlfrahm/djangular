@@ -1,0 +1,24 @@
+<a ui-sref="bar-detail({id: bar.id})" class="btn btn-default"><i class="fa fa-angle-left"></i>&nbsp;{[{ bar.name }]}</a>
+<div class="page-header">
+	<h1>{[{ bar.name }]}&nbsp;<em><small>Settings</small></em></h1>
+</div>
+<div class="row">
+	<div class="col-xs-12 col-md-3">
+		<div class="list-group">
+			<a ui-sref="bar-settings" class="list-group-item">General</a>
+			<a ui-sref="bar-settings-financial" class="list-group-item">Financial</a>
+		</div>
+	</div>
+	<div class="col-xs-12 col-md-8">
+		<div class="panel panel-default">
+			<div class="panel-body">
+				<form class="form-horizontal">
+					<div class="form-group">
+						<label>Location</label>
+						<input type="text" class="form-control input-lg">
+					</div>
+				</form>
+			</div>
+		</div>
+	</div>
+</div>

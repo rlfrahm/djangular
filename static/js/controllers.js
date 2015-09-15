@@ -6,6 +6,10 @@ angular.module('App')
 	});
 }])
 
+.controller('BarCtrl', ['$scope', '$state', '$stateParams', 'Bar', function($scope, $state, $stateParams, Bar) {
+	$scope.bar = Bar.get({id: $stateParams.id});
+}])
+
 .controller('BarAddCtrl', ['$scope', '$state', 'Bar', function($scope, $state, Bar) {
 	$scope.newbar = new Bar();
 
@@ -14,4 +18,8 @@ angular.module('App')
 			$state.go('bars-mine');
 		});
 	};
+}])
+
+.controller('BarSettingsCtrl', ['$scope', '$stateParams', 'Bar', function($scope, $stateParams, Bar) {
+	$scope.bar = Bar.get({id: $stateParams.id});
 }]);
