@@ -1,8 +1,34 @@
-angular.module('App', ['ui.bootstrap'])
+angular.module('App', ['Api', 'ui.bootstrap', 'ui.router'])
 
-.config(function($interpolateProvider) {
+.config(['$interpolateProvider', '$stateProvider', '$urlRouterProvider', function($interpolateProvider, $stateProvider, $urlRouterProvider) {
   $interpolateProvider.startSymbol('{[{').endSymbol('}]}');
-})
+
+  // For any unmatched url
+  $urlRouterProvider.otherwise('/');
+
+  // States
+  $stateProvider
+    .state('home', {
+      url: '/',
+      templateUrl: 'static/partials/home.html'
+    })
+    .state('profile', {
+      url: '/profile',
+      templateUrl: 'static/partials/user/profile.html'
+    })
+    .state('tabs', {
+      url: '/tabs/open',
+      templateUrl: 'static/partials/drinks/open-tab.html'
+    });
+}])
+
+.run(['$rootScope', 'Me', function($rootScope, Me) {
+  if (!$rootScope.user) {
+    $rootScope.user = Me.get(function() {
+      console.log($rootScope.user);
+    });
+  }
+}])
 
 .directive('buyDrinks', [function() {
   return {

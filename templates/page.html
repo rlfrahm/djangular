@@ -10,21 +10,21 @@
         <span class="icon-bar"></span>
         <span class="icon-bar"></span>
       </button>
-      <a class="navbar-brand" href="/">MyDrinkNation</a>
+      <a class="navbar-brand" ui-sref="home">MyDrinkNation</a>
     </div>
 
     <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
       <ul class="nav navbar-nav navbar-right">
         <li>
           <p class="navbar-btn">
-            <a href="{% url 'core:buy_drinks' %}" class="btn btn-primary">Buy a Drink</a>
+            <a ui-sref="tabs" class="btn btn-primary">Buy a Tab</a>
           </p>
         </li>
         <li class="dropdown" dropdown>
           <a href="#" dropdown-toggle>{{ user }} <span class="caret"></span></a>
           <ul class="dropdown-menu" dropdown-menu>
             <li><a href="{% url 'bars:register-bar' %}">Register Bar</a></li>
-            <li><a href="{% url 'user:profile' %}">Settings</a></li>
+            <li><a ui-sref="profile">Profile</a></li>
             <li><a href="{% url 'user:logout' %}">Logout</a></li>
           </ul>
         </li>
@@ -33,6 +33,6 @@
   </div>
 </nav>
 <div class="container">
-  {% block content %}{% endblock %}
+  <div ui-view></div>
 </div>
 {% endblock %}
