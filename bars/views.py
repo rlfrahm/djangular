@@ -38,3 +38,10 @@ def barDetailHandler(request, bar_id):
 def barDetailHandler(request, bar_id, invite_id):
   bar = get_object_or_404(Bar, pk=bar_id)
   return render(request, 'bars/bar_detail.html', {'bar': bar})
+
+@login_required
+def bartenderInviteHandler(request, bar_id, invite_id):
+  print bar_id
+  print invite_id
+  invite = get_object_or_404(BartenderInvite, pk=invite_id)
+  print invite

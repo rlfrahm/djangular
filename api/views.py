@@ -150,16 +150,6 @@ class BarsHandler(APIView):
     else:
       return Response({'error': True})
 
-class BartenderInviteHandler(APIView):
-  """
-  Bartender invite handler
-  """
-  def get(self, request, bar_id, invite_id, format=None):
-    print bar_id
-    print invite_id
-    invite = get_object_or_404(BartenderInvite, pk=invite_id)
-    print invite
-
 class BartendersHandler(APIView):
   """
   CRUD operations for Bartenders

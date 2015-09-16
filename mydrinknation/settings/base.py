@@ -39,7 +39,7 @@ INSTALLED_APPS = (
     'corsheaders',
 
     # App
-    'core',
+    # 'core',
     'recipes',
     'account',
     'bars',
