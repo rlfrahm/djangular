@@ -19,7 +19,7 @@ My Drink Nation
  2. Install new Django `pip install django`
 7. Install project dependencies using `pip install -r requirements.txt`
 8. Migrate the database
-8. Restart gunicorn `service gunicorn restart`
+9. Restart gunicorn `service gunicorn restart`
 
 ### Logs
 * Gunicorn `/var/log/upstart/gunicorn.log`
