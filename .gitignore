@@ -1,5 +1,7 @@
-db.sqlite3
-
 migrations/
+db.sqlite3
+.DS_Store
+
+mydrinknation/settings/site.py
 
 *.pyc
