@@ -1,9 +1,10 @@
 from rest_framework import serializers
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate
+from django.shortcuts import get_object_or_404
 
 from account.models import UserProfile
-from bars.models import Bar
+from bars.models import Bar, BartenderInvite
 
 class LoginSerializer(serializers.Serializer):
   username = serializers.CharField(max_length=255)
@@ -43,7 +44,26 @@ class BarSerializer(serializers.ModelSerializer):
     bar.street = validated_data.get('street')
     bar.city = validated_data.get('city')
     bar.province = validated_data.get('province')
-    print self.context
     bar.owner = self.context['request'].user
     bar.save()
     return bar
+
+  def update(self):
+    print self.context['request']
+    bar = get_object_or_404(Bar, pk=self.context['request'].id)
+    bar.name = self.context['request'].name
+    bar.street = self.context['request'].street
+    bar.city = self.context['request'].city
+    bar.province = self.context['request'].province
+    bar.save()
+    return bar
+
+class InviteSerializer(serializers.Serializer):
+  email = serializers.EmailField()
+
+  def create(self, validated_data):
+    user = self.context['request'].user
+    bar = get_object_or_404(Bar, pk=self.context['bar_id'])
+    invite = BartenderInvite(Bar, validated_data.get('email'))
+    invite.save()
+    return invite

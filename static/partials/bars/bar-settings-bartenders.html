@@ -1,0 +1,25 @@
+<div class="row">
+  <div class="col-xs-12 col-sm-6 col-md-4" ng-repeat="bartender in bartenders">
+    <a href class="thumbnail">{[{ bartender.firstname }]}</a>
+  </div>
+  <div class="col-xs-12 col-sm-6 col-md-4">
+    <a href class="thumbnail text-center" ng-click="inviteBartender()"><h2><i class="fa fa-user-plus"></i></h2></a>
+  </div>
+</div>
+<script type="text/ng-template" id="invite-bartender.html">
+  <form name="form" ng-submit="$close(invite.email)">
+    <div class="modal-header">
+        <h3 class="modal-title">Invite Bartender</h3>
+    </div>
+    <div class="modal-body">
+          <div class="form-group">
+            <label>Enter email</label>
+            <input type="email" class="form-control input-lg" ng-model="invite.email" name="email" required focus>
+          </div>
+    </div>
+    <div class="modal-footer">
+        <button class="btn btn-link btn-lg" type="button" ng-click="$dismiss('cancel')">Cancel</button>
+        <button class="btn btn-primary btn-lg" type="submit">Invite</button>
+    </div>
+  </form>
+</script>

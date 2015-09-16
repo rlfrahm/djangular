@@ -7,10 +7,10 @@ from django.contrib.auth import authenticate, login, logout
 from rest_framework.authentication import SessionAuthentication
 from django.shortcuts import get_object_or_404
 
-from .serializers import RegisterSerializer, LoginSerializer, BarSerializer
+from .serializers import RegisterSerializer, LoginSerializer, BarSerializer, InviteSerializer
 
 from account.models import UserProfile
-from bars.models import Bar
+from bars.models import Bar, Bartender, BartenderInvite
 
 # Create your views here.
 class LoginHandler(APIView):
@@ -108,23 +108,40 @@ class BarHandler(APIView):
       'id': b.pk,
       'owner': b.owner.pk
     }
-    # bars = []
-    # for bar in bs:
-    #   print bar.name
-    #   bar.append({
-    #     'id': bar.pk,
-    #     'name': bar.name,
-    #     'street': bar.street,
-    #     'city': bar.city,
-    #     'province': bar.province,
-    #     'owner': bar.owner.pk,
-    #     })
     return Response(bar)
+
+  def post(self, request, bar_id, format=None):
+    print request.data
+    serializer = BarSerializer(data=request.data, context={'request': request})
+    print serializer.is_valid()
+    if serializer.is_valid():
+      bar = get_object_or_404(Bar, pk=bar_id)
+      bar.name = request.data.get('name')
+      bar.save()
+      return Response(serializer.data)
+    else:
+      return Response({'error': True})
+
+  def delete(self, request, bar_id, format=None):
+    bar = get_object_or_404(Bar, pk=bar_id)
+    bar.delete()
+    return Response({'delete': True})
 
 class BarsHandler(APIView):
   """
   CRUD for Bar
   """
+  def get(self, request, format=None):
+    bs = Bar.objects.all()
+    bars = []
+    for bar in bs:
+      bars.append({
+        'id': bar.pk,
+        'name': bar.name,
+        'owner': bar.owner.pk
+        })
+    return Response(bars)
+
   def post(self, request, format=None):
     serializer = BarSerializer(data=request.data, context={'request': request})
     if serializer.is_valid():
@@ -132,3 +149,39 @@ class BarsHandler(APIView):
       return Response(serializer.data)
     else:
       return Response({'error': True})
+
+class BartenderInviteHandler(APIView):
+  """
+  Bartender invite handler
+  """
+  def get(self, request, bar_id, invite_id, format=None):
+    print bar_id
+    print invite_id
+    invite = get_object_or_404(BartenderInvite, pk=invite_id)
+    print invite
+
+class BartendersHandler(APIView):
+  """
+  CRUD operations for Bartenders
+  """
+  def get(self, request, bar_id, format=None):
+    bar = get_object_or_404(Bar, pk=bar_id)
+    bartenders = []
+    for b in bar.bartender_set.all():
+      b.append({
+        'firstname': b.user.first_name,
+        'lastname': b.user.last_name,
+        'id': b.user.pk,
+        })
+    return Response(bartenders)
+
+  # Creates and returns a BartenderInvite
+  def post(self, request, bar_id, format=None):
+    serializer = InviteSerializer(data=request.data, context={'request': request, 'bar_id': bar_id})
+    if serializer.is_valid(raise_exception=True):
+      invite = serializer.save()
+      return Response({
+        'bar_id': invite.bar.pk,
+        'email': invite.email,
+        'token': invite.token,
+        })

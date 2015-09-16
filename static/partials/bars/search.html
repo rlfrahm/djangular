@@ -1,1 +1,8 @@
-<h1>Bars near you</h1>
+<div class="page-header">
+  <h1>Bars near you</h1>
+</div>
+<div class="row">
+  <div class="col-xs-12 col-sm-6 col-md-3" ng-repeat="bar in bars">
+    <a ui-sref="bar-detail({id:bar.id})" class="thumbnail">{[{ bar.name }]}</a>
+  </div>
+</div>

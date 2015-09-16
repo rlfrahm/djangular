@@ -13,7 +13,15 @@ angular.module('Api', ['ngResource'])
 }])
 
 .factory('Bar', ['$resource', function($resource) {
-	return $resource('/api/v1/bars/:id', { id: '@_id' });
+	return $resource('/api/v1/bars/:id', { id: '@id' });
+}])
+
+.factory('Bartenders', ['$resource', function($resource) {
+	return $resource('/api/v1/bars/:id/bartenders', { id: '@id' }, {
+		invite: {
+			method: 'POST'
+		}
+	});
 }])
 
 .factory('Bars', ['$resource', function($resource) {

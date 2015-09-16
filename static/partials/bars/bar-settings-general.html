@@ -1,0 +1,41 @@
+<div class="panel panel-default">
+  <div class="panel-body">
+    <form name="form">
+      <div class="form-group">
+        <label>Name</label>
+        <input type="text" class="form-control input-lg" name="name" ng-model="bar.name" ng-blur="save(form)" ng-change="changed()" required>
+      </div>
+      <div class="form-group">
+        <label>Location</label>
+        <input type="text" class="form-control input-lg">
+      </div>
+    </form>
+  </div>
+</div>
+<div class="panel panel-default">
+  <div class="panel-heading">
+    <h4>Delete</h4>
+  </div>
+  <div class="panel-body">
+    <div class="form-group">
+      <button type="button" class="btn btn-danger btn-lg" ng-click="confirmDelete()">Delete</button>
+    </div>
+  </div>
+</div>
+<script type="text/ng-template" id="confirm-delete.html">
+  <form name="form" ng-submit="$close(confirm.username)">
+    <div class="modal-header">
+        <h3 class="modal-title">Confirm Delete</h3>
+    </div>
+    <div class="modal-body">
+          <div class="form-group">
+            <label>Verify that you want to delete this bar by entering your <strong>username</strong></label>
+            <input type="text" class="form-control input-lg" ng-model="confirm.username" name="username" required focus>
+          </div>
+    </div>
+    <div class="modal-footer">
+        <button class="btn btn-link btn-lg" type="button" ng-click="$dismiss('cancel')">Cancel</button>
+        <button class="btn btn-danger btn-lg" type="submit">Delete</button>
+    </div>
+  </form>
+</script>

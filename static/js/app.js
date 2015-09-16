@@ -36,7 +36,8 @@ angular.module('App', ['Api', 'ui.bootstrap', 'ui.router'])
     })
     .state('bars', {
       url: '/bars',
-      templateUrl: 'static/partials/bars/search.html'
+      templateUrl: 'static/partials/bars/search.html',
+      controller: 'BarsCtrl'
     })
     .state('bars-mine', {
       url: '/bars/mine',
@@ -57,14 +58,24 @@ angular.module('App', ['Api', 'ui.bootstrap', 'ui.router'])
       url: '/bars/:id/settings',
       templateUrl: 'static/partials/bars/bar-settings.html',
       controller: 'BarSettingsCtrl'
+    })
+    .state('bar-settings.general', {
+      url: '/general',
+      templateUrl: 'static/partials/bars/bar-settings-general.html'
+    })
+    .state('bar-settings.financial', {
+      url: '/financial',
+      templateUrl: 'static/partials/bars/bar-settings-financial.html'
+    })
+    .state('bar-settings.bartenders', {
+      url: '/bartenders',
+      templateUrl: 'static/partials/bars/bar-settings-bartenders.html'
     });
 }])
 
 .run(['$rootScope', '$state', 'Auth', 'Me', function($rootScope, $state, Auth, Me) {
   if (!$rootScope.user) {
-    $rootScope.user = Me.get(function() {
-      console.log($rootScope.user);
-    });
+    $rootScope.user = Me.get();
   }
 
   $rootScope.logout = function() {
@@ -127,10 +138,12 @@ angular.module('App', ['Api', 'ui.bootstrap', 'ui.router'])
   };
 }])
 
-.directive('focus', [function() {
+.directive('focus', ['$timeout', function($timeout) {
   return {
     link: function(scope, element) {
-      element[0].focus();
+      $timeout(function() {
+        element[0].focus();
+      }, 0);
     }
   };
 }]);
