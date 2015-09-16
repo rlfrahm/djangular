@@ -66,13 +66,8 @@ angular.module('App')
 			size: 'sm'
 		});
 
-		m.result.then(function(username) {
-			if (username == $rootScope.user.username) {
-				console.log($scope.bar);
-				$scope.bar.$delete(function() {
-					$state.go('bars-mine');
-				});
-			}
+		m.result.then(function(email) {
+			$scope.bartenders.$save();
 		});
 	};
 }]);

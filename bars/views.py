@@ -33,3 +33,8 @@ def registerBarHandler(request):
 def barDetailHandler(request, bar_id):
   bar = get_object_or_404(Bar, pk=bar_id)
   return render(request, 'bars/bar_detail.html', {'bar': bar})
+
+@login_required
+def barDetailHandler(request, bar_id, invite_id):
+  bar = get_object_or_404(Bar, pk=bar_id)
+  return render(request, 'bars/bar_detail.html', {'bar': bar})
