@@ -46,3 +46,10 @@ class BartenderInvite(models.Model):
 	@classmethod
 	def create(cls, bar, email):
 		return cls(bar=bar, email=email, token=uuid.uuid4())
+
+class Checkin(models.Model):
+  user = models.ForeignKey(settings.AUTH_USER_MODEL)
+  when = models.DateTimeField()
+  bar = models.ForeignKey('Bar')
+  created = models.DateTimeField(auto_now_add=True, auto_now=False)
+  updated = models.DateTimeField(auto_now_add=False, auto_now=True)

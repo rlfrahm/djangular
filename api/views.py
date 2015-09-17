@@ -10,10 +10,10 @@ from django.shortcuts import get_object_or_404
 from .serializers import RegisterSerializer, LoginSerializer, BarSerializer, InviteSerializer
 
 from account.models import UserProfile
-from bars.models import Bar, Bartender, BartenderInvite
+from bars.models import Bar, Bartender, BartenderInvite, Checkin
 from bars.emails import send_bartender_invite
 
-import uuid
+import uuid, datetime
 
 # Create your views here.
 class LoginHandler(APIView):
@@ -208,4 +208,34 @@ class BartenderHandler(APIView):
       'id': bartender.pk,
       'working': bartender.working,
       'user': bartender.user.pk,
+      })
+
+class BarCheckinHandler(APIView):
+  """
+  Handler for bar checkins by drinkers
+  """
+  def get(self, request, bar_id, format=None):
+    cs = Checkin.objects.filter(bar__pk=bar_id).order_by('-created')[:10]
+    checkins = []
+    for c in cs:
+      checkins.append({
+        'id': c.pk,
+        'user': c.user.pk,
+        'firstname': c.user.first_name,
+        'bar': c.bar.pk,
+        'when': c.when
+        })
+    return Response(checkins)
+
+  def post(self, request, bar_id, format=None):
+    checkin = Checkin()
+    checkin.bar = get_object_or_404(Bar, pk=bar_id)
+    checkin.user = request.user
+    checkin.when = datetime.now()
+    checkin.save()
+    return Response({
+      'id': checkin.pk,
+      'user': checkin.user.pk,
+      'bar': checkin.bat.pk,
+      'when': checkin.when,
       })

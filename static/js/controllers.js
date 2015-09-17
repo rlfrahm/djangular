@@ -23,9 +23,15 @@ angular.module('App')
 	});
 }])
 
-.controller('BarCtrl', ['$scope', '$state', '$stateParams', 'Bar', 'Bartenders', function($scope, $state, $stateParams, Bar, Bartenders) {
+.controller('BarCtrl', ['$scope', '$state', '$stateParams', 'Bar', 'Bartenders', 'Checkin', function($scope, $state, $stateParams, Bar, Bartenders, Checkin) {
 	$scope.bar = Bar.get({id: $stateParams.id});
 	$scope.bartenders = Bartenders.query({id: $stateParams.id});
+	$scope.checkins = Checkin.query({id: $stateParams.id});
+
+	$scope.checkin = function() {
+		var checkin = new Checkin();
+		checking.$save({id: $scope.bar.id});
+	};
 }])
 
 .controller('BarAddCtrl', ['$scope', '$state', 'Bar', function($scope, $state, Bar) {

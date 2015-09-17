@@ -4,7 +4,7 @@
 <div class="row">
   <div class="col-sm-6 col-md-3" ng-repeat="bar in bars">
     <div class="thumbnail">
-      <p class="text-center"><img src="/static/images/drink87.png" width="60%"></p>
+      <a ui-sref="bar-detail({id: bar.id})" class="text-center"><img src="/static/images/drink87.png" width="60%"></a>
       <div class="caption">
         <h3>{[{ bar.name }]}</h3>
         <p ng-if="bar.bartender && !bar.working"><button type="button" class="btn btn-primary btn-lg" ng-click="imWorking(bar)">I'm Working!</button></p>

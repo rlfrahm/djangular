@@ -62,8 +62,3 @@ class UserProfile(models.Model):
 
     class Meta:
         unique_together = ("email", "user",)
-
-class Checkin(models.Model):
-    user = models.ForeignKey(settings.AUTH_USER_MODEL)
-    when = models.DateTimeField()
-    bar = models.ForeignKey('Bar')
