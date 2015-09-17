@@ -33,7 +33,29 @@ angular.module('App', ['Api', 'ui.bootstrap', 'ui.router'])
     })
     .state('tabs', {
       url: '/tabs/open',
-      templateUrl: 'static/partials/drinks/open-tab.html'
+      templateUrl: 'static/partials/drinks/open-tab.html',
+      controller: 'TabOpenCtrl'
+    })
+    .state('tabs.for', {
+      url: '/for',
+      templateUrl: 'static/partials/drinks/open-tab.for.html',
+      controller: function($scope) {
+        $scope.order.title = 'Open a tab for';
+      }
+    })
+    .state('tabs.amount', {
+      url: '/amount',
+      templateUrl: 'static/partials/drinks/open-tab.amount.html',
+      controller: function($scope, $state) {
+        $scope.order.title = 'How much?';
+      }
+    })
+    .state('tabs.summary', {
+      url: '/confirm',
+      templateUrl: 'static/partials/drinks/open-tab.summary.html',
+      controller: function($scope, $state) {
+        $scope.order.title = 'Confirm order';
+      }
     })
     .state('bars', {
       url: '/bars',
@@ -88,7 +110,7 @@ angular.module('App', ['Api', 'ui.bootstrap', 'ui.router'])
   };
 }])
 
-.directive('buyDrinks', [function() {
+.directive('buyDrinks', ['$rootScope', function($rootScope) {
   return {
     scope: true,
     link: function(scope) {
@@ -115,7 +137,7 @@ angular.module('App', ['Api', 'ui.bootstrap', 'ui.router'])
       scope.setType = function(t) {
         scope.order.type = t;
         if (t == 'me')
-          scope.order.emails = [email];
+          scope.order.emails = [$rootScope.user.email];
         else
           scope.order.emails = [''];
         scope.setState(1);

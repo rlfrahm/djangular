@@ -27,8 +27,10 @@ def loginHandler(request):
           # Account is disabled
           return HttpResponseRedirect('/login')
       else:
-        # invalid login
-        return HttpResponseRedirect('/login')
+        form.add_error(None, 'Invalid username or password')
+      # else:
+      #   # invalid login
+      #   return HttpResponseRedirect('/login')
   else:
     if request.user.is_authenticated():
       return HttpResponseRedirect('/')

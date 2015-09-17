@@ -1,28 +1,21 @@
-<h1>Open a Tab</h1>
-
-<div class="row" buy-drinks>
+<div class="row">
   <div class="col-xs-12 col-sm-6 col-md-4 col-centered">
     <div class="panel panel-default">
       <div class="panel-heading">
-        <h4 class="panel-title"><a href ng-click="setState(state - 1)" ng-if="state" ng-cloak><span class="glyphicon glyphicon-menu-left"></span></a>&nbsp;Buy A Drink For:</h4>
+        <h4 class="panel-title clearfix text-center"><a class="pull-left" href ng-click="setState(state - 1)" ng-if="state" ng-cloak><span class="glyphicon glyphicon-menu-left"></span></a>&nbsp;{[{ order.title }]}</h4>
       </div>
+      <div ui-view class="list-group"></div>
       <div class="list-group" ng-switch="state">
-        <div ng-switch-when="0">
-          <a href class="list-group-item clearfix" ng-click="setType('friends')">
-            Friends
-            <span class="glyphicon glyphicon-menu-right pull-right"></span>
-          </a>
-          <a href class="list-group-item clearfix" ng-click="setType('me')">
-            Yourself
-            <span class="glyphicon glyphicon-menu-right pull-right"></span>
-          </a>
-          <!-- <a href class="list-group-item clearfix" ng-click="setState(1)">
-            Group
-            <span class="glyphicon glyphicon-menu-right pull-right"></span>
-          </a> -->
-        </div>
+        <!-- Email -->
         <form name="form" ng-switch-when="1" ng-cloak>
           <div class="list-group-item">
+            <div class="form-group" dropdown is-open="searching">
+              <input type="text" class="form-control input-lg" placeholder="Search..." ng-model="term" ng-model-options="{ debounce: 500 }" ng-change="search(term)" dropdown-toggle>
+              <ul class="dropdown-menu" style="width:100%">
+                <li ng-repeat="user in users"><a href ng-click="selectUser(user)">{[{ user.email }]}</a></li>
+              </ul>
+            </div>
+            <legend>OR</legend>
             <div class="form-group" ng-repeat="e in order.emails">
               <input type="email" class="form-control input-lg" placeholder="Enter email" ng-model="e" required>
             </div>
@@ -60,7 +53,7 @@
                   <td>{[{ drink.cost | currency }]}</td>
                 </tr>
                 <tr>
-                  <td><input type="text" class="form-control input-lg" ng-model=""></td>
+                  <td><input type="text" class="form-control input-lg"></td>
                   <td></td>
                 </tr>
               </tbody>

@@ -6,11 +6,12 @@ from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login, logout
 from rest_framework.authentication import SessionAuthentication
 from django.shortcuts import get_object_or_404
+from django.db.models import Q
 
-from .serializers import RegisterSerializer, LoginSerializer, BarSerializer, InviteSerializer
+from .serializers import RegisterSerializer, LoginSerializer, BarSerializer, InviteSerializer, SearchSerializer, TabSerializer
 
 from account.models import UserProfile
-from bars.models import Bar, Bartender, BartenderInvite, Checkin
+from bars.models import Bar, Bartender, BartenderInvite, Checkin, Tab
 from bars.emails import send_bartender_invite
 
 import uuid, datetime
@@ -239,3 +240,40 @@ class BarCheckinHandler(APIView):
       'bar': checkin.bat.pk,
       'when': checkin.when,
       })
+
+class UserSearchHandler(APIView):
+  def get(self, request, format=None):
+    serializer = SearchSerializer(data=request.GET)
+    if serializer.is_valid():
+      term = request.GET.get('term')
+      users = User.objects.filter(Q(first_name__icontains=term) | Q(last_name__icontains=term) | Q(email__icontains=term))
+      u = []
+      for user in users:
+        u.append({
+          'id': user.pk,
+          'first_name': user.first_name,
+          'last_name': user.last_name,
+          'email': user.email,
+        })
+      return Response(u)
+    else:
+      return Response([])
+
+class TabsHandler(APIView):
+  """
+  CRUD operations for user tabs
+  """
+  def post(self, request, format=None):
+    serializer = TabSerializer(data=request.data)
+    if serializer.is_valid(raise_exception=True):
+      tab = Tab()
+      tab.amount = serializer.validated_data['amount']
+      tab.email = serializer.validated_data['email']
+      tab.sender = request.user
+      tab.save()
+      return Response({
+        'id': tab.pk,
+        'sender': tab.sender.pk,
+        'email': tab.email,
+        'amount': tab.amount,
+        })

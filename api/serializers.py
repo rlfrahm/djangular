@@ -69,3 +69,10 @@ class InviteSerializer(serializers.Serializer):
     invite = BartenderInvite(bar=bar, email=validated_data.get('email'))
     invite.save()
     return invite
+
+class SearchSerializer(serializers.Serializer):
+  term = serializers.CharField(max_length=25)
+
+class TabSerializer(serializers.Serializer):
+  amount = serializers.DecimalField(max_digits=6, decimal_places=2)
+  email = serializers.EmailField()

@@ -17,3 +17,7 @@ body {
 .page-header h1 {
 	margin-top: 0;
 }
+
+.navbar-btn:hover {
+  margin-top: 6px;
+}

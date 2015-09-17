@@ -46,4 +46,12 @@ angular.module('Api', ['ngResource'])
 			method: 'DELETE'
 		}
 	});
+}])
+
+.factory('UserSearch', ['$resource', function($resource) {
+	return $resource('/api/v1/search/users', {term: '@term'});
+}])
+
+.factory('Tab', ['$resource', function($resource) {
+	return $resource('/api/v1/tabs/:id');
 }]);

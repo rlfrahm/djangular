@@ -98,4 +98,65 @@ angular.module('App')
 			// $scope.bartenders.$save();
 		});
 	};
+}])
+
+.controller('TabOpenCtrl', ['$rootScope', '$scope', '$state', 'UserSearch', 'Tab', function($rootScope, $scope, $state, UserSearch, Tab) {
+	$scope.users = [];
+	$scope.searching = false;
+	$scope.term = '';
+	$scope.buyingType = 'tab';
+	$scope.tab = new Tab();
+	$scope.tab.emails = [];
+
+	$scope.order = {
+    bar: '',
+    bartender: '',
+    emails: [],
+    drinks: [
+      { name: 'Beer', cost: 5 }
+    ],
+    title: ''
+  };
+  $scope.state = 0;
+  $scope.setState = function(s) {
+    $scope.state = s;
+  };
+  $scope.isState = function(s) {
+    return (s == $scope.state);
+  };
+  $scope.addAnotherEmail = function() {
+    if ($scope.tab.emails[$scope.tab.emails.length - 1] != '')
+      $scope.tab.emails.push('');
+  };
+  $scope.setType = function(t) {
+    $scope.tab.type = t;
+    console.log(t);
+    if (t == 'me') {
+      $scope.tab.emails = [$rootScope.user.email];
+    } else {
+      $scope.tab.emails = [''];
+    }
+  };
+
+	$scope.search = function(term) {
+		console.log(term);
+		$scope.users = UserSearch.query({term: term}, function() {
+			$scope.searching = true;
+			console.log($scope.users);
+		});
+	};
+
+	$scope.selectUser = function(user) {
+		console.log(user);
+		$scope.searching = false;
+		$scope.order.emails[0] = user.email;
+		console.log($scope.term);
+	};
+
+	$scope.submit = function() {
+		$scope.tab.email = $scope.tab.emails[0];
+		$scope.tab.$save(function() {
+			$state.go('tabs');
+		});
+	};
 }]);

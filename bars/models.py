@@ -53,3 +53,10 @@ class Checkin(models.Model):
   bar = models.ForeignKey('Bar')
   created = models.DateTimeField(auto_now_add=True, auto_now=False)
   updated = models.DateTimeField(auto_now_add=False, auto_now=True)
+
+class Tab(models.Model):
+	bar = models.ForeignKey('Bar', blank=True)
+	amount = models.DecimalField(max_digits=6, decimal_places=2)
+	sender = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='sender')
+	receiver = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='receiver', blank=True)
+	email = models.EmailField(blank=True)
