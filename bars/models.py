@@ -5,6 +5,8 @@ import uuid
 
 # Create your models here.
 class Bar(models.Model):
+	class Meta:
+		app_label = 'bars'
 	# Details
 	name = models.CharField(max_length=255)
 	# slug = models.SlugField(unique=True)
@@ -32,8 +34,9 @@ class Bar(models.Model):
 		return self.owner.pk == user_id
 
 class Bartender(models.Model):
-	user = models.OneToOneField(settings.AUTH_USER_MODEL)
+	user = models.ForeignKey(settings.AUTH_USER_MODEL)
 	bar = models.ForeignKey('Bar')
+	working = models.BooleanField(default=False)
 
 class BartenderInvite(models.Model):
 	bar = models.ForeignKey('Bar')

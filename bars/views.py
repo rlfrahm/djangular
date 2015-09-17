@@ -1,11 +1,12 @@
-from django.shortcuts import get_object_or_404, render
+from django.shortcuts import get_object_or_404, render, redirect
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponseRedirect
 from django.core.urlresolvers import reverse
 from django.utils.text import slugify
 
 from .forms import RegisterForm
-from .models import Bar, Bartender
+from .models import Bar, Bartender, BartenderInvite
+from .emails import send_bartender_invite
 
 # Create your views here.
 @login_required
@@ -41,7 +42,11 @@ def barDetailHandler(request, bar_id, invite_id):
 
 @login_required
 def bartenderInviteHandler(request, bar_id, invite_id):
-  print bar_id
-  print invite_id
-  invite = get_object_or_404(BartenderInvite, pk=invite_id)
-  print invite
+  invite = get_object_or_404(BartenderInvite, token=invite_id)
+  if request.user.email == invite.email:
+    bartender = Bartender()
+    bartender.user = request.user
+    bartender.bar = get_object_or_404(Bar, pk=bar_id)
+    bartender.save()
+    invite.delete()
+    return redirect(reverse('core:home') + '#/bars/%s' % bar_id)

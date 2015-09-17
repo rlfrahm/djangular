@@ -63,7 +63,9 @@ class InviteSerializer(serializers.Serializer):
 
   def create(self, validated_data):
     user = self.context['request'].user
+    print self.context['bar_id']
     bar = get_object_or_404(Bar, pk=self.context['bar_id'])
-    invite = BartenderInvite(Bar, validated_data.get('email'))
+    print bar
+    invite = BartenderInvite(bar=bar, email=validated_data.get('email'))
     invite.save()
     return invite

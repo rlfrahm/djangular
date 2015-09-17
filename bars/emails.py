@@ -1,7 +1,7 @@
 from django.core.mail import EmailMessage
 from django.core.urlresolvers import reverse
 
-def send_bartender_invite(invite, to):
+def send_bartender_invite(request, invite):
   msg = EmailMessage()
   msg.subject = 'You have been invited to join %s' % invite.bar.name
   msg.body = """
@@ -10,8 +10,8 @@ def send_bartender_invite(invite, to):
   To accept this invitation, simply follow this link: %s.
 
   My Drink Nation helps people buy drinks for their friends. Come help make that happen!
-  """ % (invite.bar.name, reverse('bars:bartender-invite', args=(invite.bar.pk, invite.token,)))
+  """ % (invite.bar.name, request.build_absolute_uri(reverse('bars:bartender-invite', args=(invite.bar.pk, invite.token,))))
   msg.from_email = 'no-reply@mydrinknation.com'
-  msg.to = [to]
-  msg.save()
+  msg.to = [invite.email]
+  msg.send()
   return msg

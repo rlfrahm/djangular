@@ -11,6 +11,9 @@ from .serializers import RegisterSerializer, LoginSerializer, BarSerializer, Inv
 
 from account.models import UserProfile
 from bars.models import Bar, Bartender, BartenderInvite
+from bars.emails import send_bartender_invite
+
+import uuid
 
 # Create your views here.
 class LoginHandler(APIView):
@@ -69,7 +72,6 @@ class UserBarsHandler(APIView):
   """
   def get(self, request, format=None):
     bs = request.user.bar_set.all()
-    print bs
     bars = []
     for bar in bs:
       print bar.name
@@ -80,6 +82,19 @@ class UserBarsHandler(APIView):
         'city': bar.city,
         'province': bar.province,
         'owner': bar.owner.pk,
+        })
+    ub = request.user.bartender_set.all()
+    for b in ub:
+      bars.append({
+        'id': b.bar.pk,
+        'name': b.bar.name,
+        'street': b.bar.street,
+        'city': b.bar.city,
+        'province': b.bar.province,
+        'owner': b.bar.owner.pk,
+        'bartender': True,
+        'working': b.working,
+        'bartender_id': b.pk,
         })
     return Response(bars)
 
@@ -158,7 +173,8 @@ class BartendersHandler(APIView):
     bar = get_object_or_404(Bar, pk=bar_id)
     bartenders = []
     for b in bar.bartender_set.all():
-      b.append({
+      bartenders.append({
+        'email': b.user.email,
         'firstname': b.user.first_name,
         'lastname': b.user.last_name,
         'id': b.user.pk,
@@ -169,9 +185,27 @@ class BartendersHandler(APIView):
   def post(self, request, bar_id, format=None):
     serializer = InviteSerializer(data=request.data, context={'request': request, 'bar_id': bar_id})
     if serializer.is_valid(raise_exception=True):
-      invite = serializer.save()
+      # invite = serializer.save()
+      bar = get_object_or_404(Bar, pk=bar_id)
+      invite = BartenderInvite(bar=bar, email=request.data.get('email'), token=uuid.uuid4())
+      invite.save()
+      send_bartender_invite(request, invite)
       return Response({
         'bar_id': invite.bar.pk,
         'email': invite.email,
         'token': invite.token,
         })
+
+class BartenderHandler(APIView):
+  """
+  CRUD operations for a specific bartender
+  """
+  def put(self, request, bar_id, bartender_id, format=None):
+    bartender = get_object_or_404(Bartender, pk=bartender_id)
+    bartender.working = request.data.get('working')
+    bartender.save()
+    return Response({
+      'id': bartender.pk,
+      'working': bartender.working,
+      'user': bartender.user.pk,
+      })

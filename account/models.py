@@ -1,7 +1,10 @@
 from django.db import models
 from django.contrib.auth.models import User
+from django.conf import settings
 
 import datetime
+
+from bars.models import Bar
 
 # Create your models here.
 class UserProfile(models.Model):
@@ -59,3 +62,8 @@ class UserProfile(models.Model):
 
     class Meta:
         unique_together = ("email", "user",)
+
+class Checkin(models.Model):
+    user = models.ForeignKey(settings.AUTH_USER_MODEL)
+    when = models.DateTimeField()
+    bar = models.ForeignKey('Bar')

@@ -1,5 +1,18 @@
 angular.module('App')
 
+.controller('HomeCtrl', ['$scope', 'UserBars', 'Bartender', function($scope, UserBars, Bartender) {
+	$scope.bars = UserBars.query();
+
+	$scope.imWorking = function(bar) {
+		var b = new Bartender();
+		b.working = !bar.working;
+		var res = b.$working({id: bar.id, bid: bar.bartender_id})
+		.then(function(res) {
+			bar.working = res.working;
+		});
+	};
+}])
+
 .controller('BarsCtrl', ['$scope', 'Bars', function($scope, Bars) {
 	$scope.bars = Bars.query();
 }])
@@ -10,8 +23,9 @@ angular.module('App')
 	});
 }])
 
-.controller('BarCtrl', ['$scope', '$state', '$stateParams', 'Bar', function($scope, $state, $stateParams, Bar) {
+.controller('BarCtrl', ['$scope', '$state', '$stateParams', 'Bar', 'Bartenders', function($scope, $state, $stateParams, Bar, Bartenders) {
 	$scope.bar = Bar.get({id: $stateParams.id});
+	$scope.bartenders = Bartenders.query({id: $stateParams.id});
 }])
 
 .controller('BarAddCtrl', ['$scope', '$state', 'Bar', function($scope, $state, Bar) {
@@ -26,8 +40,14 @@ angular.module('App')
 
 .controller('BarSettingsCtrl', ['$rootScope', '$scope', '$state', '$stateParams', '$modal', 'Bar', 'Bartenders', function($rootScope, $scope, $state, $stateParams, $modal, Bar, Bartenders) {
 	$scope.bar = Bar.get({id: $stateParams.id});
-	$scope.bartenders = Bartenders.query({id: $stateParams.id});
+	
 	$scope.shouldSave = false;
+
+	function refreshBartenders() {
+		$scope.bartenders = Bartenders.query({id: $stateParams.id});	
+	}
+
+	refreshBartenders();
 
 	$scope.isState = function(s) {
 		return $state.is(s);
@@ -52,7 +72,6 @@ angular.module('App')
 
 		m.result.then(function(username) {
 			if (username == $rootScope.user.username) {
-				console.log($scope.bar);
 				$scope.bar.$delete(function() {
 					$state.go('bars-mine');
 				});
@@ -67,7 +86,10 @@ angular.module('App')
 		});
 
 		m.result.then(function(email) {
-			$scope.bartenders.$save();
+			var bartender = new Bartenders();
+			bartender.email = email;
+			bartender.$save({id: $stateParams.id});
+			// $scope.bartenders.$save();
 		});
 	};
 }]);

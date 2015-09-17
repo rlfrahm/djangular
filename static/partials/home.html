@@ -1,1 +1,15 @@
-<h1>Welcome {[{ user.username }]}</h1>
+<div class="page-header">
+  <h1>Welcome {[{ user.username }]}</h1>
+</div>
+<div class="row">
+  <div class="col-sm-6 col-md-3" ng-repeat="bar in bars">
+    <div class="thumbnail">
+      <p class="text-center"><img src="/static/images/drink87.png" width="60%"></p>
+      <div class="caption">
+        <h3>{[{ bar.name }]}</h3>
+        <p ng-if="bar.bartender && !bar.working"><button type="button" class="btn btn-primary btn-lg" ng-click="imWorking(bar)">I'm Working!</button></p>
+        <p ng-if="bar.bartender && bar.working"><button type="button" class="btn btn-success btn-lg" ng-click="imWorking(bar)">I'm Done Working!</button></p>
+      </div>
+    </div>
+  </div>
+</div>

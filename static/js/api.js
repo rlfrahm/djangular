@@ -16,8 +16,16 @@ angular.module('Api', ['ngResource'])
 	return $resource('/api/v1/bars/:id', { id: '@id' });
 }])
 
+.factory('Bartender', ['$resource', function($resource) {
+	return $resource('/api/v1/bars/:id/bartenders/:bid', {}, {
+		working: {
+			method: 'PUT'
+		}
+	});
+}])
+
 .factory('Bartenders', ['$resource', function($resource) {
-	return $resource('/api/v1/bars/:id/bartenders', { id: '@id' }, {
+	return $resource('/api/v1/bars/:id/bartenders', {}, {
 		invite: {
 			method: 'POST'
 		}

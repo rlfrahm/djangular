@@ -14,3 +14,12 @@ src="https://www.google.com/maps/embed/v1/place?q=Ames,IA&key=AIzaSyAyJXdPAlRBVq
 		</div>
 	</div>
 </div>
+<div class="list-group">
+	<div class="list-group-item">
+		<h2 class="list-group-item-heading">Bartenders</h2>
+	</div>
+	<div class="list-group-item" ng-repeat="bartender in bartenders">
+		<h4 class="list-group-item-heading">{[{ bartender.firstname || 'Joe Blow' }]}</h4>
+		<p class="list-group-item-text">{[{ bartender.email }]}</p>
+	</div>
+</div>

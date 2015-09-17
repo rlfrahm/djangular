@@ -1,6 +1,10 @@
 {% extends "base.html" %}
 {% load staticfiles %}
 
+{% block base %}
+<base href="/">
+{% endblock %}
+
 {% block page %}
 <nav class="navbar navbar-default">
   <div class="container">
@@ -29,7 +33,7 @@
           <ul class="dropdown-menu" dropdown-menu>
             <li><a ui-sref="bars-mine">My bars</a></li>
             <li><a ui-sref="profile">Profile</a></li>
-            <li><a ui-sref="logout">Logout</a></li>
+            <li><a href="{% url 'user:logout' %}">Logout</a></li>
           </ul>
         </li>
       </ul>

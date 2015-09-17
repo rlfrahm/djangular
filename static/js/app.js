@@ -4,7 +4,7 @@ angular.module('App', ['Api', 'ui.bootstrap', 'ui.router'])
   $interpolateProvider.startSymbol('{[{').endSymbol('}]}');
 
   // Remove hashbang
-  $locationProvider.html5Mode(true)
+  $locationProvider.html5Mode(true);
 
   // Add csrf token security
   $httpProvider.defaults.xsrfCookieName = 'csrftoken';
@@ -17,7 +17,8 @@ angular.module('App', ['Api', 'ui.bootstrap', 'ui.router'])
   $stateProvider
     .state('home', {
       url: '/',
-      templateUrl: 'static/partials/home.html'
+      templateUrl: 'static/partials/home.html',
+      controller: 'HomeCtrl'
     })
     .state('logout', {
       url: '/logout',

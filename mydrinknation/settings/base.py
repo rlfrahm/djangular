@@ -39,10 +39,10 @@ INSTALLED_APPS = (
     'corsheaders',
 
     # App
-    # 'core',
+    'core',
     'recipes',
-    'account',
     'bars',
+    'account',
 )
 
 MIDDLEWARE_CLASSES = (
@@ -112,3 +112,7 @@ REST_FRAMEWORK = {
         'rest_framework.permissions.AllowAny',
     ),
 }
+
+LOGIN_URL = '/login'
+LOGOUT_URL = '/logout'
+LOGIN_REDIRECT_URL = '/#/profile'

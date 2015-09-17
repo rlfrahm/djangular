@@ -19,6 +19,9 @@ def loginHandler(request):
       if user is not None:
         if user.is_active:
           login(request, user)
+          continue_url = request.GET.get('next')
+          if continue_url:
+            return HttpResponseRedirect(continue_url)
           return HttpResponseRedirect('/')
         else:
           # Account is disabled
@@ -51,6 +54,9 @@ def registerHandler(request):
 
       user = authenticate(username=username, password=password)
       login(request, user)
+      continue_url = request.GET.get('next')
+      if continue_url:
+        return HttpResponseRedirect(continue_url)
       return HttpResponseRedirect('/')
   else:
     if request.user.is_authenticated():
