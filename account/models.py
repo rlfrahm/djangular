@@ -26,6 +26,8 @@ class UserProfile(models.Model):
     ip_address = models.CharField(max_length=120, default='ABC')
     picture = models.ImageField(upload_to='profile_images', blank=True)
 
+    tab = models.DecimalField(max_digits=6, decimal_places=2, default=0)
+
 
     def save(self, *args, **kwargs):
         try:

@@ -159,4 +159,18 @@ angular.module('App')
 			$state.go('tabs');
 		});
 	};
+}])
+
+.controller('TabsCtrl', ['$scope', 'Tab', function($scope, Tab) {
+	$scope.tabs = Tab.query()
+}])
+
+.controller('UserProfileCtrl', ['$scope', 'Me', function($scope, Me) {
+	$scope.user = Me.get();
+
+	$scope.save = function(form, user) {
+		if (form.$invalid) return;
+		console.log(user);
+		user.$save();
+	};
 }]);

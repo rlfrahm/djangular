@@ -1,5 +1,8 @@
 from django.db import models
 from django.conf import settings
+from django.contrib.auth.models import User
+
+from .emails import send_tab_invite
 
 import uuid
 
@@ -54,9 +57,29 @@ class Checkin(models.Model):
   created = models.DateTimeField(auto_now_add=True, auto_now=False)
   updated = models.DateTimeField(auto_now_add=False, auto_now=True)
 
+class TabInvite(models.Model):
+	tab = models.ForeignKey('Tab')
+	email = models.EmailField()
+	token = models.CharField(max_length=100)
+
 class Tab(models.Model):
-	bar = models.ForeignKey('Bar', blank=True)
+	bar = models.ForeignKey('Bar', blank=True, null=True)
 	amount = models.DecimalField(max_digits=6, decimal_places=2)
 	sender = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='sender')
-	receiver = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='receiver', blank=True)
-	email = models.EmailField(blank=True)
+	receiver = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='receiver', blank=True, null=True)
+	email = models.EmailField(blank=True, null=True)
+
+	def set_receiver(self, request, email):
+		user = User.objects.get(email=email)
+		if not user:
+			# There is no user with this email, send email
+			invite = TabInvite()
+			invite.tab = self
+			invite.email = email
+			invite.token = uuid.uuid4()
+			invite.save()
+			send_tab_invite(request, self, invite)
+			self.email = email
+		else:
+			self.receiver = user
+		return self

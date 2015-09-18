@@ -263,14 +263,31 @@ class TabsHandler(APIView):
   """
   CRUD operations for user tabs
   """
+  def get(self, request, format=None):
+    tabs = Tab.objects.filter(receiver=request.user)
+    t = []
+    for tab in tabs:
+      t.append({
+        'id': tab.pk,
+        'amount': tab.amount,
+        'receiver': tab.receiver.pk,
+        'sender': tab.sender.pk
+        })
+    return Response(t)
+
   def post(self, request, format=None):
     serializer = TabSerializer(data=request.data)
     if serializer.is_valid(raise_exception=True):
       tab = Tab()
       tab.amount = serializer.validated_data['amount']
-      tab.email = serializer.validated_data['email']
       tab.sender = request.user
+      tab = tab.set_receiver(request, serializer.validated_data['email'])
       tab.save()
+
+      # Add the amount to the user's tab unless there was an invite sent
+      if tab.receiver:
+        request.user.userprofile.tab += float(tab.amount)
+
       return Response({
         'id': tab.pk,
         'sender': tab.sender.pk,

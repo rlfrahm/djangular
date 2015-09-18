@@ -15,3 +15,18 @@ def send_bartender_invite(request, invite):
   msg.to = [invite.email]
   msg.send()
   return msg
+
+def send_tab_invite(request, tab, invite):
+  msg = EmailMessage()
+  msg.subject = 'You have a $%0.00f tab waiting for you on My Drink nation' % tab.amount
+  msg.body = """
+  %s has opened a $%0.00f tab for you on My Drink Nation! This is money you can use to buy yourself a drink at a bar.
+
+  To accept this invitation, simply follow this link: %s.
+
+  My Drink Nation helps people buy drinks for their friends. Come join us!
+  """ % (tab.sender.first_name, tab.amount, request.build_absolute_uri(reverse('bars:bartender-invite', args=(tab.pk, invite.token,))))
+  msg.from_email = 'no-reply@mydrinknation.com'
+  msg.to = [invite.email]
+  msg.send()
+  return msg

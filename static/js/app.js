@@ -29,28 +29,34 @@ angular.module('App', ['Api', 'ui.bootstrap', 'ui.router'])
     })
     .state('profile', {
       url: '/profile',
-      templateUrl: 'static/partials/user/profile.html'
+      templateUrl: 'static/partials/user/profile.html',
+      controller: 'UserProfileCtrl'
     })
     .state('tabs', {
+      url: '/tabs',
+      templateUrl: 'static/partials/drinks/tabs.html',
+      controller: 'TabsCtrl'
+    })
+    .state('tabs-open', {
       url: '/tabs/open',
       templateUrl: 'static/partials/drinks/open-tab.html',
       controller: 'TabOpenCtrl'
     })
-    .state('tabs.for', {
+    .state('tabs-open.for', {
       url: '/for',
       templateUrl: 'static/partials/drinks/open-tab.for.html',
       controller: function($scope) {
         $scope.order.title = 'Open a tab for';
       }
     })
-    .state('tabs.amount', {
+    .state('tabs-open.amount', {
       url: '/amount',
       templateUrl: 'static/partials/drinks/open-tab.amount.html',
       controller: function($scope, $state) {
         $scope.order.title = 'How much?';
       }
     })
-    .state('tabs.summary', {
+    .state('tabs-open.summary', {
       url: '/confirm',
       templateUrl: 'static/partials/drinks/open-tab.summary.html',
       controller: function($scope, $state) {
