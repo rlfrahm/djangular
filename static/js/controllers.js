@@ -1,6 +1,7 @@
 angular.module('App')
 
-.controller('HomeCtrl', ['$scope', 'UserBars', 'Bartender', function($scope, UserBars, Bartender) {
+.controller('HomeCtrl', ['$scope', '$state', 'UserBars', 'Bartender', function($scope, $state, UserBars, Bartender) {
+	$state.go('tabs-open.for');
 	$scope.bars = UserBars.query();
 
 	$scope.imWorking = function(bar) {
@@ -100,13 +101,15 @@ angular.module('App')
 	};
 }])
 
-.controller('TabOpenCtrl', ['$rootScope', '$scope', '$state', '$modal', 'UserSearch', 'Tab', function($rootScope, $scope, $state, $modal, UserSearch, Tab) {
+.controller('TabOpenCtrl', ['$rootScope', '$scope', '$state', '$modal', 'UserSearch', 'Tab', 'Source', function($rootScope, $scope, $state, $modal, UserSearch, Tab, Source) {
 	$scope.users = [];
 	$scope.searching = false;
 	$scope.term = '';
 	$scope.buyingType = 'tab';
 	$scope.tab = new Tab();
 	$scope.tab.emails = [];
+	$scope.tab.amount = 10;
+	$scope.selectedSource = null;
 
 	$scope.order = {
     bar: '',
@@ -148,6 +151,11 @@ angular.module('App')
 		$scope.order.emails[0] = user.email;
 	};
 
+	$scope.selectSource = function(source) {
+		$scope.tab.source = source.id;
+		$scope.selectedSource = source;
+	};
+
 	$scope.submit = function() {
 		$scope.tab.email = $scope.tab.emails[0];
 		$scope.tab.$save(function() {
@@ -166,16 +174,86 @@ angular.module('App')
   };
 }])
 
-.controller('TabsCtrl', ['$scope', 'Tab', function($scope, Tab) {
+.controller('TabCtrl', ['$scope', '$modal', 'MyTab', 'Tab', function($scope, $modal, MyTab, Tab) {
 	$scope.tabs = Tab.query()
+	var t = MyTab.get(function() {
+		$scope.tab = t.tab;
+	});
+
+	$scope.selectBar = function(bar) {
+		$scope.term = bar.name;
+		$scope.bar = bar;
+	};
+
+	$scope.useTab = function(tab) {
+    var m = $modal.open({
+      templateUrl: 'tab-checkout.html',
+      size: 'sm',
+      scope: $scope
+    });
+
+    m.result.then(function(email) {
+    });
+	};
+
+	$scope.processPayment = function(form) {
+		if (form.$invalid) return;
+
+		$scope.processing = true;
+
+		// setTimeout(function() {
+		// 	$scope.processing = false;
+		// 	$scope.$digest();
+		// }, 1000);
+	};
 }])
 
-.controller('UserProfileCtrl', ['$scope', 'Me', function($scope, Me) {
+.controller('UserProfileCtrl', ['$scope', 'Me', 'Source', function($scope, Me, Source) {
 	$scope.user = Me.get();
+	$scope.cards = Source.query();
 
 	$scope.save = function(form, user) {
 		if (form.$invalid) return;
-		console.log(user);
 		user.$save();
+	};
+
+	$scope.createNewCard = function(form, newcard) {
+		if (form.$invalid) return;
+		$scope.adding = true;
+
+		Stripe.setPublishableKey(pk);
+
+		Stripe.card.createToken({
+      number: newcard.number,
+      cvc: newcard.cvc,
+      exp_month: (newcard.month.getMonth()>10)?'0'+newcard.month.getMonth():''+newcard.month.getMonth(),
+      exp_year: newcard.year,
+      currency: newcard.currency || 'usd'
+    }, stripeResponseHandler);
+
+    function stripeResponseHandler(status, response) {
+	    var $form = form;
+	    $scope.adding = false;
+
+	    if (response.error) {
+	      $scope.$digest();
+	      // Show the errors on the form
+	      // $form.find('.payment-errors').text(response.error.message);
+	      // $form.find('button').prop('disabled', false);
+	    } else {
+	      // response contains id and card, which contains additional card details
+	      var token = response.id;
+	      $scope.newcard.stripe_token = token;
+	      $scope.$digest();
+	      var c = new Source();
+	      c.token = token;
+	      c.$save();
+	      // element[0].submit();
+	      // Insert the token into the form so it gets submitted to the server
+	      // $form.append($('<input type="hidden" name="stripeToken" />').val(token));
+	      // and submit
+	      // $form.get(0).submit();
+	    }
+	  }
 	};
 }]);

@@ -2,9 +2,14 @@ from django.shortcuts import get_object_or_404, render
 from django.http import HttpResponseRedirect
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
+from django.conf import settings
 
 from .forms import LoginForm, RegisterForm, ProfileForm
-from .models import UserProfile
+from .models import UserProfile, StripeCustomer
+
+import stripe
+
+stripe.api_key = settings.STRIPE_API_KEY
 
 def loginHandler(request):
   form = None
@@ -53,6 +58,15 @@ def registerHandler(request):
       user.save()
 
       profile = UserProfile(user=user, dob=dob)
+      profile.save()
+
+      # Stripe
+      cus = stripe.Customer.create(
+        description=user.email,
+        email=user.email
+      )
+      stripe_customer = StripeCustomer(user=user, customer_id=cus.get('id'))
+      stripe_customer.save()
 
       user = authenticate(username=username, password=password)
       login(request, user)

@@ -12,6 +12,10 @@ angular.module('Api', ['ngResource'])
 	return $resource('/api/v1/user');
 }])
 
+.factory('MyTab', ['$resource', function($resource){
+	return $resource('/api/v1/user/tab');
+}])
+
 .factory('Bar', ['$resource', function($resource) {
 	return $resource('/api/v1/bars/:id');
 }])
@@ -52,6 +56,14 @@ angular.module('Api', ['ngResource'])
 	return $resource('/api/v1/search/users', {term: '@term'});
 }])
 
+.factory('BarSearch', ['$resource', function($resource) {
+	return $resource('/api/v1/search/bars', {term: '@term'});
+}])
+
 .factory('Tab', ['$resource', function($resource) {
 	return $resource('/api/v1/tabs/:id');
+}])
+
+.factory('Source', ['$resource', function($resource) {
+	return $resource('/api/v1/user/sources');
 }]);

@@ -7,14 +7,17 @@ from django.contrib.auth import authenticate, login, logout
 from rest_framework.authentication import SessionAuthentication
 from django.shortcuts import get_object_or_404
 from django.db.models import Q
+from django.conf import settings
 
-from .serializers import RegisterSerializer, LoginSerializer, BarSerializer, InviteSerializer, SearchSerializer, TabSerializer
+from .serializers import RegisterSerializer, LoginSerializer, BarSerializer, InviteSerializer, SearchSerializer, TabSerializer, CreditCardSerializer, PayBarSerializer
 
 from account.models import UserProfile
 from bars.models import Bar, Bartender, BartenderInvite, Checkin, Tab
 from bars.emails import send_bartender_invite
 
-import uuid, datetime
+import uuid, datetime, stripe
+
+stripe.api_key = settings.STRIPE_API_KEY
 
 # Create your views here.
 class LoginHandler(APIView):
@@ -259,6 +262,27 @@ class UserSearchHandler(APIView):
     else:
       return Response([])
 
+class BarSearchHandler(APIView):
+  def get(self, request, format=None):
+    serializer = SearchSerializer(data=request.GET)
+    if serializer.is_valid():
+      term = serializer.validated_data['term']
+      bs = Bar.objects.filter(Q(name__icontains=term))
+      bars = []
+      for bar in bs:
+        bars.append({
+          'id': bar.pk,
+          'name': bar.name
+          })
+      return Response(bars)
+    else:
+      return Response([])
+
+class UserTabHandler(APIView):
+  def get(self, request, format=None):
+    tab = request.user.profile.tab
+    return Response({'tab': tab})
+
 class TabsHandler(APIView):
   """
   CRUD operations for user tabs
@@ -281,12 +305,13 @@ class TabsHandler(APIView):
       tab = Tab()
       tab.amount = serializer.validated_data['amount']
       tab.sender = request.user
+      tab.source = serializer.validated_data['source']
       tab = tab.set_receiver(request, serializer.validated_data['email'])
       tab.save()
 
       # Add the amount to the user's tab unless there was an invite sent
       if tab.receiver:
-        request.user.userprofile.tab += float(tab.amount)
+        request.user.profile.tab += tab.amount
 
       return Response({
         'id': tab.pk,
@@ -294,3 +319,26 @@ class TabsHandler(APIView):
         'email': tab.email,
         'amount': tab.amount,
         })
+
+class SourcesHandler(APIView):
+  """
+  CRUD operations for Stripe sources
+  """
+  def get(self, request, format=None):
+    sources = stripe.Customer.retrieve(request.user.stripe.customer_id).sources.all()
+    return Response(sources.get('data'))
+
+  def post(self, request, format=None):
+    serializer = CreditCardSerializer(data=request.data)
+    serializer.is_valid(raise_exception=True)
+    customer = stripe.Customer.retrieve(request.user.stripe.customer_id)
+    customer.sources.create(source=serializer.validated_data['token'])
+    return Response({'success': True})
+
+class PayBarHandler(APIView):
+  """
+  Handles payment at bars
+  """
+  # Create new payment
+  def post(self, request, format=None):
+    return Response(True)

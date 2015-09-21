@@ -1,0 +1,25 @@
+<div class="panel panel-default">
+	<div class="panel-body">
+		<p class="text-center">You have</p>
+		<h2 class="text-center">{[{ tab | currency }]}</h2>
+	</div>
+</div>
+<div class="input-group" bar-search dropdown>
+	<input type="text" class="form-control input-lg" placeholder="Search for bar.." ng-model="term" ng-model-options="{ debounce: 500 }" ng-change="searchForBar(term)" dropdown-toggle>
+	<ul class="dropdown-menu" style="width:100%">
+    <li ng-repeat="bar in barslist"><a href ng-click="selectBar(bar)">{[{ bar.name }]}</a></li>
+  </ul>
+	<span class="input-group-btn">
+		<button type="button" class="btn btn-success btn-lg" ng-click="useTab(tab)" ng-disabled="!bar">Use</button>
+	</span>
+</div><br>
+<div class="panel panel-default">
+	<div class="panel-heading">
+		<h4>Recent Donors</h4>
+	</div>
+	<div class="list-group">
+	  <div class="list-group-item" ng-repeat="tab in tabs">
+	    <h4 class="list-group-heading">{[{ tab.amount | currency }]}</h4>
+	  </div>
+	</div>
+</div>

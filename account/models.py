@@ -64,3 +64,7 @@ class UserProfile(models.Model):
 
     class Meta:
         unique_together = ("email", "user",)
+
+class StripeCustomer(models.Model):
+    user = models.OneToOneField(settings.AUTH_USER_MODEL, related_name='stripe')
+    customer_id = models.CharField(max_length=100)

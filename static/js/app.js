@@ -11,7 +11,7 @@ angular.module('App', ['Api', 'ui.bootstrap', 'ui.router'])
   $httpProvider.defaults.xsrfHeaderName = 'X-CSRFToken';
 
   // For any unmatched url
-  $urlRouterProvider.otherwise('/');
+  $urlRouterProvider.otherwise('/tab');
 
   // States
   $stateProvider
@@ -32,10 +32,10 @@ angular.module('App', ['Api', 'ui.bootstrap', 'ui.router'])
       templateUrl: 'static/partials/user/profile.html',
       controller: 'UserProfileCtrl'
     })
-    .state('tabs', {
-      url: '/tabs',
-      templateUrl: 'static/partials/drinks/tabs.html',
-      controller: 'TabsCtrl'
+    .state('tab', {
+      url: '/tab',
+      templateUrl: 'static/partials/drinks/tab.html',
+      controller: 'TabCtrl'
     })
     .state('tabs-open', {
       url: '/tabs/open',

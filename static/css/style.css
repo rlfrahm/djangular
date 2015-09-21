@@ -21,3 +21,7 @@ body {
 .navbar-btn:hover {
   margin-top: 6px;
 }
+
+.navbar {
+	border-radius: 0;
+}

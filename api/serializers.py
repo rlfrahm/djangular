@@ -76,3 +76,10 @@ class SearchSerializer(serializers.Serializer):
 class TabSerializer(serializers.Serializer):
   amount = serializers.DecimalField(max_digits=6, decimal_places=2)
   email = serializers.EmailField()
+  source = serializers.CharField(max_length=100)
+
+class CreditCardSerializer(serializers.Serializer):
+  token = serializers.CharField(max_length=100)
+
+class PayBarSerializer(serializers.Serializer):
+  amount = serializers.DecimalField(max_digits=8, decimal_places=2)
