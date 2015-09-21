@@ -100,7 +100,7 @@ angular.module('App')
 	};
 }])
 
-.controller('TabOpenCtrl', ['$rootScope', '$scope', '$state', 'UserSearch', 'Tab', function($rootScope, $scope, $state, UserSearch, Tab) {
+.controller('TabOpenCtrl', ['$rootScope', '$scope', '$state', '$modal', 'UserSearch', 'Tab', function($rootScope, $scope, $state, $modal, UserSearch, Tab) {
 	$scope.users = [];
 	$scope.searching = false;
 	$scope.term = '';
@@ -130,7 +130,6 @@ angular.module('App')
   };
   $scope.setType = function(t) {
     $scope.tab.type = t;
-    console.log(t);
     if (t == 'me') {
       $scope.tab.emails = [$rootScope.user.email];
     } else {
@@ -139,18 +138,14 @@ angular.module('App')
   };
 
 	$scope.search = function(term) {
-		console.log(term);
 		$scope.users = UserSearch.query({term: term}, function() {
 			$scope.searching = true;
-			console.log($scope.users);
 		});
 	};
 
 	$scope.selectUser = function(user) {
-		console.log(user);
 		$scope.searching = false;
 		$scope.order.emails[0] = user.email;
-		console.log($scope.term);
 	};
 
 	$scope.submit = function() {
@@ -159,6 +154,16 @@ angular.module('App')
 			$state.go('tabs');
 		});
 	};
+
+  $scope.addNewPaymentMethod = function() {
+    var m = $modal.open({
+      templateUrl: 'select-payment-method.html',
+      size: 'sm'
+    });
+
+    m.result.then(function(email) {
+    });
+  };
 }])
 
 .controller('TabsCtrl', ['$scope', 'Tab', function($scope, Tab) {
