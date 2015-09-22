@@ -120,7 +120,7 @@ class AuthHandler(APIView):
   Login, register, logout users
   """
   def delete(self, request, format=None):
-    logout(request.user)
+    logout(request)
     return Response({
       'logout': True
       })

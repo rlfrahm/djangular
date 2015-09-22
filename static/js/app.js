@@ -117,8 +117,7 @@ angular.module('App', ['Api', 'ui.bootstrap', 'ui.router'])
   $rootScope.logout = function() {
     var status = Auth.logout(function() {
       document.cookie = "sessionid=; expires=Thu, 01 Jan 1970 00:00:00 UTC";
-      // window.location.reload(true);
-      $state.go($state.current.name, $state.params, { reload: true });
+      window.location.href = '/';
     });
   };
 }])
