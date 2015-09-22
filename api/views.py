@@ -9,7 +9,7 @@ from django.shortcuts import get_object_or_404
 from django.db.models import Q
 from django.conf import settings
 
-from .serializers import RegisterSerializer, LoginSerializer, BarSerializer, InviteSerializer, SearchSerializer, TabSerializer, CreditCardSerializer, PayBarSerializer
+from .serializers import RegisterSerializer, LoginSerializer, BarSerializer, InviteSerializer, SearchSerializer, TabSerializer, CreditCardSerializer, PayBarSerializer, UserSerializer
 
 from account.models import UserProfile
 from bars.models import Bar, Bartender, BartenderInvite, Checkin, Tab
@@ -65,6 +65,22 @@ class UserHandler(APIView):
       'username': request.user.username,
       'email': request.user.email,
       'id': request.user.pk,
+      'first_name': request.user.first_name,
+      'last_name': request.user.last_name
+      })
+
+  def post(self, request, format=None):
+    serializer = UserSerializer(data=request.data)
+    serializer.is_valid(raise_exception=True)
+    request.user.first_name = serializer.validated_data['first_name']
+    request.user.last_name = serializer.validated_data['last_name']
+    request.user.save()
+    return Response({
+      'id': request.user.pk,
+      'username': request.user.username,
+      'email': request.user.email,
+      'first_name': request.user.first_name,
+      'last_name': request.user.last_name
       })
 
 class UserBarsHandler(APIView):

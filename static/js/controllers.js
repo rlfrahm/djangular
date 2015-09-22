@@ -213,6 +213,7 @@ angular.module('App')
 
 	$scope.saveUser = function(form, user) {
 		if (form.$invalid) return;
+    console.log(user);
 		user.$save();
 	};
 

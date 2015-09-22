@@ -33,6 +33,10 @@ class RegisterSerializer(serializers.Serializer):
     profile.save()
     return user
 
+class UserSerializer(serializers.Serializer):
+  first_name = serializers.CharField(max_length=255)
+  last_name = serializers.CharField(max_length=255)
+
 class BarSerializer(serializers.ModelSerializer):
   class Meta:
     model = Bar
