@@ -1,13 +1,15 @@
-from django.shortcuts import get_object_or_404, render
+from django.shortcuts import get_object_or_404, render, redirect
 from django.http import HttpResponseRedirect
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
 from django.conf import settings
+from django.contrib.auth.decorators import login_required
+from django.core.urlresolvers import reverse
 
-from .forms import LoginForm, RegisterForm, ProfileForm
-from .models import UserProfile, StripeCustomer
+from .forms import LoginForm, RegisterForm, ProfileForm, StripeConnectRedirectForm
+from .models import UserProfile, StripeCustomer, StripeMerchant
 
-import stripe
+import stripe, urllib, urllib2, json
 
 stripe.api_key = settings.STRIPE_API_KEY
 
@@ -73,7 +75,7 @@ def registerHandler(request):
       continue_url = request.GET.get('next')
       if continue_url:
         return HttpResponseRedirect(continue_url)
-      return HttpResponseRedirect('/')
+      return HttpResponseRedirect('/#/profile')
   else:
     if request.user.is_authenticated():
       return HttpResponseRedirect('/')
@@ -86,10 +88,38 @@ def logoutHandler(request):
   logout(request)
   return HttpResponseRedirect('/')
 
+@login_required
 def profileHandler(request):
   form = ProfileForm()
   return render(request, 'user/user_settings_profile.html', {'form': form})
 
+@login_required
 def userHandler(request, user_id):
   user = get_object_or_404(User, pk=user_id)
   return render(request, 'user/user.html', {'user': user})
+
+@login_required
+def stripeConnectRedirectHandler(request):
+  form = StripeConnectRedirectForm(request.GET)
+  if form.is_valid():
+    data = {
+      'client_secret': settings.STRIPE_API_KEY,
+      'code': request.GET['code'],
+      'grant_type': 'authorization_code',
+    }
+    data = urllib.urlencode(data)
+    url = 'https://connect.stripe.com/oauth/token'
+    res = urllib2.urlopen(url, data)
+    # TODO: Error checking
+    data = json.loads(res.read())
+    merchant = StripeMerchant()
+    merchant.user = request.user
+    merchant.account_id = data.get('stripe_user_id')
+    merchant.pub_key = data.get('stripe_publishable_key')
+    merchant.refresh_token = data.get('refresh_token')
+    merchant.access_token = data.get('access_token')
+    merchant.save()
+    return redirect(reverse('core:home') + '#/bars/mine')
+  else:
+    # Something went wrong
+    return redirect(reverse('core:home'))

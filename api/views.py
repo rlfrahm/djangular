@@ -32,8 +32,6 @@ class LoginHandler(APIView):
     serializer = LoginSerializer(data=request.data)
     if serializer.is_valid():
       user = authenticate(username=request.data['username'], password=request.data['password'])
-      print request.data
-      print user
       token = Token.objects.get(user=user)
       if token:
         return Response({'token': token.key})
@@ -47,7 +45,6 @@ class RegisterHandler(APIView):
   authentication_classes = ()
   def post(self, request, format=None):
     serializer = RegisterSerializer(data=request.data)
-    print request.data
     if serializer.is_valid():
       user = serializer.save()
 
@@ -78,7 +75,6 @@ class UserBarsHandler(APIView):
     bs = request.user.bar_set.all()
     bars = []
     for bar in bs:
-      print bar.name
       bars.append({
         'id': bar.pk,
         'name': bar.name,
@@ -130,9 +126,7 @@ class BarHandler(APIView):
     return Response(bar)
 
   def post(self, request, bar_id, format=None):
-    print request.data
     serializer = BarSerializer(data=request.data, context={'request': request})
-    print serializer.is_valid()
     if serializer.is_valid():
       bar = get_object_or_404(Bar, pk=bar_id)
       bar.name = request.data.get('name')
@@ -311,7 +305,8 @@ class TabsHandler(APIView):
 
       # Add the amount to the user's tab unless there was an invite sent
       if tab.receiver:
-        request.user.profile.tab += tab.amount
+        tab.receiver.profile.tab += tab.amount
+        tab.receiver.profile.save()
 
       return Response({
         'id': tab.pk,
@@ -325,13 +320,13 @@ class SourcesHandler(APIView):
   CRUD operations for Stripe sources
   """
   def get(self, request, format=None):
-    sources = stripe.Customer.retrieve(request.user.stripe.customer_id).sources.all()
+    sources = stripe.Customer.retrieve(request.user.customer.customer_id).sources.all()
     return Response(sources.get('data'))
 
   def post(self, request, format=None):
     serializer = CreditCardSerializer(data=request.data)
     serializer.is_valid(raise_exception=True)
-    customer = stripe.Customer.retrieve(request.user.stripe.customer_id)
+    customer = stripe.Customer.retrieve(request.user.customer.customer_id)
     customer.sources.create(source=serializer.validated_data['token'])
     return Response({'success': True})
 
@@ -340,5 +335,50 @@ class PayBarHandler(APIView):
   Handles payment at bars
   """
   # Create new payment
-  def post(self, request, format=None):
-    return Response(True)
+  def post(self, request, bar_id, format=None):
+    serializer = PayBarSerializer(data=request.data)
+    serializer.is_valid()
+    bar = get_object_or_404(Bar, pk=bar_id)
+    open_tabs = Tab.objects.filter(receiver=request.user).order_by('-created')
+    amount = serializer.validated_data['amount'] # The amount of the sale
+    total_tab = request.user.profile.tab
+    for tab in open_tabs:
+      # Iterate through open tabs until we
+      # 1) Run out of tabs to extract money from
+      # 2) Suffice the amount of money needed to be withdrawn
+      if amount < tab.amount:
+        # Just use this tab
+        tab.amount -= amount
+        total_tab -= tab.amount
+        charge_source(tab.sender.customer.customer_id, tab.source, bar.owner.merchant.account_id, amount)
+        tab.save()
+        break
+      elif amount > tab.amount:
+        total_tab -= tab.amount
+        charge_source(tab.sender.customer.customer_id, tab.source, bar.owner.merchant.account_id, tab.amount)
+        tab.delete()
+      else:
+        # Amounts are equal; remove & break
+        total_tab -= amount
+        charge_source(tab.sender.customer.customer_id, tab.source, bar.owner.merchant.account_id, amount)
+        tab.delete()
+        break
+    request.user.profile.tab = total_tab
+    request.user.profile.save()
+
+    # TODO: Cover the rest of the costs using the user's account!
+    return Response({'tab': total_tab})
+
+def charge_source(customer_id, source, recipient_id, amount):
+  application_fee = int(float(amount) * 0.1 * 100)
+  amount = amount * 100
+  res = stripe.Charge.create(
+    amount=amount,
+    currency='usd',
+    customer=customer_id,
+    source=source,
+    description='Charge for tab',
+    destination=recipient_id,
+    application_fee=application_fee
+  )
+  return res

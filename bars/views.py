@@ -3,6 +3,7 @@ from django.contrib.auth.decorators import login_required
 from django.http import HttpResponseRedirect
 from django.core.urlresolvers import reverse
 from django.utils.text import slugify
+from django.conf import settings
 
 from .forms import RegisterForm
 from .models import Bar, Bartender, BartenderInvite

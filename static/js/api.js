@@ -20,8 +20,12 @@ angular.module('Api', ['ngResource'])
 	return $resource('/api/v1/bars/:id');
 }])
 
+.factory('BarPayment', ['$resource', function($resource) {
+	return $resource('/api/v1/bars/:id/pay');
+}])
+
 .factory('Checkin', ['$resource', function($resource) {
-	return $resource('/api/v1/bars/:id/checkin')
+	return $resource('/api/v1/bars/:id/checkin');
 }])
 
 .factory('Bartender', ['$resource', function($resource) {

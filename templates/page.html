@@ -59,7 +59,7 @@
 <script type="text/javascript" src="{% static "js/directives.js" %}"></script>
 <script type="text/javascript">var pk = '{{ stripe_pk }}';</script>
 <script type="text/ng-template" id="tab-checkout.html">
-  <form name="form" ng-submit="processPayment(form)">
+  <form name="form" ng-submit="processPayment(form, bar.id, cost)">
     <div class="modal-header">
         <h2 class="modal-title text-center">{[{ bar.name }]}</h2>
     </div>

@@ -1,0 +1,17 @@
+<form name="form" ng-cloak>
+  <div class="list-group-item clearfix" ng-repeat="e in tab.emails">
+    <h4 class="list-group-item-heading pull-left">{[{ e }]}</h4>
+    <button type="button" class="close pull-right" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+  </div>
+  <div class="list-group-item">
+    <div class="form-group" dropdown is-open="searching">
+      <input type="text" class="form-control input-lg" placeholder="Search..." ng-model="term" ng-model-options="{ debounce: 500 }" ng-change="search(term)" dropdown-toggle>
+      <ul class="dropdown-menu" style="width:100%">
+        <li ng-repeat="user in users"><a href ng-click="selectUser(user)">{[{ user.email }]}</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="list-group-item clearfix">
+    <button type="submit" class="btn btn-primary btn-lg pull-right" ui-sref="tabs-open.amount"><span class="glyphicon glyphicon-menu-right pull-right"></span></button>
+  </div>
+</form>

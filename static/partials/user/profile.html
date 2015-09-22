@@ -7,13 +7,13 @@
             <div class="col-sm-6">
               <div class="form-group">
                 <label>First Name</label>
-                <input type="text" class="form-control input-lg" name="firstname" ng-model="user.first_name" ng-model-options="{ debounce: 500 }" ng-change="save(form, user)" required focus>
+                <input type="text" class="form-control input-lg" name="firstname" ng-model="user.first_name" ng-blur="saveUser(form, user)" required focus>
               </div>
             </div>
             <div class="col-sm-6">
               <div class="form-group">
                 <label>Last Name</label>
-                <input type="text" class="form-control input-lg" name="lastname" ng-model="user.last_name" ng-model-options="{ debounce: 500 }" ng-change="save(form, user)" required>
+                <input type="text" class="form-control input-lg" name="lastname" ng-model="user.last_name" ng-blur="saveUser(form, user)" required>
               </div>
             </div>
           </div>

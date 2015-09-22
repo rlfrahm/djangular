@@ -8,4 +8,5 @@ urlpatterns = [
   url(r'^logout$', views.logoutHandler, name='logout'),
   url(r'^user/(?P<user_id>[0-9]+)$', views.userHandler, name='user'),
   url(r'^user/$', views.profileHandler, name='profile'),
+  url(r'^settings/financial/stripe/connect$', views.stripeConnectRedirectHandler, name='stripe-connect'),
 ]

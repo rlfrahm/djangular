@@ -49,6 +49,13 @@ angular.module('App', ['Api', 'ui.bootstrap', 'ui.router'])
         $scope.order.title = 'Open a tab for';
       }
     })
+    .state('tabs-open.find', {
+      url: '/find',
+      templateUrl: 'static/partials/drinks/open-tab.find.html',
+      controller: function($scope) {
+        $scope.order.title = 'For who?';
+      }
+    })
     .state('tabs-open.amount', {
       url: '/amount',
       templateUrl: 'static/partials/drinks/open-tab.amount.html',

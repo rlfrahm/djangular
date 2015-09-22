@@ -22,7 +22,6 @@ class UserProfile(models.Model):
     # age = models.PositiveIntegerField(blank=True,null=True)
     # birthday = models.DateField()
     dob = models.DateField(default=datetime.date.today)
-    email= models.EmailField('email', unique=False, db_index=True)
     ip_address = models.CharField(max_length=120, default='ABC')
     picture = models.ImageField(upload_to='profile_images', blank=True)
 
@@ -63,8 +62,15 @@ class UserProfile(models.Model):
         return self.user.username
 
     class Meta:
-        unique_together = ("email", "user",)
+        unique_together = ("user",)
+
+class StripeMerchant(models.Model):
+    user = models.OneToOneField(settings.AUTH_USER_MODEL, related_name='merchant')
+    account_id = models.CharField(max_length=100)
+    pub_key = models.CharField(max_length=100)
+    refresh_token = models.CharField(max_length=100)
+    access_token = models.CharField(max_length=100)
 
 class StripeCustomer(models.Model):
-    user = models.OneToOneField(settings.AUTH_USER_MODEL, related_name='stripe')
+    user = models.OneToOneField(settings.AUTH_USER_MODEL, related_name='customer')
     customer_id = models.CharField(max_length=100)

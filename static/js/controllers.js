@@ -1,7 +1,7 @@
 angular.module('App')
 
 .controller('HomeCtrl', ['$scope', '$state', 'UserBars', 'Bartender', function($scope, $state, UserBars, Bartender) {
-	$state.go('tabs-open.for');
+	$state.go('tab');
 	$scope.bars = UserBars.query();
 
 	$scope.imWorking = function(bar) {
@@ -136,7 +136,7 @@ angular.module('App')
     if (t == 'me') {
       $scope.tab.emails = [$rootScope.user.email];
     } else {
-      $scope.tab.emails = [''];
+      $scope.tab.emails = [];
     }
   };
 
@@ -148,7 +148,7 @@ angular.module('App')
 
 	$scope.selectUser = function(user) {
 		$scope.searching = false;
-		$scope.order.emails[0] = user.email;
+		$scope.tab.emails.push(user.email);
 	};
 
 	$scope.selectSource = function(source) {
@@ -159,7 +159,7 @@ angular.module('App')
 	$scope.submit = function() {
 		$scope.tab.email = $scope.tab.emails[0];
 		$scope.tab.$save(function() {
-			$state.go('tabs');
+			$state.go('tab');
 		});
 	};
 
@@ -174,7 +174,7 @@ angular.module('App')
   };
 }])
 
-.controller('TabCtrl', ['$scope', '$modal', 'MyTab', 'Tab', function($scope, $modal, MyTab, Tab) {
+.controller('TabCtrl', ['$scope', '$modal', 'MyTab', 'Tab', 'BarPayment', function($scope, $modal, MyTab, Tab, BarPayment) {
 	$scope.tabs = Tab.query()
 	var t = MyTab.get(function() {
 		$scope.tab = t.tab;
@@ -196,15 +196,14 @@ angular.module('App')
     });
 	};
 
-	$scope.processPayment = function(form) {
+	$scope.processPayment = function(form, bar_id, amount) {
 		if (form.$invalid) return;
 
 		$scope.processing = true;
 
-		// setTimeout(function() {
-		// 	$scope.processing = false;
-		// 	$scope.$digest();
-		// }, 1000);
+    var payment = new BarPayment();
+    payment.amount = amount;
+    var p = payment.$save({id: bar_id});
 	};
 }])
 
@@ -212,7 +211,7 @@ angular.module('App')
 	$scope.user = Me.get();
 	$scope.cards = Source.query();
 
-	$scope.save = function(form, user) {
+	$scope.saveUser = function(form, user) {
 		if (form.$invalid) return;
 		user.$save();
 	};
