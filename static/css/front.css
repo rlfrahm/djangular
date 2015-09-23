@@ -9,7 +9,10 @@ h1, h2, h3, h4 {
 body {
 	-webkit-font-smoothing: antialiased;
 	-moz-osx-font-smoothing: grayscale;
-	text-shadow: 1px 1px 1px rgba(0,0,0,0.004);
+}
+
+.content {
+	text-shadow: 1px 1px 1px rgba(0,0,0,1);
 }
 
 .footer {
@@ -17,7 +20,7 @@ body {
 }
 
 .page .content {
-	min-height: calc(100% - 100px);
+	min-height: calc(100% - 70px);
 	background-image: url('/static/images/Happy-group-of-friends-go-clubbing-1400x933.png');
 	background-repeat: no-repeat;
 	background-position: center;
@@ -34,7 +37,7 @@ body {
 
 .page .footer {
 	background: #333;
-	min-height: 100px;
+	min-height: 70px;
 }
 
 .navbar-transparent .navbar-brand {
