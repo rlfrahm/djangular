@@ -1,0 +1,55 @@
+html, body, .page {
+	height: 100%;
+}
+
+h1, h2, h3, h4 {
+	color: #fff;
+}
+
+body {
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
+	text-shadow: 1px 1px 1px rgba(0,0,0,0.004);
+}
+
+.footer {
+	color: #aaa;
+}
+
+.page .content {
+	min-height: calc(100% - 100px);
+	background-image: url('/static/images/Happy-group-of-friends-go-clubbing-1400x933.png');
+	background-repeat: no-repeat;
+	background-position: center;
+	background-size: cover;
+}
+
+.background {
+	position: absolute;
+	left: 0;
+	top: 0;
+	right: 0;
+	bottom: 0;
+}
+
+.page .footer {
+	background: #333;
+	min-height: 100px;
+}
+
+.navbar-transparent .navbar-brand {
+	color: #fff;
+}
+
+.navbar-transparent .navbar-nav>li>a {
+	color: #fff;
+}
+
+.navbar-transparent .navbar-nav>li>a:focus, .navbar-transparent .navbar-nav>li>a:hover {
+	color: #999;
+	background-color: transparent;
+}
+
+.navbar-transparent .navbar-toggle .icon-bar {
+	background-color: #fff;
+}
