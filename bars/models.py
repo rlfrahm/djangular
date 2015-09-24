@@ -69,6 +69,7 @@ class Tab(models.Model):
 	receiver = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='receiver', blank=True, null=True)
 	email = models.EmailField(blank=True, null=True)
 	source = models.CharField(max_length=100, null=True, blank=True, default='')
+	accepted = models.BooleanField(default=False)
 	created = models.DateTimeField(auto_now_add=True, auto_now=False)
 	updated = models.DateTimeField(auto_now_add=False, auto_now=True)
 

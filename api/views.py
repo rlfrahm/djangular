@@ -83,6 +83,20 @@ class UserHandler(APIView):
       'last_name': request.user.last_name
       })
 
+class UserProfileHandler(APIView):
+  """
+  Retrieves users based on an id
+  """
+  def get(self, request, user_id, format=None):
+    user = get_object_or_404(User, pk=user_id)
+    return Response({
+      'username': user.username,
+      'email': user.email,
+      'id': user.id,
+      'first_name': user.first_name,
+      'last_name': user.last_name
+      })
+
 class UserBarsHandler(APIView):
   """
   Get all bars owned by user
@@ -245,12 +259,12 @@ class BarCheckinHandler(APIView):
     checkin = Checkin()
     checkin.bar = get_object_or_404(Bar, pk=bar_id)
     checkin.user = request.user
-    checkin.when = datetime.now()
+    checkin.when = datetime.datetime.now()
     checkin.save()
     return Response({
       'id': checkin.pk,
       'user': checkin.user.pk,
-      'bar': checkin.bat.pk,
+      'bar': checkin.bar.pk,
       'when': checkin.when,
       })
 
@@ -320,7 +334,7 @@ class TabsHandler(APIView):
       tab.save()
 
       # Add the amount to the user's tab unless there was an invite sent
-      if tab.receiver:
+      if tab.receiver or tab.accepted is not True:
         tab.receiver.profile.tab += tab.amount
         tab.receiver.profile.save()
 
@@ -330,6 +344,24 @@ class TabsHandler(APIView):
         'email': tab.email,
         'amount': tab.amount,
         })
+
+class TabHandler(APIView):
+  """
+  Handles the acceptance of a tab
+  """
+  def post(self, request, tab_id, format=None):
+    tab = get_object_or_404(Tab, pk=tab_id)
+    tab.accepted = True
+
+    # Add the amount to the user's tab
+    tab.receiver.profile.tab += tab.amount
+    tab.receiver.profile.save()
+    tab.save()
+
+    return Response({
+      'id': tab.pk,
+      'accepted': True
+      })
 
 class SourcesHandler(APIView):
   """

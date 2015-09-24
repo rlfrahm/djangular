@@ -106,6 +106,10 @@ angular.module('App', ['Api', 'ui.bootstrap', 'ui.router'])
     .state('bar-settings.bartenders', {
       url: '/bartenders',
       templateUrl: 'static/partials/bars/bar-settings-bartenders.html'
+    })
+    .state('user', {
+      url: '/user/:id',
+      templateUrl: 'static/partials/user/user.html'
     });
 }])
 

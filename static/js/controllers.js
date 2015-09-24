@@ -29,9 +29,13 @@ angular.module('App')
 	$scope.bartenders = Bartenders.query({id: $stateParams.id});
 	$scope.checkins = Checkin.query({id: $stateParams.id});
 
+  $scope.formatDate = function(string) {
+    return new Date(string).toLocaleString();
+  };
+
 	$scope.checkin = function() {
 		var checkin = new Checkin();
-		checking.$save({id: $scope.bar.id});
+		checkin.$save({id: $scope.bar.id});
 	};
 }])
 
