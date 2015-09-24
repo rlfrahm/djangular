@@ -72,6 +72,7 @@ class Tab(models.Model):
 	accepted = models.BooleanField(default=False)
 	created = models.DateTimeField(auto_now_add=True, auto_now=False)
 	updated = models.DateTimeField(auto_now_add=False, auto_now=True)
+	note = models.CharField(max_length=140, default='', null=True)
 
 	def set_receiver(self, request, email):
 		if request.user.email is email:

@@ -18,4 +18,17 @@ angular.module('App')
 			};
 		}
 	};
+}])
+
+.directive('maxLength', [function(){
+	return {
+		link: function(scope, element, attrs) {
+			scope.maxLength = attrs.maxLength;
+			
+			scope.calc = function(text) {
+				scope.length = text.length;
+			};
+			
+		}
+	};
 }]);;

@@ -18,19 +18,15 @@
       <a class="navbar-brand" ui-sref="tab">MyDrinkNation</a>
     </div>
 
-    <div class="collapse navbar-collapse" collapse="navbarCollapsed">
+    <div class="collapse navbar-collapse" collapse="navbarCollapsed" ng-click="navbarCollapsed = !navbarCollapsed">
       <ul class="nav navbar-nav navbar-left">
         <li><a ui-sref="bars">Bars</a></li>
       </ul>
       <ul class="nav navbar-nav navbar-right">
         <li><a ui-sref="tab">{[{ 10 | currency }]}</a></li>
-        <li>
-          <p class="navbar-btn">
-            <a ui-sref="tabs-open.for" class="btn btn-primary">Open a Tab</a>
-          </p>
-        </li>
+        <li><a ui-sref="tabs-open.for">Open a Tab</a></li>
         <li class="dropdown" dropdown>
-          <a href="#" dropdown-toggle>{{ user }} <span class="caret"></span></a>
+          <a href="#" dropdown-toggle ng-click="$event.stopPropagation()">{{ user }} <span class="caret"></span></a>
           <ul class="dropdown-menu" dropdown-menu>
             <li><a ui-sref="bars-mine">My bars</a></li>
             <li><a ui-sref="profile">Profile</a></li>

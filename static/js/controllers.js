@@ -1,3 +1,5 @@
+'use strict'
+
 angular.module('App')
 
 .controller('HomeCtrl', ['$scope', '$state', 'UserBars', 'Bartender', function($scope, $state, UserBars, Bartender) {
@@ -209,11 +211,38 @@ angular.module('App')
     payment.amount = amount;
     var p = payment.$save({id: bar_id});
 	};
+
+	$scope.confirmTab = function(tab, decision) {
+		tab.accepted = decision;
+		tab.$save();
+		$scope.$close();
+	};
+
+	$scope.showTabModal = function(tab) {
+		var s = $scope.$new();
+		s.tab = tab;
+    var m = $modal.open({
+      templateUrl: 'tab-detail.html',
+      size: 'sm',
+      scope: s
+    });
+
+    m.result.then(function(email) {
+    });
+  };
 }])
 
-.controller('UserProfileCtrl', ['$scope', 'Me', 'Source', function($scope, Me, Source) {
+.controller('UserProfileCtrl', ['$scope', 'Me', 'Source', 'months', function($scope, Me, Source, months) {
 	$scope.user = Me.get();
 	$scope.cards = Source.query();
+	$scope.months = months;
+	$scope.newcard = {
+		month: '01'
+	};
+
+	$scope.setMonth = function(month) {
+		$scope.newcard.month = month;
+	};
 
 	$scope.saveUser = function(form, user) {
 		if (form.$invalid) return;
@@ -230,7 +259,7 @@ angular.module('App')
 		Stripe.card.createToken({
       number: newcard.number,
       cvc: newcard.cvc,
-      exp_month: (newcard.month.getMonth()>10)?'0'+newcard.month.getMonth():''+newcard.month.getMonth(),
+      exp_month: newcard.month,
       exp_year: newcard.year,
       currency: newcard.currency || 'usd'
     }, stripeResponseHandler);
@@ -260,4 +289,8 @@ angular.module('App')
 	    }
 	  }
 	};
+}])
+
+.controller('UserHandler', ['$scope', '$stateParams', 'User', function($scope, $stateParams, User) {
+	$scope.usr = User.get({id: $stateParams.id});
 }]);

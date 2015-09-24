@@ -9,7 +9,7 @@ from django.shortcuts import get_object_or_404
 from django.db.models import Q
 from django.conf import settings
 
-from .serializers import RegisterSerializer, LoginSerializer, BarSerializer, InviteSerializer, SearchSerializer, TabSerializer, CreditCardSerializer, PayBarSerializer, UserSerializer
+from .serializers import RegisterSerializer, LoginSerializer, BarSerializer, InviteSerializer, SearchSerializer, TabSerializer, CreditCardSerializer, PayBarSerializer, UserSerializer, AcceptTabSerializer
 
 from account.models import UserProfile
 from bars.models import Bar, Bartender, BartenderInvite, Checkin, Tab
@@ -312,14 +312,18 @@ class TabsHandler(APIView):
   CRUD operations for user tabs
   """
   def get(self, request, format=None):
-    tabs = Tab.objects.filter(receiver=request.user)
+    tabs = Tab.objects.filter(receiver=request.user).order_by('-accepted', '-created')
     t = []
     for tab in tabs:
       t.append({
         'id': tab.pk,
         'amount': tab.amount,
         'receiver': tab.receiver.pk,
-        'sender': tab.sender.pk
+        'sender': tab.sender.pk,
+        'sender_first_name': tab.sender.first_name,
+        'sender_last_name': tab.sender.last_name,
+        'accepted': tab.accepted,
+        'note': tab.note
         })
     return Response(t)
 
@@ -330,6 +334,7 @@ class TabsHandler(APIView):
       tab.amount = serializer.validated_data['amount']
       tab.sender = request.user
       tab.source = serializer.validated_data['source']
+      tab.note = serializer.validated_data['note']
       tab = tab.set_receiver(request, serializer.validated_data['email'])
       tab.save()
 
@@ -345,22 +350,41 @@ class TabsHandler(APIView):
         'amount': tab.amount,
         })
 
+class TabsAccepted(APIView):
+  def get(self, request, format=None):
+    ts = request.user.tab_set.filter(accepted=False)
+    tabs = []
+    for tab in ts:
+      tabs.append({
+        'id': tab.pk,
+        'amount': tab.amount,
+        'sender': tab.sender.pk,
+        'sender_first_name': tab.sender.username
+        })
+
+
 class TabHandler(APIView):
   """
   Handles the acceptance of a tab
   """
   def post(self, request, tab_id, format=None):
+    serializer = AcceptTabSerializer(request.data)
+    serializer.is_valid(raise_exception=True)
     tab = get_object_or_404(Tab, pk=tab_id)
-    tab.accepted = True
+    accepted = serializer.validated_data['accepted']
+    if accepted:
+      tab.accepted = True
 
-    # Add the amount to the user's tab
-    tab.receiver.profile.tab += tab.amount
-    tab.receiver.profile.save()
-    tab.save()
+      # Add the amount to the user's tab
+      tab.receiver.profile.tab += tab.amount
+      tab.receiver.profile.save()
+      tab.save()
+    else:
+      tab.delete()
 
     return Response({
       'id': tab.pk,
-      'accepted': True
+      'accepted': False
       })
 
 class SourcesHandler(APIView):

@@ -109,7 +109,8 @@ angular.module('App', ['Api', 'ui.bootstrap', 'ui.router'])
     })
     .state('user', {
       url: '/user/:id',
-      templateUrl: 'static/partials/user/user.html'
+      templateUrl: 'static/partials/user/user.html',
+      controller: 'UserHandler'
     });
 }])
 
@@ -184,5 +185,22 @@ angular.module('App', ['Api', 'ui.bootstrap', 'ui.router'])
         element[0].focus();
       }, 0);
     }
+  };
+}])
+
+.factory('months', [function() {
+  return {
+    '01': 'January',
+    '02': 'Febuary',
+    '03': 'March',
+    '04': 'April',
+    '05': 'May',
+    '06': 'June',
+    '07': 'July',
+    '08': 'August',
+    '09': 'September',
+    '10': 'October',
+    '11': 'November',
+    '12': 'December'
   };
 }]);

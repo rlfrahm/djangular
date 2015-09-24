@@ -2,6 +2,10 @@ body {
   background: #f2f2f2;
 }
 
+textarea {
+	resize: vertical;
+}
+
 .row-centered {
   position: absolute;
   top: 0;
@@ -24,4 +28,8 @@ body {
 
 .navbar {
 	border-radius: 0;
+}
+
+.dropdown-menu.select {
+	width: 100%;
 }

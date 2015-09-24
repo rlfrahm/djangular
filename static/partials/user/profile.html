@@ -62,7 +62,13 @@
                 <div class="row">
                   <div class="col-xs-6">
                     <label>Month</label>
-                    <input type="month" class="form-control" placeholder="MM" ng-model="newcard.month" required>
+                    <div dropdown>
+                      <button type="button" class="btn btn-default btn-block" dropdown-toggle>{[{ months[newcard.month] }]}</button>
+                      <ul class="dropdown-menu select">
+                        <li ng-repeat="(key, month) in months"><a href ng-click="setMonth(key)">{[{ month }]}</a></li>
+                      </ul>
+                    </div>
+                    <!-- <input type="month" class="form-control" placeholder="MM" ng-model="newcard.month" required> -->
                   </div>
                   <div class="col-xs-6">
                     <label>Year</label>

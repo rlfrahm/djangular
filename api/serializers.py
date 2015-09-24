@@ -81,6 +81,10 @@ class TabSerializer(serializers.Serializer):
   amount = serializers.DecimalField(max_digits=6, decimal_places=2)
   email = serializers.EmailField()
   source = serializers.CharField(max_length=100)
+  note = serializers.CharField(max_length=140, required=False)
+
+class AcceptTabSerializer(serializers.Serializer):
+  accepted = serializers.BooleanField()
 
 class CreditCardSerializer(serializers.Serializer):
   token = serializers.CharField(max_length=100)

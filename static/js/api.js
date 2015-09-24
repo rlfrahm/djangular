@@ -68,6 +68,10 @@ angular.module('Api', ['ngResource'])
 	return $resource('/api/v1/tabs/:id');
 }])
 
+.factory('TabAccept', ['$resource', function($resource) {
+	return $resource('/api/v1/tabs/:id/accept');
+}])
+
 .factory('Source', ['$resource', function($resource) {
 	return $resource('/api/v1/user/sources');
 }]);
