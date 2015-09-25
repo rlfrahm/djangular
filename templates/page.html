@@ -1,9 +1,4 @@
 {% extends "base.html" %}
-{% load staticfiles %}
-
-{% block base %}
-<base href="/">
-{% endblock %}
 
 {% block page %}
 <nav class="navbar navbar-default" ng-init="navbarCollapsed=true">
@@ -15,64 +10,17 @@
         <span class="icon-bar"></span>
         <span class="icon-bar"></span>
       </button>
-      <a class="navbar-brand" ui-sref="tab">MyDrinkNation</a>
+      <a class="navbar-brand" href="{% url 'core:home' %}">MyDrinkNation</a>
     </div>
 
     <div class="collapse navbar-collapse" collapse="navbarCollapsed" ng-click="navbarCollapsed = !navbarCollapsed">
-      <ul class="nav navbar-nav navbar-left">
-        <li><a ui-sref="bars">Bars</a></li>
-      </ul>
       <ul class="nav navbar-nav navbar-right">
-        <li><a ui-sref="tab">{[{ 10 | currency }]}</a></li>
-        <li><a ui-sref="tabs-open.for">Open a Tab</a></li>
-        <li class="dropdown" dropdown>
-          <a href="#" dropdown-toggle ng-click="$event.stopPropagation()">{{ user }} <span class="caret"></span></a>
-          <ul class="dropdown-menu" dropdown-menu>
-            <li><a ui-sref="bars-mine">My bars</a></li>
-            <li><a ui-sref="profile">Profile</a></li>
-            <li><a href="{% url 'user:logout' %}">Logout</a></li>
-          </ul>
-        </li>
+        <li><a href="">For Bars</a></li>
       </ul>
     </div>
   </div>
 </nav>
 <div class="container">
-  <div ui-view></div>
+  {% block content %}{% endblock %}
 </div>
-{% endblock %}
-
-{% block scripts %}
-<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.4.4/angular.min.js"></script>
-<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.4.5/angular-resource.min.js"></script>
-<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/angular-ui-router/0.2.15/angular-ui-router.min.js"></script>
-<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/angular-ui-bootstrap/0.13.3/ui-bootstrap-tpls.min.js"></script>
-<script type="text/javascript" src="https://js.stripe.com/v2/" async></script>
-<!-- <script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAyJXdPAlRBVqqTqgrWodd11IqCg_-J68w&libraries=places"></script> -->
-<script type="text/javascript" src="{% static "js/api.js" %}"></script>
-<script type="text/javascript" src="{% static "js/app.js" %}"></script>
-<script type="text/javascript" src="{% static "js/controllers.js" %}"></script>
-<script type="text/javascript" src="{% static "js/directives.js" %}"></script>
-<script type="text/javascript">var pk = '{{ stripe_pk }}';</script>
-<script type="text/ng-template" id="tab-checkout.html">
-  <form name="form" ng-submit="processPayment(form, bar.id, cost)">
-    <div class="modal-header">
-        <h2 class="modal-title text-center">{[{ bar.name }]}</h2>
-    </div>
-    <div class="modal-body">
-      <div class="form-group">
-        <label>Drink Cost</label>
-        <input type="number" min="10" step="1" class="form-control input-lg" ng-model="cost" focus required>
-      </div>
-    </div>
-    <div class="modal-footer clearfix">
-      <div class="pull-left" ng-if="processing">
-        <div class="throbber-loader">
-          Loading…
-        </div>
-      </div>
-      <button class="btn btn-success btn-lg" type="submit" style="margin:0 auto">Process</button>
-    </div>
-  </form>
-</script>
 {% endblock %}
