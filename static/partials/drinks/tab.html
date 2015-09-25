@@ -19,10 +19,16 @@
 	</div>
 	<div class="list-group">
 	  <a href ng-click="showTabModal(tab)" class="list-group-item clearfix" ng-repeat="tab in tabs">
-	    <h4 class="list-group-heading pull-left">{[{ tab.amount | currency }]}</h4>
-	    <ul class="list-inline list-unstyled pull-right">
-	    	<li><h4 class="list-group-heading">{[{ tab.sender_first_name }]}</h4></li>
-	    </ul>
+      <div class="row">
+        <div class="col-xs-6">
+          <h4 class="list-group-heading">{[{ tab.amount | currency }]}</h4>
+          <p class="list-group-item-text">{[{ tab.sender_first_name }]}</p>
+        </div>
+        <div class="col-xs-6">
+          <button type="button" class="btn btn-success pull-right" ng-if="!tab.accepted">Accept</button>
+          <button type="button" class="btn btn-success pull-right" ng-if="tab.accepted" ng-disabled="tab.accepted">Accepted</button>
+        </div>
+      </div>
 	  </a>
 	</div>
 </div>

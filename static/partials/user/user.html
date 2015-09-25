@@ -1,5 +1,18 @@
-<div class="panel panel-default">
-	<div class="panel-body">
-		<h1>{[{ usr.first_name }]} {[{ usr.last_name }]}</h1>
-	</div>
+<div class="row">
+  <div class="col-xs-12 col-sm-8 col-md-9 text-center">
+    <div class="panel panel-default">
+      <div class="panel-body">
+      <img src="/static/images/silhouette78.png" height="100px">
+      <h1>{[{ usr.first_name }]} {[{ usr.last_name }]}</h1>
+      <p>{[{ usr.bio }]}</p>
+    </div>
+  </div>
+  </div>
+  <div class="col-xs-12 col-sm-4 col-md-3">
+    <div class="panel panel-default">
+      <div class="panel-body">
+        <a ui-sref="tabs-open.amount({for: usr.email})" class="btn btn-primary btn-lg btn-block">Buy Me a Drink!</a>
+      </div>
+    </div>
+  </div>
 </div>

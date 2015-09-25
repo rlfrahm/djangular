@@ -107,13 +107,16 @@ angular.module('App')
 	};
 }])
 
-.controller('TabOpenCtrl', ['$rootScope', '$scope', '$state', '$modal', 'UserSearch', 'Tab', 'Source', function($rootScope, $scope, $state, $modal, UserSearch, Tab, Source) {
+.controller('TabOpenCtrl', ['$rootScope', '$scope', '$state', '$stateParams', '$modal', 'UserSearch', 'Tab', 'Source', function($rootScope, $scope, $state, $stateParams, $modal, UserSearch, Tab, Source) {
 	$scope.users = [];
 	$scope.searching = false;
 	$scope.term = '';
 	$scope.buyingType = 'tab';
 	$scope.tab = new Tab();
 	$scope.tab.emails = [];
+  console.log($stateParams);
+  if ($stateParams.for)
+    $scope.tab.emails.push($stateParams.for);
 	$scope.tab.amount = 10;
 	$scope.selectedSource = null;
 
