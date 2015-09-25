@@ -47,6 +47,8 @@ def loginHandler(request):
   return render(request, 'registration/login.html', {'form': form})
 
 def registerHandler(request):
+  if settings.SIGN_UP_LOCKED:
+    return render(request, 'registration/disabled.html')
   form = None
   if request.method == 'POST':
     form = RegisterForm(request.POST)

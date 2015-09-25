@@ -42,3 +42,6 @@ HAYSTACK_CONNECTIONS = {
         # 'URL': 'http://127.0.0.1:8983/solr/mysite',
     },
 }
+
+# Set this to true if you want to disable registration of new accounts
+SIGN_UP_LOCKED = False
