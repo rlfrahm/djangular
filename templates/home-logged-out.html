@@ -5,23 +5,24 @@
 {% block page %}
 <link href="{% static 'css/front.css' %}" rel="stylesheet">
 <div class="content">
-    <nav class="navbar navbar-transparent">
+    <nav class="navbar navbar-transparent" ng-init="navbarCollapsed=true">
         <div class="container-fluid">
             <div class="navbar-header">
-              <!-- <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+              <button type="button" class="navbar-toggle collapsed" ng-click="navbarCollapsed = !navbarCollapsed">
                 <span class="sr-only">Toggle navigation</span>
                 <span class="icon-bar"></span>
                 <span class="icon-bar"></span>
                 <span class="icon-bar"></span>
-              </button> -->
-              <a class="navbar-brand" href>My Drink Nation</a>
+              </button>
+              <a class="navbar-brand" href="{% url 'core:home' %}">MyDrinkNation</a>
             </div>
-            <!-- <div class="collapse navbar-collapse">
-                <ul class="nav navbar-nav navbar-right">
-                    <li><a href>Login</a></li>
-                    <li><a href>Register</a></li>
-                </ul>
-            </div> -->
+
+            <div class="collapse navbar-collapse" collapse="navbarCollapsed" ng-click="navbarCollapsed = !navbarCollapsed">
+              <ul class="nav navbar-nav navbar-right">
+                <li><a href="{% url 'core:about' %}">About</a></li>
+                <li><a href="{% url 'bars:bar-contact' %}">For Bars</a></li>
+              </ul>
+            </div>
         </div>
     </nav>
     <div class="container-fluid header">
@@ -67,182 +68,8 @@
         </ul>
     </div>
 </div>
-<!-- <link href="{% static 'css/soon.css' %}" rel="stylesheet"> -->
-<!-- <link href="{% static 'css/social_share.css' %}" rel="stylesheet"> -->
-<section id="header" class="hide">
-    <div class="container">
-        <div class="row">
-            <div class="col-md-12">
-                <div class="header ">
-                    <!-- HEADLINE -->
-                    <h3 data-animated="GoIn"><b><font color=aqua>my</font>Drink<font color=aqua>N</font>ation</b><br> A
-                        round with friends <br> around the world...</h3>
-
-                    <h3><font color=white>To Drinkers and Bartenders:</font></h3> <br><br>
-                    <h4> My<font color=#ff4500>Drink</font>Nation <font color=white>is the only bar related social app
-                        that connects you with your </font> friends at the bar
-                        anywhere in the world. </h4>
-
-                    <div>
-                        <a href="/about" class="btn btn-primary" role="button"
-                           style="padding-right: 10px">LEARN MORE</a>
-
-                        <a href="/tour" class="btn btn-info" role="button"
-                           style="padding-right: 10px">TAKE A TOUR</a>
-
-                        <a href="{% url 'user:login' %}" data-toggle="modal" class="btn btn-success">LOGIN FOR DRINK</a>
-                        {#                         <a href="/home/" class="btn btn-warning">ENTER</a>#}
-
-                    </div>
-                </div>
-
-
-                <div class="col-lg-4 col-lg-offset-4 mt centered">
-
-
-                    <hr>
-                    <div class="text-center center-block">
-                        <h4><font color=aqua>Follow...</font></h4>
-                        <a href="https://www.facebook.com/mydrinknation" target="_blank"><i id="social"
-                                                                                            class="fa fa-facebook-square fa-3x social-fb"></i></a>
-                        <a href="https://twitter.com/home?status=Tweet%20%40mydrinknation" target="_blank"><i
-                                id="social" class="fa fa-twitter-square fa-3x social-tw"></i></a>
-                        <a href='https://plus.google.com/share?url=www.mydrinknation.com/' target="_blank"><i
-                                id="social" class="fa fa-google-plus-square fa-3x social-gp"></i></a>
-
-                    </div>
-                    <hr>
-                </div>
-            </div>
-        </div>
-
-
-    </div>
-
-    <!-- LAYER OVER THE SLIDER TO MAKE THE WHITE TEXT READABLE -->
-    <div id="layer"></div>
-    <!-- END LAYER -->
-    <!-- START SLIDER -->
-    <div id="slider" class="rev_slider">
-        <ul>
-            <li data-transition="slideleft" data-slotamount="1"
-                data-thumb="assets/img/slider/Happy-group-of-friends-go-clubbing-000042783786_XXXLarge.jpg">
-                <img src="{% static 'images/Happy-group-of-friends-go-clubbing-1400x933.png' %}">
-            </li>
-            <li data-transition="slideleft" data-slotamount="1" data-thumb="assets/img/slider/2.jpg">
-                <img src="{% static 'static_dirs/img/Buttons_BG/2.jpg' %}">
-            </li>
-            <li data-transition="slideleft" data-slotamount="1"
-                data-thumb="assets/img/slider/assets/img/slider/glass-35477_640.png">
-                <img src="{% static 'static_dirs/img/Buttons_BG/glass-35477_640.png' %}">
-            </li>
-            <li data-transition="slideleft" data-slotamount="1" data-thumb="{% static 'assets/img/slider/BG03.jpg' %}">
-                <img src="{% static 'static_dirs/img/Buttons_BG/BG03.jpg' %}">
-            </li>
-        </ul>
-    </div>
-    <!-- END SLIDER -->
-    <footer class="footer">
-        <div class="container">
-            <p class="inverse">Copyright &copy;2014-2015 My Drink Nation, a Tallawah<font color=#ff4500>Works</font>
-                Media LLC Company. All Rights Reserved. </p>
-        </div>
-    </footer>
-</section>
 {% endblock %}
-<!--navigator-->
-{% block modal_login %}
-    <div class="modal fade" id="login" role="dialog">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span>
-                        <span class="sr-only">Close</span></button>
-                    <h3 class="modal-title omb_authTitle">MY DRINK NATION</h3>
-                </div>
-                <!--modal header-->
-                <div class="modal-body">
-                    <div class="omb_login">
-                        <div class="row omb_row-sm-offset-3 omb_socialButtons">
-                            <div class="col-xs-3 col-sm-2">
-                                <a href="#" class="btn btn-lg btn-block omb_btn-facebook">
-                                    <i class="fa fa-facebook visible-xs"></i>
-                                    <span class="hidden-xs">Facebook</span>
-                                </a>
-                            </div>
-                            <div class="col-xs-3 col-sm-2">
-                                <a href="#" class="btn btn-lg btn-block omb_btn-twitter">
-                                    <i class="fa fa-twitter visible-xs"></i>
-                                    <span class="hidden-xs">Twitter</span>
-                                </a>
-                            </div>
-                            <div class="col-xs-3 col-sm-2">
-                                <a href="#" class="btn btn-lg btn-block omb_btn-google">
-                                    <i class="fa fa-google-plus visible-xs"></i>
-                                    <span class="hidden-xs">Google+</span>
-                                </a>
-                            </div>
-                        </div>
-                        <!--row holds facebook, twitter and google+ buttons-->
 
-                        <div class="row omb_row-sm-offset-3 omb_loginOr">
-                            <div class="col-xs-12 col-sm-6">
-                                <hr class="omb_hrOr">
-                                <span class="omb_spanOr">or</span>
-                            </div>
-                        </div>
-                        <!--or divider-->
-                        <div class="row omb_row-sm-offset-3">
-                            <div class="col-xs-12 col-sm-6">
-                                <form class="omb_loginForm" action="/login"
-                                      autocomplete="off" method="post">{% csrf_token %}
-                                    <div class="input-group">
-                                        <span class="input-group-addon"><i class="fa fa-user"></i></span>
-                                        <input type="text" class="form-control" name="{{ form.username }}"
-                                               placeholder="email address">
-                                    </div>
-                                    <span class="help-block"></span>
-
-                                    <div class="input-group">
-                                        <span class="input-group-addon"><i class="fa fa-lock"></i></span>
-                                        <input type="password" class="form-control" name="{{ form.password }}"
-                                               placeholder="Password">
-                                    </div>
-                                    <span class="help-block">Password error</span>
-                                    <button class="btn btn-lg btn-primary btn-block" type="submit">Login</button>
-                                </form>
-                                <!--email form-->
-                            </div>
-                        </div>
-                        <div class="row omb_row-sm-offset-3">
-                            <div class="col-xs-12 col-sm-3">
-                                <label class="checkbox">
-                                    <input type="checkbox" value="remember-me">Remember Me
-                                </label>
-                            </div>
-                            <div class="col-xs-12 col-sm-3">
-                                <p class="omb_forgotPwd">
-                                    <a href="#">Forgot password?</a>
-                                </p>
-                            </div>
-                        </div>
-                    </div>
-                    <!--login to trigger modal-->
-                </div>
-                <!--modal body-->
-            </div>
-            <!--modal dialog-->
-        </div>
-        <!--modal content-->
-    </div><!--content to display within modal and "login_id" triggers modal from navbar-->
-<!-- Bootstrap core JavaScript
-================================================== -->
-<!-- Placed at the end of the document so the pages load faster -->
-<script src="{% static 'static_dirs/js/soon/plugins.js' %}"></script>
-<script src="{% static 'static_dirs/js/soon/jquery.themepunch.revolution.min.js' %}"></script>
-<script src="{% static 'static_dirs/js/soon/custom.js' %}"></script>
-
-</body>
-<!-- END BODY -->
-
+{% block scripts %}
+<script type="text/javascript" src="{% static "js/init.js" %}"></script>
 {% endblock %}

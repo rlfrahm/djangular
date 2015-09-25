@@ -1,0 +1,59 @@
+{% extends "page.html" %}
+{% load widget_tweaks %}
+
+{% block title %}For Bars{% endblock %}
+
+{% block content %}
+<div class="page-header text-center">
+	<h1>My Drink Nation for Bars</h1>
+</div>
+<div class="row">
+	<div class="col-xs-12 col-sm-9 col-md-8 col-centered text-center">
+		<h3>My Drink Nation aims to give bars full control over interacting with drinkers and increasing revenue.</h3>
+		<h3>Interested in joining the My Drink Nation network? Inquire below.</h3> 
+	</div>
+</div>
+<div class="row">
+	<div class="col-xs-12 col-sm-9 col-md-6 col-centered">
+	  <div class="panel panel-default">
+	    <div class="panel-body">
+	      <form action="{% url 'bars:bar-contact' %}" method="post">
+	        {% csrf_token %}
+	        {{ form.non_field_errors }}
+	        <div class="form-group">
+	          {{ form.bar_name.errors }}
+	          {{ form.bar_name.label }}
+	          {{ form.bar_name|add_class:"form-control" }}
+	        </div>
+	        <div class="form-group">
+	          {{ form.name.errors }}
+	          {{ form.name.label }}
+	          {{ form.name|add_class:"form-control" }}
+	        </div>
+	        <div class="form-group">
+	          {{ form.email.errors }}
+	          {{ form.email.label }}
+	          {{ form.email|add_class:"form-control" }}
+	        </div>
+	        <div class="form-group">
+	          {{ form.phone.errors }}
+	          {{ form.phone.label }}
+	          {% render_field form.phone class="form-control" type="tele" %}
+	        </div>
+	        <div class="form-group">
+	          {{ form.license_number.errors }}
+	          {{ form.license_number.label }}
+	          {% render_field form.license_number class="form-control" type="tele" %}
+	        </div>
+	        <div class="form-group">
+	          {{ form.comments.errors }}
+	          {{ form.comments.label }}
+	          {{ form.comments|add_class:"form-control" }}
+	        </div>
+	        <button type="submit" class="btn btn-primary btn-block btn-lg">Submit</button>
+	      </form>
+	    </div>
+	  </div>
+	</div>
+</div>
+{% endblock %}

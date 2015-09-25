@@ -30,3 +30,18 @@ def send_tab_invite(request, tab, invite):
   msg.to = [invite.email]
   msg.send()
   return msg
+
+def send_us_bar_inquiry(request, name, bar_name, email, phone, license, comments):
+  msg = EmailMessage()
+  msg.subject = 'Bar Inquiry: %s' % bar_name
+  msg.body = """
+  Who: %s with %s
+  License # (last six): %s
+  Email: %s
+  Phone: %s
+  Comments: %s
+  """ % (name, bar_name, license, email, phone, comments)
+  msg.from_email = 'no-reply@mydrinknation.com'
+  msg.to = ['frahmryan@gmail.com']
+  msg.send()
+  return msg

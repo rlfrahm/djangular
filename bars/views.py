@@ -5,9 +5,9 @@ from django.core.urlresolvers import reverse
 from django.utils.text import slugify
 from django.conf import settings
 
-from .forms import RegisterForm
+from .forms import RegisterForm, ContactForm
 from .models import Bar, Bartender, BartenderInvite
-from .emails import send_bartender_invite
+from .emails import send_bartender_invite, send_us_bar_inquiry
 
 # Create your views here.
 @login_required
@@ -51,3 +51,20 @@ def bartenderInviteHandler(request, bar_id, invite_id):
     bartender.save()
     invite.delete()
     return redirect(reverse('core:home') + '#/bars/%s' % bar_id)
+
+def barsContactHandler(request):
+  if request.method == 'POST':
+    form = ContactForm(request.POST)
+    if form.is_valid():
+      send_us_bar_inquiry(
+        request,
+        form.cleaned_data['name'],
+        form.cleaned_data['bar_name'],
+        form.cleaned_data['email'],
+        form.cleaned_data['phone'],
+        form.cleaned_data['license_number'],
+        form.cleaned_data['comments'])
+      form = ContactForm()
+  else:
+    form = ContactForm()
+  return render(request, 'bars/contact.html', {'form': form})

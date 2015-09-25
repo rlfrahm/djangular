@@ -6,6 +6,8 @@ django-positions==0.5.2
 django-ratings==0.3.7
 django-widget-tweaks==1.4.1
 djangorestframework==3.2.3
+docopt==0.4.0
+mandrill==1.0.57
 Pillow==2.9.0
 Pint==0.5.2
 pysolr==3.3.2
