@@ -10,6 +10,7 @@ from django.db.models import Q
 from django.conf import settings
 
 from .serializers import RegisterSerializer, LoginSerializer, BarSerializer, InviteSerializer, SearchSerializer, TabSerializer, CreditCardSerializer, PayBarSerializer, UserSerializer, AcceptTabSerializer
+from .decorators import HasGroupPermission, is_in_group, BAR_OWNERS, DRINKERS
 
 from account.models import UserProfile
 from bars.models import Bar, Bartender, BartenderInvite, Checkin, Tab
@@ -66,7 +67,8 @@ class UserHandler(APIView):
       'email': request.user.email,
       'id': request.user.pk,
       'first_name': request.user.first_name,
-      'last_name': request.user.last_name
+      'last_name': request.user.last_name,
+      'bar_owner': is_in_group(request.user, BAR_OWNERS)
       })
 
   def post(self, request, format=None):
@@ -101,6 +103,11 @@ class UserBarsHandler(APIView):
   """
   Get all bars owned by user
   """
+  permission_classes = [HasGroupPermission]
+  required_groups = {
+    'GET': [BAR_OWNERS],
+  }
+
   def get(self, request, format=None):
     bs = request.user.bar_set.all()
     bars = []
@@ -143,6 +150,13 @@ class BarHandler(APIView):
   """
   CRUD on bar
   """
+  permission_classes = [HasGroupPermission]
+  required_groups = {
+    'GET': [],
+    'POST': [BAR_OWNERS],
+    'DELETE': [BAR_OWNERS],
+  }
+
   def get(self, request, bar_id, format=None):
     b = get_object_or_404(Bar, pk=self.kwargs.get('bar_id'))
     bar = {
@@ -150,6 +164,10 @@ class BarHandler(APIView):
       'street': b.street,
       'city': b.city,
       'province': b.province,
+      'postal': b.postal,
+      'country': b.country,
+      'lat': b.lat,
+      'lng': b.lng,
       'id': b.pk,
       'owner': b.owner.pk
     }
@@ -174,6 +192,12 @@ class BarsHandler(APIView):
   """
   CRUD for Bar
   """
+  permission_classes = [HasGroupPermission]
+  required_groups = {
+    'GET': [DRINKERS],
+    'POST': [DRINKERS],
+  }
+
   def get(self, request, format=None):
     bs = Bar.objects.all()
     bars = []
@@ -312,7 +336,7 @@ class TabsHandler(APIView):
   CRUD operations for user tabs
   """
   def get(self, request, format=None):
-    tabs = Tab.objects.filter(receiver=request.user).order_by('-accepted', '-created')
+    tabs = Tab.objects.filter(receiver=request.user).order_by('accepted', '-created')
     t = []
     for tab in tabs:
       t.append({
@@ -368,7 +392,7 @@ class TabHandler(APIView):
   Handles the acceptance of a tab
   """
   def post(self, request, tab_id, format=None):
-    serializer = AcceptTabSerializer(request.data)
+    serializer = AcceptTabSerializer(data=request.data)
     serializer.is_valid(raise_exception=True)
     tab = get_object_or_404(Tab, pk=tab_id)
     accepted = serializer.validated_data['accepted']
@@ -384,7 +408,7 @@ class TabHandler(APIView):
 
     return Response({
       'id': tab.pk,
-      'accepted': False
+      'accepted': tab.accepted
       })
 
 class SourcesHandler(APIView):

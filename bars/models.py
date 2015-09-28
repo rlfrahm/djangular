@@ -18,10 +18,13 @@ class Bar(models.Model):
 	owner = models.ForeignKey(settings.AUTH_USER_MODEL, null=True)
 
 	# Address
-	street = models.TextField(blank=True, null=True)
-	city = models.TextField(blank=True, null=True)
-	province = models.TextField(blank=True, null=True)
-	code = models.TextField(blank=True, null=True)
+	street = models.CharField(max_length=255, blank=True, null=True)
+	city = models.CharField(max_length=255, blank=True, null=True)
+	province = models.CharField(max_length=255, blank=True, null=True)
+	postal = models.CharField(max_length=25, blank=True, null=True)
+	country = models.CharField(max_length=2, default='US')
+	lat = models.DecimalField(max_digits=16, decimal_places=14)
+	lng = models.DecimalField(max_digits=16, decimal_places=14)
 
 	# Image
 	image = models.ImageField(upload_to='bars', blank=True, null=True)

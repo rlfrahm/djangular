@@ -7,15 +7,17 @@
   </div>
 </div>
 <script type="text/ng-template" id="invite-bartender.html">
-  <form name="form" ng-submit="$close(invite.email)">
+  <form name="form" ng-submit="$close(invite)">
     <div class="modal-header">
         <h3 class="modal-title">Invite Bartender</h3>
     </div>
     <div class="modal-body">
-          <div class="form-group">
-            <label>Enter email</label>
-            <input type="email" class="form-control input-lg" ng-model="invite.email" name="email" required focus>
-          </div>
+      <div class="form-group" dropdown is-open="searching">
+        <input type="text" class="form-control input-lg" placeholder="Search..." ng-model="search.term" ng-model-options="{ debounce: 500 }" ng-change="search(search.term)" dropdown-toggle>
+        <ul class="dropdown-menu" style="width:100%" ng-show="users">
+          <li ng-repeat="user in users"><a href ng-click="selectUser(user)">{[{ (user.first_name)?user.first_name + ' ' + user.last_name:user.email }]}</a></li>
+        </ul>
+      </div>
     </div>
     <div class="modal-footer">
         <button class="btn btn-link btn-lg" type="button" ng-click="$dismiss('cancel')">Cancel</button>

@@ -27,7 +27,14 @@ angular.module('App')
 }])
 
 .controller('BarCtrl', ['$scope', '$state', '$stateParams', 'Bar', 'Bartenders', 'Checkin', function($scope, $state, $stateParams, Bar, Bartenders, Checkin) {
-	$scope.bar = Bar.get({id: $stateParams.id});
+	$scope.bar = Bar.get({id: $stateParams.id}, function() {
+    var map = new google.maps.Map(document.getElementById('map'), {
+      center: {lat: $scope.bar.lat, lng: $scope.bar.lng},
+      zoom: 8,
+      draggable: false,
+      scrollwheel: false
+    });
+  });
 	$scope.bartenders = Bartenders.query({id: $stateParams.id});
 	$scope.checkins = Checkin.query({id: $stateParams.id});
 
@@ -44,6 +51,65 @@ angular.module('App')
 .controller('BarAddCtrl', ['$scope', '$state', 'Bar', function($scope, $state, Bar) {
 	$scope.newbar = new Bar();
 
+  var autocomplete, placeSearch;
+  var componentForm = {
+    street_number: 'short_name',
+    route: 'long_name',
+    locality: 'long_name',
+    administrative_area_level_1: 'short_name',
+    country: 'short_name',
+    postal_code: 'short_name'
+  }, tmp = {};
+
+  autocomplete = new google.maps.places.Autocomplete(
+    /** @type {!HTMLInputElement} */(document.getElementById('autocomplete')),
+    {types: ['geocode']});
+
+  autocomplete.addListener('place_changed', fillInAddress);
+
+  function fillInAddress() {
+    // Get the place details from the autocomplete object.
+    var place = autocomplete.getPlace();
+
+    // Get each component of the address from the place details
+    // and fill the corresponding field on the form.
+    for (var i = 0; i < place.address_components.length; i++) {
+      var addressType = place.address_components[i].types[0];
+      if (componentForm[addressType]) {
+        var val = place.address_components[i][componentForm[addressType]];
+        tmp[addressType] = val;
+      }
+    }
+
+    $scope.newbar.street = tmp.street_number + ' ' + tmp.route;
+    $scope.newbar.city = tmp.locality;
+    $scope.newbar.province = tmp.administrative_area_level_1;
+    $scope.newbar.postal = tmp.postal_code;
+    $scope.newbar.country = tmp.country;
+    console.log(place);
+    $scope.newbar.lat = place.geometry.location.lat();
+    $scope.newbar.lng = place.geometry.location.lng();
+    console.log($scope.newbar);
+  }
+
+  // Bias the autocomplete object to the user's geographical location,
+  // as supplied by the browser's 'navigator.geolocation' object.
+  function geolocate() {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(function(position) {
+        var geolocation = {
+          lat: position.coords.latitude,
+          lng: position.coords.longitude
+        };
+        var circle = new google.maps.Circle({
+          center: geolocation,
+          radius: position.coords.accuracy
+        });
+        autocomplete.setBounds(circle.getBounds());
+      });
+    }
+  }
+
 	$scope.create = function() {
 		$scope.newbar.$save(function() {
 			$state.go('bars-mine');
@@ -51,8 +117,9 @@ angular.module('App')
 	};
 }])
 
-.controller('BarSettingsCtrl', ['$rootScope', '$scope', '$state', '$stateParams', '$modal', 'Bar', 'Bartenders', function($rootScope, $scope, $state, $stateParams, $modal, Bar, Bartenders) {
+.controller('BarSettingsCtrl', ['$rootScope', '$scope', '$state', '$stateParams', '$modal', 'Bar', 'Bartenders', 'UserSearch', function($rootScope, $scope, $state, $stateParams, $modal, Bar, Bartenders, UserSearch) {
 	$scope.bar = Bar.get({id: $stateParams.id});
+  $scope.search = {term:null};
 	
 	$scope.shouldSave = false;
 
@@ -77,6 +144,17 @@ angular.module('App')
 		$scope.shouldSave = false;
 	};
 
+  $scope.search = function(term) {
+    $scope.users = UserSearch.query({term: term}, function() {
+      $scope.searching = true;
+    });
+  };
+
+  $scope.selectUser = function(u) {
+    $scope.search.term = (u.first_name)?u.first_name + ' ' + u.last_name:u.email;
+    $scope.invite = u;
+  };
+
 	$scope.confirmDelete = function() {
 		var m = $modal.open({
 			templateUrl: 'confirm-delete.html',
@@ -95,14 +173,15 @@ angular.module('App')
 	$scope.inviteBartender = function() {
 		var m = $modal.open({
 			templateUrl: 'invite-bartender.html',
-			size: 'sm'
+			size: 'sm',
+      scope: $scope
 		});
 
-		m.result.then(function(email) {
+		m.result.then(function(user) {
+      console.log(user);
 			var bartender = new Bartenders();
-			bartender.email = email;
+			bartender.email = user.email;
 			bartender.$save({id: $stateParams.id});
-			// $scope.bartenders.$save();
 		});
 	};
 }])
@@ -114,7 +193,6 @@ angular.module('App')
 	$scope.buyingType = 'tab';
 	$scope.tab = new Tab();
 	$scope.tab.emails = [];
-  console.log($stateParams);
   if ($stateParams.for)
     $scope.tab.emails.push($stateParams.for);
 	$scope.tab.amount = 10;
@@ -184,6 +262,7 @@ angular.module('App')
 }])
 
 .controller('TabCtrl', ['$scope', '$modal', 'MyTab', 'Tab', 'BarPayment', function($scope, $modal, MyTab, Tab, BarPayment) {
+  $scope.title = 'Tab';
 	$scope.tabs = Tab.query()
 	var t = MyTab.get(function() {
 		$scope.tab = t.tab;
@@ -217,7 +296,7 @@ angular.module('App')
 
 	$scope.confirmTab = function(tab, decision) {
 		tab.accepted = decision;
-		tab.$save();
+		tab.$save({id: tab.id});
 		$scope.$close();
 	};
 
@@ -235,62 +314,18 @@ angular.module('App')
   };
 }])
 
-.controller('UserProfileCtrl', ['$scope', 'Me', 'Source', 'months', function($scope, Me, Source, months) {
+.controller('UserProfileCtrl', ['$scope', 'Me', 'Source', function($scope, Me, Source) {
 	$scope.user = Me.get();
-	$scope.cards = Source.query();
-	$scope.months = months;
-	$scope.newcard = {
-		month: '01'
-	};
 
-	$scope.setMonth = function(month) {
-		$scope.newcard.month = month;
-	};
+  $scope.getCards = function() {
+    $scope.cards = Source.query();
+  };
+
+  $scope.getCards();
 
 	$scope.saveUser = function(form, user) {
 		if (form.$invalid) return;
-    console.log(user);
 		user.$save();
-	};
-
-	$scope.createNewCard = function(form, newcard) {
-		if (form.$invalid) return;
-		$scope.adding = true;
-
-		Stripe.setPublishableKey(pk);
-
-		Stripe.card.createToken({
-      number: newcard.number,
-      cvc: newcard.cvc,
-      exp_month: newcard.month,
-      exp_year: newcard.year,
-      currency: newcard.currency || 'usd'
-    }, stripeResponseHandler);
-
-    function stripeResponseHandler(status, response) {
-	    var $form = form;
-	    $scope.adding = false;
-
-	    if (response.error) {
-	      $scope.$digest();
-	      // Show the errors on the form
-	      // $form.find('.payment-errors').text(response.error.message);
-	      // $form.find('button').prop('disabled', false);
-	    } else {
-	      // response contains id and card, which contains additional card details
-	      var token = response.id;
-	      $scope.newcard.stripe_token = token;
-	      $scope.$digest();
-	      var c = new Source();
-	      c.token = token;
-	      c.$save();
-	      // element[0].submit();
-	      // Insert the token into the form so it gets submitted to the server
-	      // $form.append($('<input type="hidden" name="stripeToken" />').val(token));
-	      // and submit
-	      // $form.get(0).submit();
-	    }
-	  }
 	};
 }])
 

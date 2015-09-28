@@ -6,7 +6,7 @@
   <div class="list-group-item">
     <div class="form-group" dropdown is-open="searching">
       <input type="text" class="form-control input-lg" placeholder="Search..." ng-model="term" ng-model-options="{ debounce: 500 }" ng-change="search(term)" dropdown-toggle>
-      <ul class="dropdown-menu" style="width:100%">
+      <ul class="dropdown-menu" style="width:100%" ng-show="users">
         <li ng-repeat="user in users"><a href ng-click="selectUser(user)">{[{ user.email }]}</a></li>
       </ul>
     </div>

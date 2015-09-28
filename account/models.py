@@ -8,13 +8,6 @@ from bars.models import Bar
 
 # Create your models here.
 class UserProfile(models.Model):
-    DRINKER = 'Drinker'
-    BARTENDER = 'Bartender'
-    BUSINESS = 'Business'
-
-    USER_TYPE_CHOICES=((DRINKER, 'Drinker'), (BARTENDER, 'Bartender'), (BUSINESS, 'Business'),)
-
-
     user = models.OneToOneField(User, related_name="profile")
     created = models.DateTimeField(auto_now_add=True, auto_now=False)
     updated = models.DateTimeField(auto_now_add=False, auto_now=True)
@@ -25,8 +18,9 @@ class UserProfile(models.Model):
     ip_address = models.CharField(max_length=120, default='ABC')
     picture = models.ImageField(upload_to='profile_images', blank=True)
 
+    # The user's tab is the amount of money that has been given to them
+    # and not used yet.
     tab = models.DecimalField(max_digits=6, decimal_places=2, default=0)
-
 
     def save(self, *args, **kwargs):
         try:

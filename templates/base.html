@@ -1,7 +1,7 @@
 {% load staticfiles %}
 
 <!DOCTYPE html>
-<html>
+<html ng-app="App">
   <head>
     <title>{% block title %}{% endblock %} - My Drink Nation</title>
     <meta charset="utf-8">
@@ -15,7 +15,7 @@
     <link rel="stylesheet" href="{% static "css/style.css" %}">
     {% block base %}{% endblock %}
   </head>
-  <body ng-app="App">
+  <body>
     <div class="page">
       {% block page %}{% endblock %}
     </div>

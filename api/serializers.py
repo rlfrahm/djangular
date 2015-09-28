@@ -40,7 +40,7 @@ class UserSerializer(serializers.Serializer):
 class BarSerializer(serializers.ModelSerializer):
   class Meta:
     model = Bar
-    exclude = ('image', 'code')
+    exclude = ('image',)
 
   def create(self, validated_data):
     bar = Bar()
@@ -48,6 +48,10 @@ class BarSerializer(serializers.ModelSerializer):
     bar.street = validated_data.get('street')
     bar.city = validated_data.get('city')
     bar.province = validated_data.get('province')
+    bar.postal = validated_data.get('postal')
+    bar.country = validated_data.get('country')
+    bar.lat = validated_data.get('lat')
+    bar.lng = validated_data.get('lng')
     bar.owner = self.context['request'].user
     bar.save()
     return bar

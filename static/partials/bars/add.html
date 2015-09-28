@@ -4,23 +4,12 @@
       <form enctype="multipart/form-data" ng-submit="create(newbar)">
         <div class="form-group">
         	<label>Bar Name</label>
-        	<input type="text" class="form-control input-lg" name="name" ng-model="newbar.name" focus>
+        	<input type="text" class="form-control input-lg" name="name" ng-model="newbar.name" focus required>
         </div>
-        <fieldset>
-          <legend>Address</legend>
-          <div class="form-group">
-          	<label>Street</label>
-          	<input type="text" class="form-control input-lg" name="street" ng-model="newbar.street">
-          </div>
-          <div class="form-group">
-          	<label>City</label>
-            <input type="text" class="form-control input-lg" name="city" ng-model="newbar.city">
-          </div>
-          <div class="form-group">
-          	<label>State</label>
-            <input type="text" class="form-control input-lg" name="province" ng-model="newbar.province">
-          </div>
-        </fieldset>
+        <div class="form-group">
+          <label>Location</label>
+          <input type="text" class="form-control input-lg" name="address" ng-model="newbar.address" required id="autocomplete">
+        </div>
         <button type="submit" class="btn btn-primary btn-lg btn-block">Create</button>
       </form>
     </div>

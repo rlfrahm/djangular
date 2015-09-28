@@ -5,6 +5,7 @@ from django.contrib.auth.models import User
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.core.urlresolvers import reverse
+from django.contrib.auth.models import Group
 
 from .forms import LoginForm, RegisterForm, ProfileForm, StripeConnectRedirectForm
 from .models import UserProfile, StripeCustomer, StripeMerchant
@@ -60,6 +61,9 @@ def registerHandler(request):
 
       user = User.objects.create_user(username, email, password)
       user.save()
+
+      group = Group.objects.get(name='Drinkers')
+      user.groups.add(group)
 
       profile = UserProfile(user=user, dob=dob)
       profile.save()

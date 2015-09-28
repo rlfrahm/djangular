@@ -1,5 +1,3 @@
-<iframe width="100%" height="450" frameborder="0" style="border:0"
-src="https://www.google.com/maps/embed/v1/place?q=Ames,IA&key=AIzaSyAyJXdPAlRBVqqTqgrWodd11IqCg_-J68w" allowfullscreen></iframe>
 <div class="page-header clearfix">
 	<h1 class="pull-left">{[{ bar.name }]}&nbsp;<em><small>{[{ bar.street }]}, {[{ bar.city }]}, {[{ bar.province }]}</small></em></h1>
 	<ul class="list-inline list-unstyled pull-right">
@@ -7,6 +5,7 @@ src="https://www.google.com/maps/embed/v1/place?q=Ames,IA&key=AIzaSyAyJXdPAlRBVq
 		<li ng-if="bar.owner==user.id"><a ui-sref="bar-settings.general({id: bar.id})" class="btn btn-default btn-lg"><i class="fa fa-cog"></i></a></li>
 	</ul>
 </div>
+<div id="map" style="width:100%;height:300px"></div>
 <div class="row">
 	<div class="col-xs-12 col-sm-12 col-md-6">
 		<div class="list-group">

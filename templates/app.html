@@ -28,7 +28,7 @@
         <li class="dropdown" dropdown>
           <a href="#" dropdown-toggle ng-click="$event.stopPropagation()">{{ user }} <span class="caret"></span></a>
           <ul class="dropdown-menu" dropdown-menu>
-            <li><a ui-sref="bars-mine">My bars</a></li>
+            <li><a ng-if="user.bar_owner" ui-sref="bars-mine">My bars</a></li>
             <li><a ui-sref="profile">Profile</a></li>
             <li><a href="{% url 'user:logout' %}">Logout</a></li>
           </ul>
@@ -46,7 +46,7 @@
 <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.4.5/angular-resource.min.js"></script>
 <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/angular-ui-router/0.2.15/angular-ui-router.min.js"></script>
 <script type="text/javascript" src="https://js.stripe.com/v2/" async></script>
-<!-- <script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAyJXdPAlRBVqqTqgrWodd11IqCg_-J68w&libraries=places"></script> -->
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAyJXdPAlRBVqqTqgrWodd11IqCg_-J68w&libraries=places"></script>
 <script type="text/javascript" src="{% static "js/api.js" %}"></script>
 <script type="text/javascript" src="{% static "js/app.js" %}"></script>
 <script type="text/javascript" src="{% static "js/controllers.js" %}"></script>

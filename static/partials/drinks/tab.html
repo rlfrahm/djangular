@@ -6,7 +6,7 @@
 </div>
 <div class="input-group" bar-search dropdown>
 	<input type="text" class="form-control input-lg" placeholder="Search for bar.." ng-model="term" ng-model-options="{ debounce: 500 }" ng-change="searchForBar(term)" dropdown-toggle>
-	<ul class="dropdown-menu" style="width:100%">
+	<ul class="dropdown-menu" style="width:100%" ng-show="barslist">
     <li ng-repeat="bar in barslist"><a href ng-click="selectBar(bar)">{[{ bar.name }]}</a></li>
   </ul>
 	<span class="input-group-btn">
@@ -26,7 +26,6 @@
         </div>
         <div class="col-xs-6">
           <button type="button" class="btn btn-success pull-right" ng-if="!tab.accepted">Accept</button>
-          <button type="button" class="btn btn-success pull-right" ng-if="tab.accepted" ng-disabled="tab.accepted">Accepted</button>
         </div>
       </div>
 	  </a>
@@ -49,6 +48,6 @@
 		</div>
   </div>
   <div class="modal-footer">
-  	<button type="submit" class="btn btn-link btn-lg" ng-click="$dismiss()">Close</button>
+  	<button type="submit" class="btn btn-link btn-lg btn-block center" ng-click="$dismiss()">Decide Later</button>
   </div>
 </script>
