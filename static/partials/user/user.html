@@ -1,12 +1,23 @@
 <div class="row">
-  <div class="col-xs-12 col-sm-8 col-md-9 text-center">
-    <div class="panel panel-default">
+  <div class="col-xs-12 col-sm-8 col-md-9">
+    <div class="panel panel-default text-center">
       <div class="panel-body">
-      <img src="/static/images/silhouette78.png" height="100px">
-      <h1>{[{ usr.first_name }]} {[{ usr.last_name }]}</h1>
-      <p>{[{ usr.bio }]}</p>
+        <img src="/static/images/silhouette78.png" height="100px">
+        <h1>{[{ usr.first_name }]} {[{ usr.last_name }]}</h1>
+        <p>{[{ usr.bio }]}</p>
+      </div>
     </div>
-  </div>
+    <div class="panel panel-default">
+      <div class="list-group">
+        <div class="list-group-item">
+          <h3 class="list-group-item-heading">Recent Checkins</h3>
+        </div>
+        <a ui-sref="bar-detail({id: checkin.bar_id})" class="list-group-item" ng-repeat="checkin in usr.checkins">
+          <h4 class="list-group-item-heading">{[{ checkin.bar_name }]}</h4>
+          <p class="list-group-item-text">{[{ checkin.when | formatDate }]}</p>
+        </a>
+      </div>
+    </div>
   </div>
   <div class="col-xs-12 col-sm-4 col-md-3">
     <div class="panel panel-default">

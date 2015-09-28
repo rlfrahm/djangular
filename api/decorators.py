@@ -1,6 +1,6 @@
 from rest_framework import permissions
 
-BAR_OWNERS = 'Bar Owner'
+BAR_OWNERS = 'Bar Owners'
 DRINKERS = 'Drinkers'
 
 def is_in_group(user, group_name):

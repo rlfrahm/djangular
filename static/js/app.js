@@ -88,7 +88,11 @@ angular.module('App', ['Api', 'ui.bootstrap', 'ui.router'])
     .state('bars-add', {
       url: '/bars/mine/add',
       templateUrl: 'static/partials/bars/add.html',
-      controller: 'BarAddCtrl'
+      controller: 'BarAddCtrl',
+      access: {
+        permissions: ['BarOwner'],
+        permissionType: 'or'
+      }
     })
     .state('bar-settings', {
       url: '/bars/:id/settings',
@@ -114,9 +118,13 @@ angular.module('App', ['Api', 'ui.bootstrap', 'ui.router'])
     });
 }])
 
-.run(['$rootScope', '$state', 'Auth', 'Me', function($rootScope, $state, Auth, Me) {
+.run(['$rootScope', '$state', 'Auth', 'Me', 'Authorization', function($rootScope, $state, Auth, Me, Authorization) {
   if (!$rootScope.user) {
-    $rootScope.user = Me.get();
+    $rootScope.user = Me.get(function() {
+      authorize();
+    });
+  } else {
+    authorize();
   }
 
   $rootScope.logout = function() {
@@ -125,6 +133,39 @@ angular.module('App', ['Api', 'ui.bootstrap', 'ui.router'])
       window.location.href = '/';
     });
   };
+
+  function authorize() {
+    $rootScope.$on('$stateChangeStart', function (event, next) {
+      var authorised;
+      if (next.access !== undefined) {
+        if (Authorization.authorize(next.access))
+          $state.go(next.name);
+          // authorised = authorization.authorize(next.access.loginRequired, next.access.permissions, next.access.permissionCheckType);
+          // if (authorised === jcs.modules.auth.enums.authorised.loginRequired) {
+          //     $location.path(jcs.modules.auth.routes.login);
+          // } else if (authorised === jcs.modules.auth.enums.authorised.notAuthorised) {
+          //     $location.path(jcs.modules.auth.routes.notAuthorised).replace();
+          // }
+      }
+    });
+  }
+}])
+
+.service('Authorization', ['$rootScope', function($rootScope) {
+  this.authorize = function(access) {
+    if (access.permissionType === 'or') {
+      for (var k in access.permissions) {
+        if (check(access.permissions[k]))
+          return;
+      }
+    }
+  };
+
+  function check(perm) {
+    if (perm === 'BarOwner') {
+      return ($rootScope.user.bar_owner === true);
+    }
+  }
 }])
 
 .directive('buyDrinks', ['$rootScope', function($rootScope) {
@@ -202,5 +243,12 @@ angular.module('App', ['Api', 'ui.bootstrap', 'ui.router'])
     '10': 'October',
     '11': 'November',
     '12': 'December'
+  };
+}])
+
+.filter('formatDate', [function() {
+  return function(input) {
+    console.log(input);
+    return new Date(input).toLocaleString();
   };
 }]);

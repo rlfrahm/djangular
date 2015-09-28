@@ -50,7 +50,7 @@ def bartenderInviteHandler(request, bar_id, invite_id):
     bartender.bar = get_object_or_404(Bar, pk=bar_id)
     bartender.save()
     invite.delete()
-    return redirect(reverse('core:home') + '#/bars/%s' % bar_id)
+  return redirect(reverse('core:home') + '#/bars/%s' % bar_id)
 
 def barsContactHandler(request):
   if request.method == 'POST':

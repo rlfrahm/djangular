@@ -5,7 +5,12 @@
 		<li ng-if="bar.owner==user.id"><a ui-sref="bar-settings.general({id: bar.id})" class="btn btn-default btn-lg"><i class="fa fa-cog"></i></a></li>
 	</ul>
 </div>
-<div id="map" style="width:100%;height:300px"></div>
+<div class="row">
+	<div class="col-xs-12">
+		<div id="map" style="width:100%;height:300px"></div>
+	</div>
+</div>
+<br>
 <div class="row">
 	<div class="col-xs-12 col-sm-12 col-md-6">
 		<div class="list-group">
@@ -14,7 +19,7 @@
 			</div>
 			<a ui-sref="user({id: checkin.user})" class="list-group-item" ng-repeat="checkin in checkins">
 				<h4 class="list-group-item-heading">{[{ checkin.firstname || 'Joe Blow' }]}</h4>
-				<p class="list-group-item-text">{[{ formatDate(checkin.when) }]}</p>
+				<p class="list-group-item-text">{[{ checkin.when | formatDate }]}</p>
 			</a>
 		</div>
 	</div>
@@ -23,10 +28,10 @@
 			<div class="list-group-item">
 				<h2 class="list-group-item-heading">Bartenders</h2>
 			</div>
-			<div class="list-group-item" ng-repeat="bartender in bartenders">
+			<a ui-sref="user({id: bartender.id})" class="list-group-item" ng-repeat="bartender in bartenders">
 				<h4 class="list-group-item-heading">{[{ bartender.firstname || 'Joe Blow' }]}</h4>
-				<p class="list-group-item-text">{[{ bartender.email }]}</p>
-			</div>
+				<p class="list-group-item-text"></p>
+			</a>
 		</div>
 	</div>
 </div>

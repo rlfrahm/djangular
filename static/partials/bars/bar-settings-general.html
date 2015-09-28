@@ -1,13 +1,13 @@
-<div class="panel panel-default">
+<div class="panel panel-default" address-autocomplete model="bar">
   <div class="panel-body">
     <form name="form">
       <div class="form-group">
         <label>Name</label>
-        <input type="text" class="form-control input-lg" name="name" ng-model="bar.name" ng-blur="save(form)" ng-change="changed()" required>
+        <input type="text" class="form-control input-lg input-hide" name="name" ng-model="bar.name" ng-blur="save(form)" ng-change="changed()" required>
       </div>
       <div class="form-group">
         <label>Location</label>
-        <input type="text" class="form-control input-lg" required>
+        <input type="text" class="form-control input-lg input-hide" name="address" ng-model="bar.address" id="autocomplete" required>
       </div>
     </form>
   </div>

@@ -2,6 +2,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.authtoken.models import Token
+from rest_framework.exceptions import PermissionDenied
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login, logout
 from rest_framework.authentication import SessionAuthentication
@@ -91,12 +92,21 @@ class UserProfileHandler(APIView):
   """
   def get(self, request, user_id, format=None):
     user = get_object_or_404(User, pk=user_id)
+    cs = user.checkin_set.all().order_by('-created')[:10]
+    checkins = []
+    for checkin in cs:
+      checkins.append({
+        'when': checkin.when,
+        'bar_id': checkin.bar.pk,
+        'bar_name': checkin.bar.name
+        })
     return Response({
       'username': user.username,
       'email': user.email,
       'id': user.id,
       'first_name': user.first_name,
-      'last_name': user.last_name
+      'last_name': user.last_name,
+      'checkins': checkins
       })
 
 class UserBarsHandler(APIView):
@@ -177,6 +187,8 @@ class BarHandler(APIView):
     serializer = BarSerializer(data=request.data, context={'request': request})
     if serializer.is_valid():
       bar = get_object_or_404(Bar, pk=bar_id)
+      if bar.owner is not request.user:
+        return PermissionDenied()
       bar.name = request.data.get('name')
       bar.save()
       return Response(serializer.data)
@@ -185,6 +197,8 @@ class BarHandler(APIView):
 
   def delete(self, request, bar_id, format=None):
     bar = get_object_or_404(Bar, pk=bar_id)
+    if bar.owner is not request.user:
+      return PermissionDenied()
     bar.delete()
     return Response({'delete': True})
 
