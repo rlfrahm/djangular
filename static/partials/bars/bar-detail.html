@@ -20,9 +20,14 @@
 			<div class="list-group-item">
 				<h2 class="list-group-item-heading">Recent Checkins</h2>
 			</div>
-			<a ui-sref="user({id: checkin.user})" class="list-group-item" ng-repeat="checkin in checkins">
-				<h4 class="list-group-item-heading">{[{ checkin.firstname || 'Joe Blow' }]}</h4>
-				<p class="list-group-item-text">{[{ checkin.when | formatDate }]}</p>
+			<a ui-sref="user({id: checkin.user})" class="list-group-item media" ng-repeat="checkin in checkins">
+				<div class="media-left">
+					<img class="media-object" ng-src="{[{ checkin.avatar }]}" height="48px">
+				</div>
+				<div class="media-body">
+					<h4 class="media-heading">{[{ checkin.firstname || 'Joe Blow' }]}</h4>
+					{[{ checkin.when | formatDate }]}
+				</div>
 			</a>
 		</div>
 	</div>
@@ -31,9 +36,13 @@
 			<div class="list-group-item">
 				<h2 class="list-group-item-heading">Bartenders</h2>
 			</div>
-			<a ui-sref="user({id: bartender.id})" class="list-group-item" ng-repeat="bartender in bartenders">
-				<h4 class="list-group-item-heading">{[{ bartender.firstname || 'Joe Blow' }]}</h4>
-				<p class="list-group-item-text"></p>
+			<a ui-sref="user({id: bartender.id})" class="list-group-item media" ng-repeat="bartender in bartenders">
+				<div class="media-left">
+					<img class="media-object" ng-src="{[{ bartender.avatar }]}" height="48px">
+				</div>
+				<div class="media-body">
+					<h4 class="media-heading">{[{ bartender.firstname || 'Joe Blow' }]}</h4>
+				</div>
 			</a>
 		</div>
 	</div>

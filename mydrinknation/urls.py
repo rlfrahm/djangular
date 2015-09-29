@@ -17,22 +17,21 @@ from django.conf.urls import include, url
 from django.contrib import admin
 
 urlpatterns = [
-    url(r'^admin/', include(admin.site.urls)),
-    url(r'^recipes', include('recipes.urls', namespace='recipes')),
-    url(r'^api/v1/', include('api.urls', namespace='api')),
-    url(r'^', include('bars.urls', namespace='bars')),
-    url(r'^', include('account.urls', namespace='user')),
-    url(r'^', include('core.urls', namespace='core')),
-    # url('^', include('django.contrib.auth.urls')),
+    url(r'^admin/', include(admin.site.urls))
 ]
 
 from django.conf import settings
 if settings.DEBUG:
-    urlpatterns += patterns('',
-        url(r'^media/(?P<path>.*)$', 'django.views.static.serve', {
+    urlpatterns.append(url(r'^files/(?P<path>.*)$', 'django.views.static.serve', {
             'document_root': settings.MEDIA_ROOT,
-        }),
-        url(r'^static/(?P<path>.*)$', 'django.views.static.serve', {
+        }))
+    urlpatterns.append(url(r'^static/(?P<path>.*)$', 'django.views.static.serve', {
             'document_root': settings.STATIC_ROOT,
-        }),
-)
+        }))
+    
+urlpatterns.append(url(r'^recipes', include('recipes.urls', namespace='recipes')))
+urlpatterns.append(url(r'^api/v1/', include('api.urls', namespace='api')))
+urlpatterns.append(url(r'^', include('bars.urls', namespace='bars')))
+urlpatterns.append(url(r'^', include('account.urls', namespace='user')))
+urlpatterns.append(url(r'^', include('core.urls', namespace='core')))
+    # url('^', include('django.contrib.auth.urls')),

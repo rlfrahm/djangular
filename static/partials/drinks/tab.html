@@ -18,15 +18,13 @@
 		<h4>Recent Donations</h4>
 	</div>
 	<div class="list-group">
-	  <a href ng-click="showTabModal(tab)" class="list-group-item clearfix" ng-repeat="tab in tabs">
-      <div class="row">
-        <div class="col-xs-6">
-          <h4 class="list-group-heading">{[{ tab.amount | currency }]}</h4>
-          <p class="list-group-item-text">{[{ tab.sender_first_name }]}</p>
-        </div>
-        <div class="col-xs-6">
-          <button type="button" class="btn btn-success pull-right" ng-if="!tab.accepted">Accept</button>
-        </div>
+	  <a href ng-click="showTabModal(tab)" class="list-group-item media clearfix" ng-repeat="tab in tabs">
+      <div class="media-left">
+        <img class="media-object" ng-src="{[{ tab.sender_avatar }]}" height="48px" alt="">
+      </div>
+      <div class="media-body">
+        <h4 class="media-heading">{[{ tab.amount | currency }]}</h4>
+        {[{ tab.sender_first_name }]}
       </div>
 	  </a>
 	</div>

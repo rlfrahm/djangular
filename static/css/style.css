@@ -44,3 +44,12 @@ textarea {
 .pointer {
   cursor: pointer;
 }
+
+.dropdown-menu>li>p {
+  color: #7b8a8b;
+  padding: 3px 20px;
+}
+
+.list-group-item.media {
+  margin-top: 0;
+}

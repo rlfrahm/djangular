@@ -6,8 +6,12 @@ import datetime, os
 
 from bars.models import Bar
 
+from .storage import OverwriteStorage
+
 FILES_BASE = 'files'
 USER_PREFIX = 'user'
+
+USER_PROFILE_DEFAULT = 'static/images/user_profile_default.png'
 
 def path_and_rename(instance, filename):
 	ext = filename.split('.')[-1]
@@ -33,7 +37,7 @@ class UserProfile(models.Model):
 	# birthday = models.DateField()
 	dob = models.DateField(default=datetime.date.today)
 	ip_address = models.CharField(max_length=120, default='ABC')
-	picture = models.ImageField(upload_to=path_and_rename, blank=True)
+	picture = models.ImageField(upload_to=path_and_rename, blank=True, storage=OverwriteStorage(), default=USER_PROFILE_DEFAULT)
 
 	# The user's tab is the amount of money that has been given to them
 	# and not used yet.
@@ -67,6 +71,9 @@ class UserProfile(models.Model):
 		if started < 1:
 			raise models.ValidationError('Must be in business for at least 1 day to register')
 		return self.age in (self.BUSINESS, self.DRINKER)
+
+	def is_owner(self):
+		return self.user.bar_set.count() > 0
 
 
 	def __unicode__(self):

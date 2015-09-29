@@ -13,7 +13,7 @@ from django.conf import settings
 from .serializers import RegisterSerializer, LoginSerializer, BarSerializer, InviteSerializer, SearchSerializer, TabSerializer, CreditCardSerializer, PayBarSerializer, UserSerializer, AcceptTabSerializer, UserAvatarSerializer
 from .decorators import HasGroupPermission, is_in_group, BAR_OWNERS, DRINKERS
 
-from account.models import UserProfile
+from account.models import UserProfile, USER_PROFILE_DEFAULT
 from bars.models import Bar, Bartender, BartenderInvite, Checkin, Tab
 from bars.emails import send_bartender_invite
 
@@ -257,6 +257,7 @@ class BartendersHandler(APIView):
         'email': b.user.email,
         'firstname': b.user.first_name,
         'lastname': b.user.last_name,
+        'avatar': b.user.profile.picture.url or USER_PROFILE_DEFAULT,
         'id': b.user.pk,
         })
     return Response(bartenders)
@@ -302,6 +303,8 @@ class BarCheckinHandler(APIView):
         'id': c.pk,
         'user': c.user.pk,
         'firstname': c.user.first_name,
+        'lastname': c.user.last_name,
+        'avatar': c.user.profile.picture.url,
         'bar': c.bar.pk,
         'when': c.when
         })
@@ -374,6 +377,7 @@ class TabsHandler(APIView):
         'sender': tab.sender.pk,
         'sender_first_name': tab.sender.first_name,
         'sender_last_name': tab.sender.last_name,
+        'sender_avatar': tab.sender.profile.picture.url,
         'accepted': tab.accepted,
         'note': tab.note
         })
