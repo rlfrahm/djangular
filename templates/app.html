@@ -1,6 +1,8 @@
 {% extends "base.html" %}
 {% load staticfiles %}
 
+{% block app %}App{% endblock %}
+
 {% block base %}
 <base href="/">
 {% endblock %}
@@ -26,7 +28,7 @@
         <li><a ui-sref="tab">{[{ 10 | currency }]}</a></li>
         <li><a ui-sref="tabs-open.for">Open a Tab</a></li>
         <li class="dropdown" dropdown>
-          <a href="#" dropdown-toggle ng-click="$event.stopPropagation()">{{ user }} <span class="caret"></span></a>
+          <a href="#" dropdown-toggle ng-click="$event.stopPropagation()" style="padding:5px"><img ng-src="http://localhost:8000/{[{user.avatar}]}" height="50px"> <span class="caret"></span></a>
           <ul class="dropdown-menu" dropdown-menu>
             <li><a ng-if="user.bar_owner" ui-sref="bars-mine">My bars</a></li>
             <li><a ui-sref="profile">Profile</a></li>

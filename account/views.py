@@ -7,7 +7,7 @@ from django.contrib.auth.decorators import login_required
 from django.core.urlresolvers import reverse
 from django.contrib.auth.models import Group
 
-from .forms import LoginForm, RegisterForm, ProfileForm, StripeConnectRedirectForm
+from .forms import LoginForm, RegisterForm, ProfileForm, StripeConnectRedirectForm, Step1Form
 from .models import UserProfile, StripeCustomer, StripeMerchant
 
 import stripe, urllib, urllib2, json
@@ -21,8 +21,8 @@ def loginHandler(request):
   if request.method == 'POST':
     form = LoginForm(request.POST)
     if form.is_valid():
-      username = request.POST['username']
-      password = request.POST['password']
+      username = form.cleaned_data['email'][:30]
+      password = form.cleaned_data['password']
       user = authenticate(username=username, password=password)
       if user is not None:
         if user.is_active:
@@ -54,12 +54,16 @@ def registerHandler(request):
   if request.method == 'POST':
     form = RegisterForm(request.POST)
     if form.is_valid():
-      username = request.POST['username']
-      email = request.POST['email']
-      password = request.POST['password']
-      dob = request.POST['dob']
+      firstname = form.cleaned_data['firstname']
+      lastname = form.cleaned_data['lastname']
+      username = form.cleaned_data['email'][:30]
+      email = form.cleaned_data['email']
+      password = form.cleaned_data['password']
+      dob = form.cleaned_data['dob']
 
       user = User.objects.create_user(username, email, password)
+      user.first_name = firstname
+      user.last_name = lastname
       user.save()
 
       group = Group.objects.get(name='Drinkers')
@@ -81,7 +85,7 @@ def registerHandler(request):
       continue_url = request.GET.get('next')
       if continue_url:
         return HttpResponseRedirect(continue_url)
-      return HttpResponseRedirect('/#/profile')
+      return HttpResponseRedirect('/register/step-1')
   else:
     if request.user.is_authenticated():
       return HttpResponseRedirect('/')
@@ -89,6 +93,25 @@ def registerHandler(request):
       form = RegisterForm()
 
   return render(request, 'registration/register.html', {'form': form})
+
+def handle_uploaded_file(f, filename):
+  with open('some/file/name.txt', 'wb+') as destination:
+    for chunk in f.chunks():
+      destination.write(chunk)
+
+@login_required
+def step1Handler(request):
+  if request.method == 'POST':
+    form = Step1Form(request.POST, request.FILES)
+    print form.is_valid()
+    print form.cleaned_data
+    if form.is_valid():
+      request.user.profile.picture = form.cleaned_data['avatar']
+      request.user.profile.save()
+      return HttpResponseRedirect('/register/step-2')
+    else:
+      form = Step1Form()
+  return render(request, 'registration/step-1.html')
 
 def logoutHandler(request):
   logout(request)

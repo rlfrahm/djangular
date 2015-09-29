@@ -45,3 +45,6 @@ HAYSTACK_CONNECTIONS = {
 
 # Set this to true if you want to disable registration of new accounts
 SIGN_UP_LOCKED = False
+
+# Set this to true if you want to include google analytics
+ANALYTICS = False

@@ -16,6 +16,16 @@ angular.module('Api', ['ngResource'])
 	return $resource('/api/v1/user/tab');
 }])
 
+.factory('UserAvatar', ['$resource', function($resource) {
+	return $resource('/api/v1/user/avatar', {}, { 
+    save: { 
+        method: 'POST', 
+        // transformRequest: '<THE TRANSFORMATION METHOD DEFINED ABOVE>', 
+        headers: {'Content-Type': undefined}
+    }
+  });
+}])
+
 .factory('Bar', ['$resource', function($resource) {
 	return $resource('/api/v1/bars/:id');
 }])

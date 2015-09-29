@@ -37,6 +37,9 @@ class UserSerializer(serializers.Serializer):
   first_name = serializers.CharField(max_length=255)
   last_name = serializers.CharField(max_length=255)
 
+class UserAvatarSerializer(serializers.Serializer):
+  avatar = serializers.ImageField()
+
 class BarSerializer(serializers.ModelSerializer):
   class Meta:
     model = Bar

@@ -8,6 +8,7 @@ urlpatterns = [
   url(r'^user/bars$', views.UserBarsHandler.as_view(), name='user-bars'),
   url(r'^user/sources$', views.SourcesHandler.as_view(), name='credit-cards'),
   url(r'^user/tab$', views.UserTabHandler.as_view(), name='user-tab'),
+  url(r'^user/avatar$', views.UserAvatarHandler.as_view(), name='user-avatar'),
   url(r'^user$', views.UserHandler.as_view(), name='user'),
   url(r'^users/(?P<user_id>[0-9]+)$', views.UserProfileHandler.as_view(), name='user-profile'),
   url(r'^auth$', views.AuthHandler.as_view(), name='auth'),

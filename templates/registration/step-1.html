@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% load widget_tweaks %}
+{% load staticfiles %}
+
+{% block title %}Step 1{% endblock %}
+
+{% block page %}
+<div class="col-xs-12 col-sm-4 col-md-3 col-centered" avatar>
+  <div style="margin-top:20%">
+    <div class="panel panel-default">
+      <div class="panel-body">
+        <form action="{% url 'user:register-step-1' %}" method="post" enctype="multipart/form-data">
+          {% csrf_token %}
+          {{ form.non_field_errors }}
+          <div class="form-group">
+            <label>Avatar</label>
+            <img ng-src="{[{ avatarSRC }]}" class="pointer" width="100%" onclick="document.getElementById('uploadImage').click()" style="display:block">
+            <input type="file" id="uploadImage" name="avatar" accept="image/*" style="display:none" file-model="avatar">
+          </div>
+          <button type="submit" class="btn btn-primary btn-block btn-lg">Continue</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

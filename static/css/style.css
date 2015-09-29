@@ -40,3 +40,7 @@ textarea {
 .center {
   margin: 0 auto;
 }
+
+.pointer {
+  cursor: pointer;
+}

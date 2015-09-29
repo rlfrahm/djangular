@@ -1,4 +1,4 @@
-angular.module('App', ['Api', 'ui.bootstrap', 'ui.router'])
+angular.module('App', ['Init', 'Api', 'ui.bootstrap', 'ui.router',])
 
 .config(['$interpolateProvider', '$stateProvider', '$urlRouterProvider', '$locationProvider', '$httpProvider', function($interpolateProvider, $stateProvider, $urlRouterProvider, $locationProvider, $httpProvider) {
   $interpolateProvider.startSymbol('{[{').endSymbol('}]}');

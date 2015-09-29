@@ -10,7 +10,7 @@ from django.shortcuts import get_object_or_404
 from django.db.models import Q
 from django.conf import settings
 
-from .serializers import RegisterSerializer, LoginSerializer, BarSerializer, InviteSerializer, SearchSerializer, TabSerializer, CreditCardSerializer, PayBarSerializer, UserSerializer, AcceptTabSerializer
+from .serializers import RegisterSerializer, LoginSerializer, BarSerializer, InviteSerializer, SearchSerializer, TabSerializer, CreditCardSerializer, PayBarSerializer, UserSerializer, AcceptTabSerializer, UserAvatarSerializer
 from .decorators import HasGroupPermission, is_in_group, BAR_OWNERS, DRINKERS
 
 from account.models import UserProfile
@@ -69,7 +69,8 @@ class UserHandler(APIView):
       'id': request.user.pk,
       'first_name': request.user.first_name,
       'last_name': request.user.last_name,
-      'bar_owner': is_in_group(request.user, BAR_OWNERS)
+      'bar_owner': is_in_group(request.user, BAR_OWNERS),
+      'avatar': request.user.profile.picture.url
       })
 
   def post(self, request, format=None):
@@ -84,6 +85,19 @@ class UserHandler(APIView):
       'email': request.user.email,
       'first_name': request.user.first_name,
       'last_name': request.user.last_name
+      })
+
+class UserAvatarHandler(APIView):
+  """
+  Sets the user's profile image
+  """
+  def post(self, request, format=None):
+    serializer = UserAvatarSerializer(request.POST, request.FILES)
+    serializer.is_valid(raise_exception=True)
+    request.user.profile.picture = serializer.validated_data['avatar']
+    request.user.profile.save()
+    return Response({
+      'success': True
       })
 
 class UserProfileHandler(APIView):

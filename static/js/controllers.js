@@ -254,8 +254,10 @@ angular.module('App')
   };
 }])
 
-.controller('UserProfileCtrl', ['$scope', 'Me', 'Source', function($scope, Me, Source) {
-	$scope.user = Me.get();
+.controller('UserProfileCtrl', ['$scope', '$http', 'Me', 'Source', 'UserAvatar', function($scope, $http, Me, Source, UserAvatar) {
+	$scope.user = Me.get(function() {
+    $scope.avatarSRC = $scope.user.avatar;
+  });
 
   $scope.getCards = function() {
     $scope.cards = Source.query();
@@ -267,6 +269,24 @@ angular.module('App')
 		if (form.$invalid) return;
 		user.$save();
 	};
+
+  $scope.$watch('avatar', function(newval) {
+    if (!newval) return;
+    var fd = new FormData();
+    fd.append('avatar', newval);
+
+    // var ua = new UserAvatar();
+    // ua.$save(fd);
+
+    $http({
+      method: 'POST',
+      url: '/api/v1/user/avatar',
+      data: fd,
+      headers: {
+        'Content-Type': undefined
+      }
+    });
+  });
 }])
 
 .controller('UserHandler', ['$scope', '$stateParams', 'User', function($scope, $stateParams, User) {

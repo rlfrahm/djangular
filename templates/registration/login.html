@@ -15,17 +15,10 @@
         <form action="{% url 'user:login' %}?{{ request.GET.urlencode }}" method="post">
           {% csrf_token %}
           <div class="form-group">
-            {{ form.username.errors }}
-            <label for="{{ form.username.id_for_label }}">Username</label>
-            {{ form.username|add_class:"form-control"|attr:"focus" }}
-          </div>
-          {% comment %}
-          <div class="form-group">
-            {{ form.username.errors }}
+            {{ form.email.errors }}
             <label for="{{ form.username.id_for_label }}">Email</label>
-            {{ form.username|add_class:"form-control" }}
+            {{ form.email|add_class:"form-control"|attr:"focus" }}
           </div>
-          {% endcomment %}
           <div class="form-group">
             {{ form.password.errors }}
             <label for="{{ form.password.id_for_label }}">Password</label>
@@ -42,6 +35,6 @@
 
 {% block scripts %}
 <script type="text/javascript">
-  document.getElementsByName('username')[0].focus();
+  document.getElementsByName('email')[0].focus();
 </script>
 {% endblock %}
