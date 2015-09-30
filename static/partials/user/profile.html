@@ -1,10 +1,10 @@
 <div class="row">
   <div class="col-xs-12 col-sm-4 col-md-3">
     <div class="panel panel-default">
-      <div class="panel-body" avatar>
+      <div class="panel-body">
         <div class="form-group">
           <label>Avatar</label>
-          <img ng-src="{[{ avatarSRC }]}" class="pointer" width="100%" onclick="document.getElementById('uploadImage').click()" style="display:block">
+          <img ng-src="{[{ user.avatar }]}" class="pointer" width="100%" onclick="document.getElementById('uploadImage').click()" style="display:block">
           <input type="file" id="uploadImage" name="avatar" accept="image/*" style="display:none" file-model="avatar">
         </div>
       </div>

@@ -1,7 +1,17 @@
-<div class="col-xs-12 col-sm-6 col-md-4 col-centered" address-autocomplete model="newbar">
-  <div class="panel panel-default">
-    <div class="panel-body">
-      <form enctype="multipart/form-data" ng-submit="create(newbar)">
+<form enctype="multipart/form-data" ng-submit="create(newbar)">
+  <div class="col-xs-12 col-sm-6 col-md-4 col-centered" address-autocomplete model="newbar">
+    <div class="panel panel-default">
+      <div class="panel-body">
+        <div class="form-group" avatar="newbar.avatarFile">
+          <label>Avatar</label>
+          <img ng-src="{[{ avatarSRC }]}" class="pointer" height="200px" onclick="document.getElementById('uploadImage').click()" style="display:block;margin: 0 auto">
+          <input type="file" id="uploadImage" name="avatar" accept="image/*" style="display:none" file-model="newbar.avatarFile">
+          <p class="text-center text-muted"><small>Tap to edit</small></p>
+        </div>
+      </div>
+    </div>
+    <div class="panel panel-default">
+      <div class="panel-body">
         <div class="form-group">
         	<label>Bar Name</label>
         	<input type="text" class="form-control input-lg" name="name" ng-model="newbar.name" focus required>
@@ -11,8 +21,8 @@
           <input type="text" class="form-control input-lg" name="address" ng-model="newbar.address" required id="autocomplete">
         </div>
         <button type="submit" class="btn btn-primary btn-lg btn-block">Create</button>
-      </form>
+      </div>
     </div>
+    <p class="text-center"><a ui-sref="bars-mine">Cancel</a></p>
   </div>
-  <p class="text-center"><a ui-sref="bars-mine">Cancel</a></p>
-</div>
+<form>

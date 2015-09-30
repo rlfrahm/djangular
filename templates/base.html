@@ -19,7 +19,6 @@
     <div class="page">
       {% block page %}{% endblock %}
     </div>
-    <h1>{{ SETTINGS.ANALYTICS }}</h1>
   </body>
   <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/fastclick/1.0.6/fastclick.min.js"></script>
   <script type="text/javascript">
@@ -39,8 +38,7 @@
     m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
     })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
 
-    ga('create', 'UA-67762311-1', 'auto');
-    ga('send', 'pageview');
-
+    ga('create', 'UA-67762311-1', { 'userId': {{ user.pk }}});
   </script>
+  {% block analytics %}{% endblock %}
 </html>

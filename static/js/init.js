@@ -37,14 +37,15 @@ angular.module('Init', ['ui.bootstrap'])
 .directive('avatar', ['FileField', function(FileField) {
   return {
     link: function(scope, element, attrs) {
+      var watch = attrs.avatar || 'avatar';
       // scope.avatarSRC = '/static/images/silhouette78.png';
 
-      scope.$watch('avatar', function(newval) {
+      scope.$watch(watch, function(newval) {
         if (!newval) return;
         FileField.getURL(newval, function(e) {
           scope.avatarSRC = e.target.result;
           scope.$digest();
-        })
+        });
       });
     }
   };

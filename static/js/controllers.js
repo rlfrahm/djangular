@@ -2,7 +2,8 @@
 
 angular.module('App')
 
-.controller('HomeCtrl', ['$scope', '$state', 'UserBars', 'Bartender', function($scope, $state, UserBars, Bartender) {
+.controller('HomeCtrl', ['$scope', '$state', 'UserBars', 'Bartender', 'Analytics', function($scope, $state, UserBars, Bartender, Analytics) {
+	Analytics.pageview();
 	$state.go('tab');
 	$scope.bars = UserBars.query();
 
@@ -16,46 +17,75 @@ angular.module('App')
 	};
 }])
 
-.controller('BarsCtrl', ['$scope', 'Bars', function($scope, Bars) {
+.controller('BarsCtrl', ['$scope', 'Bars', 'Analytics', function($scope, Bars, Analytics) {
+	Analytics.pageview('Bars');
 	$scope.bars = Bars.query();
 }])
 
-.controller('UserBarsCtrl', ['$scope', '$state', 'UserBars', function($scope, $state, UserBars) {
+.controller('UserBarsCtrl', ['$scope', '$state', 'UserBars', 'Analytics', function($scope, $state, UserBars, Analytics) {
+	Analytics.pageview('My Bars');
 	$scope.bars = UserBars.query(function() {
 
 	});
 }])
 
-.controller('BarCtrl', ['$scope', '$state', '$stateParams', 'Bar', 'Bartenders', 'Checkin', function($scope, $state, $stateParams, Bar, Bartenders, Checkin) {
+.controller('BarCtrl', ['$scope', '$state', '$stateParams', 'Bar', 'Bartenders', 'Checkin', 'Time', 'Analytics', function($scope, $state, $stateParams, Bar, Bartenders, Checkin, Time, Analytics) {
 	$scope.bar = Bar.get({id: $stateParams.id}, function() {
+		Analytics.pageview($scope.bar.name);
     var map = new google.maps.Map(document.getElementById('map'), {
       center: {lat: $scope.bar.lat, lng: $scope.bar.lng},
-      zoom: 8,
+      zoom: 16,
       draggable: false,
       scrollwheel: false
     });
+
+    var marker = new google.maps.Marker({
+	    position: new google.maps.LatLng($scope.bar.lat, $scope.bar.lng),
+	    map: map,
+	    title: $scope.bar.name,
+    	animation: google.maps.Animation.DROP
+	  });
   });
 	$scope.bartenders = Bartenders.query({id: $stateParams.id});
-	$scope.checkins = Checkin.query({id: $stateParams.id});
 
 	$scope.checkin = function() {
 		var checkin = new Checkin();
-		checkin.$save({id: $scope.bar.id});
+		checkin.$save({id: $scope.bar.id}, getCheckins);
 	};
+
+	function getCheckins() {
+		$scope.checkins = Checkin.query({id: $stateParams.id}, function() {
+			var t1 = new Date();
+			$scope.checkins.forEach(function(e) {
+				e.when = Time.diff(t1, new Date(e.when));
+			});
+		});
+	}
+	getCheckins();
 }])
 
-.controller('BarAddCtrl', ['$scope', '$state', 'Bar', function($scope, $state, Bar) {
+.controller('BarAddCtrl', ['$scope', '$state', 'Bar', 'Analytics', function($scope, $state, Bar, Analytics) {
+	Analytics.pageview('Register Bar');
 	$scope.newbar = new Bar();
 
+	$scope.avatarSRC = '/static/images/user_profile_default.png';
+
 	$scope.create = function() {
+		if ($scope.newbar.avatarFile){
+			var fd = new FormData();
+			fd.append('avatar', $scope.newbar.avatarFile);
+			$scope.newbar.avatar = fd;
+		}
+
 		$scope.newbar.$save(function() {
 			$state.go('bars-mine');
 		});
 	};
 }])
 
-.controller('BarSettingsCtrl', ['$rootScope', '$scope', '$state', '$stateParams', '$modal', '$http', 'Bar', 'Bartenders', 'UserSearch', function($rootScope, $scope, $state, $stateParams, $modal, $http, Bar, Bartenders, UserSearch) {
+.controller('BarSettingsCtrl', ['$rootScope', '$scope', '$state', '$stateParams', '$modal', '$http', 'Bar', 'Bartenders', 'UserSearch', 'Analytics', function($rootScope, $scope, $state, $stateParams, $modal, $http, Bar, Bartenders, UserSearch, Analytics) {
 	$scope.bar = Bar.get({id: $stateParams.id}, function() {
+		Analytics.pageview($scope.bar.name + ' Settings');
     if ($scope.bar.street && $scope.bar.postal)
       $scope.bar.address = $scope.bar.street + ', ' + $scope.bar.city + ', ' + $scope.bar.province + ' ' + $scope.bar.postal;
 		$scope.avatarSRC = $scope.bar.avatar;
@@ -144,7 +174,8 @@ angular.module('App')
   });
 }])
 
-.controller('TabOpenCtrl', ['$rootScope', '$scope', '$state', '$stateParams', '$modal', 'UserSearch', 'Tab', 'Source', function($rootScope, $scope, $state, $stateParams, $modal, UserSearch, Tab, Source) {
+.controller('TabOpenCtrl', ['$rootScope', '$scope', '$state', '$stateParams', '$modal', 'UserSearch', 'Tab', 'Source', 'Analytics', function($rootScope, $scope, $state, $stateParams, $modal, UserSearch, Tab, Source, Analytics) {
+	Analytics.pageview('Open A Tab');
 	$scope.users = [];
 	$scope.searching = false;
 	$scope.term = '';
@@ -219,7 +250,8 @@ angular.module('App')
   };
 }])
 
-.controller('TabCtrl', ['$scope', '$modal', 'MyTab', 'Tab', 'BarPayment', function($scope, $modal, MyTab, Tab, BarPayment) {
+.controller('TabCtrl', ['$scope', '$modal', 'MyTab', 'Tab', 'BarPayment', 'Analytics', function($scope, $modal, MyTab, Tab, BarPayment, Analytics) {
+	Analytics.pageview('My Tab');
   $scope.title = 'Tab';
 	$scope.tabs = Tab.query()
 	var t = MyTab.get(function() {
@@ -272,10 +304,15 @@ angular.module('App')
   };
 }])
 
-.controller('UserProfileCtrl', ['$scope', '$http', 'Me', 'Source', 'UserAvatar', function($scope, $http, Me, Source, UserAvatar) {
-	$scope.user = Me.get(function() {
-    $scope.avatarSRC = $scope.user.avatar;
-  });
+.controller('UserProfileCtrl', ['$rootScope', '$scope', '$http', 'Me', 'Source', 'UserAvatar', 'FileField', 'Analytics', function($rootScope, $scope, $http, Me, Source, UserAvatar, FileField, Analytics) {
+	Analytics.pageview('My Profile');
+	// $rootScope.user = Me.get(function() {
+ //  });
+	// var clear = $rootScope.$watch('user.avatar', function(newval) {
+	// 	if (!newval) return;
+	// 	// $scope.avatarSRC = $rootScope.user.avatar;
+	// 	clear();
+	// });
 
   $scope.getCards = function() {
     $scope.cards = Source.query();
@@ -293,6 +330,13 @@ angular.module('App')
     var fd = new FormData();
     fd.append('avatar', newval);
 
+    FileField.getURL(newval, function(e) {
+      $rootScope.user.avatar = e.target.result;
+    });
+
+    // console.log($scope.avatarSRC);
+    // $rootScope.user.avatar = $scope.avatarSRC;
+
     // var ua = new UserAvatar();
     // ua.$save(fd);
 
@@ -307,6 +351,12 @@ angular.module('App')
   });
 }])
 
-.controller('UserHandler', ['$scope', '$stateParams', 'User', function($scope, $stateParams, User) {
-	$scope.usr = User.get({id: $stateParams.id});
+.controller('UserHandler', ['$scope', '$stateParams', 'User', 'Time', 'Analytics', function($scope, $stateParams, User, Time, Analytics) {
+	$scope.usr = User.get({id: $stateParams.id}, function() {
+		Analytics.pageview($scope.usr.first_name + ' ' + $scope.usr.last_name);
+		$scope.usr.checkins.forEach(function(e) {
+			var t1 = new Date();
+			e.when = Time.diff(t1, new Date(e.when));
+		});
+	});
 }]);

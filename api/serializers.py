@@ -56,11 +56,12 @@ class BarSerializer(serializers.ModelSerializer):
     bar.lat = validated_data.get('lat')
     bar.lng = validated_data.get('lng')
     bar.owner = self.context['request'].user
+    if validated_data.get('avatar'):
+      bar.avatar = validated_data.get('avatar')
     bar.save()
     return bar
 
   def update(self):
-    print self.context['request']
     bar = get_object_or_404(Bar, pk=self.context['request'].id)
     bar.name = self.context['request'].name
     bar.street = self.context['request'].street

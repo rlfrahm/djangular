@@ -38,3 +38,9 @@
   document.getElementsByName('email')[0].focus();
 </script>
 {% endblock %}
+
+{% block analytics %}
+<script>
+ga('send', 'pageview');
+</script>
+{% enblock %}

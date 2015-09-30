@@ -120,6 +120,7 @@ class UserProfileHandler(APIView):
       'id': user.id,
       'first_name': user.first_name,
       'last_name': user.last_name,
+      'avatar': user.profile.avatar_url,
       'checkins': checkins
       })
 
@@ -253,7 +254,8 @@ class BarsHandler(APIView):
       bars.append({
         'id': bar.pk,
         'name': bar.name,
-        'owner': bar.owner.pk
+        'owner': bar.owner.pk,
+        'avatar': bar.avatar_url,
         })
     return Response(bars)
 
