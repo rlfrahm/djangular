@@ -1,6 +1,11 @@
 <div class="panel panel-default" address-autocomplete model="bar">
   <div class="panel-body">
     <form name="form">
+      <div class="form-group" avatar>
+        <label>Avatar</label>
+        <img ng-src="{[{ avatarSRC }]}" class="pointer" width="100%" onclick="document.getElementById('uploadImage').click()" style="display:block">
+        <input type="file" id="uploadImage" name="avatar" accept="image/*" style="display:none" file-model="bar.avatarFile">
+      </div>
       <div class="form-group">
         <label>Name</label>
         <input type="text" class="form-control input-lg input-hide" name="name" ng-model="bar.name" ng-blur="save(form)" ng-change="changed()" required>

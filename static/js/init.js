@@ -37,7 +37,7 @@ angular.module('Init', ['ui.bootstrap'])
 .directive('avatar', ['FileField', function(FileField) {
   return {
     link: function(scope, element, attrs) {
-      scope.avatarSRC = '/static/images/silhouette78.png';
+      // scope.avatarSRC = '/static/images/silhouette78.png';
 
       scope.$watch('avatar', function(newval) {
         if (!newval) return;

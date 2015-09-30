@@ -37,11 +37,16 @@ class UserProfile(models.Model):
 	# birthday = models.DateField()
 	dob = models.DateField(default=datetime.date.today)
 	ip_address = models.CharField(max_length=120, default='ABC')
-	picture = models.ImageField(upload_to=path_and_rename, blank=True, storage=OverwriteStorage(), default=USER_PROFILE_DEFAULT)
+	avatar = models.ImageField(upload_to=path_and_rename, blank=True, storage=OverwriteStorage(), default=USER_PROFILE_DEFAULT)
 
 	# The user's tab is the amount of money that has been given to them
 	# and not used yet.
 	tab = models.DecimalField(max_digits=6, decimal_places=2, default=0)
+
+	@property
+	def avatar_url(self):
+	    if self.avatar and hasattr(self.avatar, 'url'):
+	        return self.avatar.url
 
 	def save(self, *args, **kwargs):
 		try:

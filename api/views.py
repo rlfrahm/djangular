@@ -10,7 +10,7 @@ from django.shortcuts import get_object_or_404
 from django.db.models import Q
 from django.conf import settings
 
-from .serializers import RegisterSerializer, LoginSerializer, BarSerializer, InviteSerializer, SearchSerializer, TabSerializer, CreditCardSerializer, PayBarSerializer, UserSerializer, AcceptTabSerializer, UserAvatarSerializer
+from .serializers import RegisterSerializer, LoginSerializer, BarSerializer, InviteSerializer, SearchSerializer, TabSerializer, CreditCardSerializer, PayBarSerializer, UserSerializer, AcceptTabSerializer, AvatarSerializer
 from .decorators import HasGroupPermission, is_in_group, BAR_OWNERS, DRINKERS
 
 from account.models import UserProfile, USER_PROFILE_DEFAULT
@@ -70,7 +70,7 @@ class UserHandler(APIView):
       'first_name': request.user.first_name,
       'last_name': request.user.last_name,
       'bar_owner': is_in_group(request.user, BAR_OWNERS),
-      'avatar': request.user.profile.picture.url
+      'avatar': request.user.profile.avatar_url
       })
 
   def post(self, request, format=None):
@@ -92,9 +92,9 @@ class UserAvatarHandler(APIView):
   Sets the user's profile image
   """
   def post(self, request, format=None):
-    serializer = UserAvatarSerializer(request.POST, request.FILES)
+    serializer = AvatarSerializer(request.POST, request.FILES)
     serializer.is_valid(raise_exception=True)
-    request.user.profile.picture = serializer.validated_data['avatar']
+    request.user.profile.avatar = serializer.validated_data['avatar']
     request.user.profile.save()
     return Response({
       'success': True
@@ -193,7 +193,8 @@ class BarHandler(APIView):
       'lat': b.lat,
       'lng': b.lng,
       'id': b.pk,
-      'owner': b.owner.pk
+      'owner': b.owner.pk,
+      'avatar': b.avatar_url,
     }
     return Response(bar)
 
@@ -215,6 +216,25 @@ class BarHandler(APIView):
       return PermissionDenied()
     bar.delete()
     return Response({'delete': True})
+
+class BarAvatarHandler(APIView):
+  """
+  Sets the user's profile image
+  """
+  permission_classes = [HasGroupPermission]
+  required_groups = {
+    'POST': [BAR_OWNERS],
+  }
+
+  def post(self, request, bar_id, format=None):
+    serializer = AvatarSerializer(request.POST, request.FILES)
+    serializer.is_valid(raise_exception=True)
+    bar = get_object_or_404(Bar, pk=bar_id)
+    bar.avatar = serializer.validated_data['avatar']
+    bar.save()
+    return Response({
+      'success': True
+      })
 
 class BarsHandler(APIView):
   """
@@ -257,7 +277,7 @@ class BartendersHandler(APIView):
         'email': b.user.email,
         'firstname': b.user.first_name,
         'lastname': b.user.last_name,
-        'avatar': b.user.profile.picture.url or USER_PROFILE_DEFAULT,
+        'avatar': b.user.profile.avatar_url or USER_PROFILE_DEFAULT,
         'id': b.user.pk,
         })
     return Response(bartenders)
@@ -304,7 +324,7 @@ class BarCheckinHandler(APIView):
         'user': c.user.pk,
         'firstname': c.user.first_name,
         'lastname': c.user.last_name,
-        'avatar': c.user.profile.picture.url,
+        'avatar': c.user.profile.avatar_url,
         'bar': c.bar.pk,
         'when': c.when
         })
@@ -377,7 +397,7 @@ class TabsHandler(APIView):
         'sender': tab.sender.pk,
         'sender_first_name': tab.sender.first_name,
         'sender_last_name': tab.sender.last_name,
-        'sender_avatar': tab.sender.profile.picture.url,
+        'sender_avatar': tab.sender.profile.avatar_url,
         'accepted': tab.accepted,
         'note': tab.note
         })

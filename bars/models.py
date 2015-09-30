@@ -4,7 +4,28 @@ from django.contrib.auth.models import User
 
 from .emails import send_tab_invite
 
-import uuid
+import uuid, os
+
+from account.storage import OverwriteStorage
+
+FILES_BASE = 'files'
+BAR_PREFIX = 'bar'
+
+BAR_PROFILE_DEFAULT = 'static/images/user_profile_default.png'
+
+def path_and_rename(instance, filename):
+	ext = filename.split('.')[-1]
+	# get filename
+	if instance.pk:
+		path = '%s_%s' % (BAR_PREFIX, instance.pk)
+		filename = '{}.{}'.format(instance.pk, ext)
+	else:
+		# set filename as random string
+		ran = uuid4().hex
+		path = '%s_%s' % (BAR_PREFIX, ran)
+		filename = '{}.{}'.format(ran, ext)
+	# return the whole path to the file
+	return os.path.join(path, filename)
 
 # Create your models here.
 class Bar(models.Model):
@@ -26,11 +47,14 @@ class Bar(models.Model):
 	lat = models.DecimalField(max_digits=16, decimal_places=14)
 	lng = models.DecimalField(max_digits=16, decimal_places=14)
 
+	avatar = models.ImageField(upload_to=path_and_rename, blank=True, storage=OverwriteStorage(), default=BAR_PROFILE_DEFAULT)
 	# Image
 	image = models.ImageField(upload_to='bars', blank=True, null=True)
 
-	# Stripe
-	# stripe_id
+	@property
+	def avatar_url(self):
+	    if self.avatar and hasattr(self.avatar, 'url'):
+	        return self.avatar.url
 
 	@models.permalink
 	def get_absolute_url(self):

@@ -54,17 +54,18 @@ angular.module('App')
 	};
 }])
 
-.controller('BarSettingsCtrl', ['$rootScope', '$scope', '$state', '$stateParams', '$modal', 'Bar', 'Bartenders', 'UserSearch', function($rootScope, $scope, $state, $stateParams, $modal, Bar, Bartenders, UserSearch) {
+.controller('BarSettingsCtrl', ['$rootScope', '$scope', '$state', '$stateParams', '$modal', '$http', 'Bar', 'Bartenders', 'UserSearch', function($rootScope, $scope, $state, $stateParams, $modal, $http, Bar, Bartenders, UserSearch) {
 	$scope.bar = Bar.get({id: $stateParams.id}, function() {
     if ($scope.bar.street && $scope.bar.postal)
       $scope.bar.address = $scope.bar.street + ', ' + $scope.bar.city + ', ' + $scope.bar.province + ' ' + $scope.bar.postal;
+		$scope.avatarSRC = $scope.bar.avatar;
   });
   $scope.search = {term:null};
-	
+
 	$scope.shouldSave = false;
 
 	function refreshBartenders() {
-		$scope.bartenders = Bartenders.query({id: $stateParams.id});	
+		$scope.bartenders = Bartenders.query({id: $stateParams.id});
 	}
 
 	refreshBartenders();
@@ -124,6 +125,23 @@ angular.module('App')
 			bartender.$save({id: $stateParams.id});
 		});
 	};
+
+	$scope.$watch('bar.avatarFile', function(newval) {
+    if (!newval) return;
+    var fd = new FormData();
+    fd.append('avatar', newval);
+
+		console.log(newval);
+
+    $http({
+      method: 'POST',
+      url: '/api/v1/bars/' + $scope.bar.id + '/avatar',
+      data: fd,
+      headers: {
+        'Content-Type': undefined
+      }
+    });
+  });
 }])
 
 .controller('TabOpenCtrl', ['$rootScope', '$scope', '$state', '$stateParams', '$modal', 'UserSearch', 'Tab', 'Source', function($rootScope, $scope, $state, $stateParams, $modal, UserSearch, Tab, Source) {

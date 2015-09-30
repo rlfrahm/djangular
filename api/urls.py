@@ -17,6 +17,7 @@ urlpatterns = [
   url(r'^bars/(?P<bar_id>[0-9]+)/bartenders$', views.BartendersHandler.as_view(), name='bartenders'),
   url(r'^bars/(?P<bar_id>[0-9]+)/checkin$', views.BarCheckinHandler.as_view(), name='bar-checkin'),
   url(r'^bars/(?P<bar_id>[0-9]+)/pay$', views.PayBarHandler.as_view(), name='bar-pay'),
+  url(r'^bars/(?P<bar_id>[0-9]+)/avatar$', views.BarAvatarHandler.as_view(), name='bar-avatar'),
   url(r'^bars/(?P<bar_id>[0-9]+)$', views.BarHandler.as_view(), name='bar'),
   url(r'^bars$', views.BarsHandler.as_view(), name='bars'),
   url(r'^search/users$', views.UserSearchHandler.as_view(), name='search-user'),
