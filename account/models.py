@@ -2,7 +2,7 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.conf import settings
 
-import datetime, os
+import datetime, os, uuid
 
 from bars.models import Bar
 
@@ -97,3 +97,7 @@ class StripeMerchant(models.Model):
 class StripeCustomer(models.Model):
 	user = models.OneToOneField(settings.AUTH_USER_MODEL, related_name='customer')
 	customer_id = models.CharField(max_length=100)
+
+class PasswordResetToken(models.Model):
+	user = models.OneToOneField(settings.AUTH_USER_MODEL)
+	token = models.CharField(max_length=100)

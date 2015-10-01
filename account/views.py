@@ -6,11 +6,13 @@ from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.core.urlresolvers import reverse
 from django.contrib.auth.models import Group
+from django.core.exceptions import ValidationError
 
-from .forms import LoginForm, RegisterForm, ProfileForm, StripeConnectRedirectForm, Step1Form
-from .models import UserProfile, StripeCustomer, StripeMerchant
+from .forms import LoginForm, RegisterForm, ProfileForm, StripeConnectRedirectForm, Step1Form, EmailForm
+from .models import UserProfile, StripeCustomer, StripeMerchant, PasswordResetToken
+from .emails import send_password_reset_email
 
-import stripe, urllib, urllib2, json
+import stripe, urllib, urllib2, json, uuid
 
 stripe.api_key = settings.STRIPE_API_KEY
 
@@ -152,3 +154,29 @@ def stripeConnectRedirectHandler(request):
   else:
     # Something went wrong
     return redirect(reverse('core:home'))
+
+def resetPasswordFormHandler(request):
+    if request.method == 'POST':
+        form = EmailForm(request.POST)
+        if form.is_valid():
+            email = form.cleaned_data['email']
+            user = User.objects.get(email=email)
+            if user is None:
+                # No user, fail
+                ValidationError(_('No user has this email.'), code='invalid')
+            passResetToken = PasswordResetToken.objects.filter(user=user)
+            if len(passResetToken) < 1:
+                passResetToken = PasswordResetToken(user=user, token=uuid.uuid4())
+                print passResetToken.token
+                send_password_reset_email(request, passResetToken)
+                passResetToken.save()
+            else:
+                ValidationError(_('A password reset email has already been sent.'), code='invalid')
+    else:
+        form = EmailForm()
+    return render(request, 'registration/reset_password.html', {'form': form})
+
+def resetPasswordHandler(request, token):
+    if request.method = 'GET':
+        passResetToken = get_object_or_404(PasswordResetToken, token=token)
+    return redirect(reverse('user:login'))

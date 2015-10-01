@@ -11,6 +11,8 @@ def send_bartender_invite(request, invite):
 
   My Drink Nation helps people buy drinks for their friends. Come help make that happen!
 
+  Thanks,
+  The My Drink Nation team
   %s
   """ % (invite.bar.name, request.build_absolute_uri(reverse('bars:bartender-invite', args=(invite.bar.pk, invite.token,))), request.build_absolute_uri(reverse('core:home')))
   msg.from_email = 'no-reply@mydrinknation.com'
@@ -28,6 +30,8 @@ def send_tab_invite(request, tab, invite):
 
   My Drink Nation helps people buy drinks for their friends. Come join us!
 
+  Thanks,
+  The My Drink Nation team
   %s
   """ % (tab.sender.first_name, tab.amount, request.build_absolute_uri(reverse('bars:bartender-invite', args=(tab.pk, invite.token,))), request.build_absolute_uri(reverse('core:home')))
   msg.from_email = 'no-reply@mydrinknation.com'

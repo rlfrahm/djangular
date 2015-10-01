@@ -123,3 +123,6 @@ LOGIN_REDIRECT_URL = '/#/profile'
 # Stripe
 STRIPE_API_KEY = 'sk_test_ZiCnD4NjSPmIzQ5Bvk67kR7k'
 STRIPE_PUB_API_KEY = 'pk_test_qaFAo6YehAQXe4Bvd03pE1zu'
+
+# Emails
+EMAIL_FROM_EMAIL = 'no-reply@mydrinknation.com'
