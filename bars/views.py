@@ -1,5 +1,6 @@
 from django.shortcuts import get_object_or_404, render, redirect
 from django.contrib.auth.decorators import login_required
+from django.contrib.admin.views.decorators import staff_member_required
 from django.http import HttpResponseRedirect
 from django.core.urlresolvers import reverse
 from django.utils.text import slugify
@@ -63,3 +64,7 @@ def barsContactHandler(request):
   else:
     form = ContactForm()
   return render(request, 'bars/contact.html', {'form': form})
+
+@staff_member_required
+def barOnboardingHandler(request):
+    return render(request, 'admin/newbar.html')

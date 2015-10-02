@@ -1,0 +1,16 @@
+{% extends "admin/base_site.html" %}
+
+{% block content %}
+<form action="{% url 'bars:bar-onboard' %}" method="post">
+  <fieldset>
+    <div class="form-row">
+        <label>Entry</label>
+        
+        <textarea style="height: 136px; width: 161px; margin: 2px;" rows="10">{{ entry.body }}</textarea>
+    </div>
+  </fieldset>
+  <div class="submit-row">
+  <input class="default" type="submit" value="Review" /></div>
+</form>
+
+{% endblock %}

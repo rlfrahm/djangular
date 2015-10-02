@@ -7,4 +7,5 @@ urlpatterns = [
   # url(r'^bars/(?P<bar_id>[0-9]+)$', views.barDetailHandler, name='bar-detail'),
   url(r'^bars/(?P<bar_id>[0-9]+)/bartenders/invite/(?P<invite_id>.+)$', views.bartenderInviteHandler, name='bartender-invite'),
   url(r'^for-bars$', views.barsContactHandler, name='bar-contact'),
+  url(r'^admin/new-bar$', views.barOnboardingHandler, name='bar-onboard'),
 ]
