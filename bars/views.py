@@ -4,6 +4,7 @@ from django.http import HttpResponseRedirect
 from django.core.urlresolvers import reverse
 from django.utils.text import slugify
 from django.conf import settings
+from django.contrib import messages
 
 from .forms import RegisterForm, ContactForm
 from .models import Bar, Bartender, BartenderInvite
@@ -56,15 +57,9 @@ def barsContactHandler(request):
   if request.method == 'POST':
     form = ContactForm(request.POST)
     if form.is_valid():
-      send_us_bar_inquiry(
-        request,
-        form.cleaned_data['name'],
-        form.cleaned_data['bar_name'],
-        form.cleaned_data['email'],
-        form.cleaned_data['phone'],
-        form.cleaned_data['license_number'],
-        form.cleaned_data['comments'])
-      form = ContactForm()
+        send_us_bar_inquiry(request, form.cleaned_data['name'], form.cleaned_data['bar_name'], form.cleaned_data['email'], form.cleaned_data['phone'], form.cleaned_data['license_number'], form.cleaned_data['comments'])
+        messages.info(request, 'My Drink Nation has been notified of your request and will get back to you shortly!')
+    form = ContactForm()
   else:
     form = ContactForm()
   return render(request, 'bars/contact.html', {'form': form})

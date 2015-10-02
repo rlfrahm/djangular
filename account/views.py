@@ -7,10 +7,14 @@ from django.contrib.auth.decorators import login_required
 from django.core.urlresolvers import reverse
 from django.contrib.auth.models import Group
 from django.core.exceptions import ValidationError
+from django.contrib import messages
+from django.views.decorators.http import require_GET
 
 from .forms import LoginForm, RegisterForm, ProfileForm, StripeConnectRedirectForm, Step1Form, EmailForm
-from .models import UserProfile, StripeCustomer, StripeMerchant, PasswordResetToken
-from .emails import send_password_reset_email
+from .models import UserProfile, StripeCustomer, StripeMerchant, PasswordResetToken, AccountActivationToken
+from .emails import send_password_reset_email, send_account_activate_email
+
+from mydrinknation.decorators import anonymous_required
 
 import stripe, urllib, urllib2, json, uuid
 
@@ -66,6 +70,7 @@ def registerHandler(request):
       user = User.objects.create_user(username, email, password)
       user.first_name = firstname
       user.last_name = lastname
+      user.is_active = False
       user.save()
 
       group = Group.objects.get(name='Drinkers')
@@ -81,6 +86,11 @@ def registerHandler(request):
       )
       stripe_customer = StripeCustomer(user=user, customer_id=cus.get('id'))
       stripe_customer.save()
+
+      # Email activation
+      token = AccountActivationToken(user=user, token=uuid.uuid4())
+      token.save()
+      send_account_activate_email(request, token)
 
       user = authenticate(username=username, password=password)
       login(request, user)
@@ -160,23 +170,41 @@ def resetPasswordFormHandler(request):
         form = EmailForm(request.POST)
         if form.is_valid():
             email = form.cleaned_data['email']
-            user = User.objects.get(email=email)
-            if user is None:
+            users = User.objects.filter(email=email)
+            if len(users) < 1:
                 # No user, fail
-                ValidationError(_('No user has this email.'), code='invalid')
+                form.add_error(None, 'No user exists with that email.')
+                return render(request, 'registration/reset_password.html', {'form': form})
+            user = users[0]
             passResetToken = PasswordResetToken.objects.filter(user=user)
             if len(passResetToken) < 1:
                 passResetToken = PasswordResetToken(user=user, token=uuid.uuid4())
                 print passResetToken.token
                 send_password_reset_email(request, passResetToken)
                 passResetToken.save()
+                return redirect(reverse('user:login'))
             else:
-                ValidationError(_('A password reset email has already been sent.'), code='invalid')
+                form.add_error(None, 'An email has already been sent to that email.')
     else:
         form = EmailForm()
     return render(request, 'registration/reset_password.html', {'form': form})
 
+@anonymous_required()
 def resetPasswordHandler(request, token):
-    if request.method = 'GET':
+    if request.method == 'GET':
         passResetToken = get_object_or_404(PasswordResetToken, token=token)
+        if passResetToken:
+            passResetToken.user.backend = 'django.contrib.auth.backends.ModelBackend'
+            login(request, passResetToken.user)
+            passResetToken.delete()
+            return redirect(reverse('core:home') + '#/profile')
     return redirect(reverse('user:login'))
+
+def activeAccountHandler(request, token):
+    if request.method == 'GET':
+        activateAccountToken = get_object_or_404(AccountActivationToken, token=token)
+        if activateAccountToken:
+            activateAccountToken.user.is_active = True
+            activateAccountToken.user.save()
+            activateAccountToken.delete()
+    return redirect(reverse('core:home'))

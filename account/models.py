@@ -101,3 +101,7 @@ class StripeCustomer(models.Model):
 class PasswordResetToken(models.Model):
 	user = models.OneToOneField(settings.AUTH_USER_MODEL)
 	token = models.CharField(max_length=100)
+
+class AccountActivationToken(models.Model):
+	user = models.OneToOneField(settings.AUTH_USER_MODEL)
+	token = models.CharField(max_length=100)
