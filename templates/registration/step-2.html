@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% load widget_tweaks %}
+{% load staticfiles %}
+
+{% block title %}Step 2{% endblock %}
+
+{% block page %}
+<div class="col-xs-12 col-sm-6 col-md-4 col-centered" avatar>
+  <div style="margin-top:20%">
+    <div class="panel panel-default">
+      <div class="panel-body">
+        <form create-card-form name="form" action="{% url 'user:register-step-1' %}" ng-submit="createNewCard(form, newcard, $event)" method="post" enctype="multipart/form-data">
+          {% csrf_token %}
+          {{ form.non_field_errors }}
+          <div create-card-form-body></div>
+          <button type="submit" class="btn btn-primary btn-block btn-lg">Continue</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block analytics %}
+<script>
+ga('send', 'pageview');
+</script>
+{% endblock %}

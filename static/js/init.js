@@ -49,4 +49,87 @@ angular.module('Init', ['ui.bootstrap'])
       });
     }
   };
+}])
+
+.directive('createCardFormBody', [function() {
+  return {
+    templateUrl: '/static/partials/directives/create_card_form.html'
+  };
+}])
+
+.directive('createCardForm', ['months', function(months) {
+	return {
+		link: function(scope, element, attrs) {
+			scope.months = months;
+			scope.newcard = {
+				month: '01'
+			};
+
+      element.on('submit', function(e) {
+        e.preventDefault();
+        createNewCard();
+      });
+
+			scope.setMonth = function(month) {
+				$scope.newcard.month = month;
+			};
+
+			function createNewCard() {
+				if (form.$invalid) return;
+				scope.form.loading = true;
+        var form = scope.form,
+          newcard = scope.newcard;
+
+				Stripe.setPublishableKey(pk);
+
+				Stripe.card.createToken({
+		      number: newcard.number,
+		      cvc: newcard.cvc,
+		      exp_month: newcard.month,
+		      exp_year: newcard.year,
+		      currency: newcard.currency || 'usd'
+		    }, stripeResponseHandler);
+
+		    function stripeResponseHandler(status, response) {
+			    var $form = form;
+			    scope.adding = false;
+
+			    if (response.error) {
+			      scope.$digest();
+			      // Show the errors on the form
+			      // $form.find('.payment-errors').text(response.error.message);
+			      // $form.find('button').prop('disabled', false);
+			    } else {
+			      // response contains id and card, which contains additional card details
+			      var token = response.id;
+			      scope.newcard.token = token;
+            element.submit();
+			      // var c = new Source();
+			      // c.token = token;
+			      // c.$save();
+			      if (scope.getCards)
+			      	scope.getCards();
+			    }
+  				scope.form.loading = true;
+			  }
+			};
+		}
+	};
+}])
+
+.factory('months', [function() {
+  return {
+    '01': 'January',
+    '02': 'Febuary',
+    '03': 'March',
+    '04': 'April',
+    '05': 'May',
+    '06': 'June',
+    '07': 'July',
+    '08': 'August',
+    '09': 'September',
+    '10': 'October',
+    '11': 'November',
+    '12': 'December'
+  };
 }]);

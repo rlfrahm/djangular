@@ -114,16 +114,26 @@ def handle_uploaded_file(f, filename):
 @login_required
 def step1Handler(request):
   if request.method == 'POST':
-    form = Step1Form(request.POST, request.FILES)
-    print form.is_valid()
-    print form.cleaned_data
-    if form.is_valid():
-      request.user.profile.picture = form.cleaned_data['avatar']
-      request.user.profile.save()
-      return HttpResponseRedirect('/register/step-2')
-    else:
-      form = Step1Form()
+      form = Step1Form(request.POST, request.FILES)
+      if form.is_valid():
+          request.user.profile.picture = form.cleaned_data['avatar']
+          request.user.profile.save()
+      return redirect(reverse('user:register-step-2'))
+  else:
+    form = Step1Form()
   return render(request, 'registration/step-1.html')
+
+@login_required
+def step2Handler(request):
+    if request.method == 'POST':
+      form = Step1Form(request.POST, request.FILES)
+      if form.is_valid():
+          request.user.profile.picture = form.cleaned_data['avatar']
+          request.user.profile.save()
+      return redirect(reverse('core:home'))
+    else:
+        form = Step1Form()
+    return render(request, 'registration/step-2.html')
 
 def logoutHandler(request):
   logout(request)

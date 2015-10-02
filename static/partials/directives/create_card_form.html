@@ -1,13 +1,13 @@
 <div class="row">
-  <div class="col-sm-6 col-centered">
+  <div class="col-xs-12">
     <h4>Add Card</h4>
     <div class="form-group">
       <div class="row">
-        <div class="col-xs-9">
+        <div class="col-xs-8">
           <label>Card Number</label>
           <input type="text" class="form-control" ng-model="newcard.number" required>
         </div>
-        <div class="col-xs-3">
+        <div class="col-xs-4">
           <label>CVC</label>
           <input type="text" class="form-control" ng-model="newcard.cvc" required>
         </div>
@@ -29,11 +29,8 @@
           <label>Year</label>
           <input type="number" min="2014" max="2999" step="1" class="form-control" placeholder="YYYY" ng-model="newcard.year" required>
         </div>
-      </div> 
+      </div>
     </div>
   </div>
-</div>
-<div class="form-controls">
-  <span class="pull-right"><button type="submit" class="btn btn-primary btn-lg"><span ng-if="adding"><i class="spin">(&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;)</i>&nbsp;&nbsp;&nbsp;</span>Add</button></span>
-  <button type="button" class="btn btn-link btn-lg pull-right" ng-click="setState(0)">Cancel</button> 
+  <input type="hidden" name="token" ng-model="newcard.token" required>
 </div>

@@ -11,7 +11,7 @@ from .storage import OverwriteStorage
 FILES_BASE = 'files'
 USER_PREFIX = 'user'
 
-USER_PROFILE_DEFAULT = 'static/images/user_profile_default.png'
+USER_PROFILE_DEFAULT = 'user_profile_default.png'
 
 def path_and_rename(instance, filename):
 	ext = filename.split('.')[-1]

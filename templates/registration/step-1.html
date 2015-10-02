@@ -14,7 +14,7 @@
           {{ form.non_field_errors }}
           <div class="form-group">
             <label>Avatar</label>
-            <img ng-src="{[{ avatarSRC }]}" class="pointer" width="100%" onclick="document.getElementById('uploadImage').click()" style="display:block">
+            <img ng-src="{[{ avatarSRC || '/static/images/user_profile_default.png' }]}" class="pointer" width="100%" onclick="document.getElementById('uploadImage').click()" style="display:block">
             <input type="file" id="uploadImage" name="avatar" accept="image/*" style="display:none" file-model="avatar">
           </div>
           <button type="submit" class="btn btn-primary btn-block btn-lg">Continue</button>
