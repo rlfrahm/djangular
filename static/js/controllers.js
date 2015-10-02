@@ -304,7 +304,7 @@ angular.module('App')
   };
 }])
 
-.controller('UserProfileCtrl', ['$rootScope', '$scope', '$http', 'Me', 'Source', 'UserAvatar', 'FileField', 'Analytics', function($rootScope, $scope, $http, Me, Source, UserAvatar, FileField, Analytics) {
+.controller('UserProfileCtrl', ['$rootScope', '$scope', '$http', '$modal', 'Me', 'MePassword', 'Source', 'UserAvatar', 'FileField', 'Analytics', function($rootScope, $scope, $http, $modal, Me, MePassword, Source, UserAvatar, FileField, Analytics) {
 	Analytics.pageview('My Profile');
 	// $rootScope.user = Me.get(function() {
  //  });
@@ -323,6 +323,25 @@ angular.module('App')
 	$scope.saveUser = function(form, user) {
 		if (form.$invalid) return;
 		user.$save();
+	};
+
+	$scope.submitChangePassword = function(form, newpass, $close) {
+		if (form.$invalid) return;
+		newpass.$save();
+		console.log($scope);
+		$close('saved');
+	};
+
+	$scope.openChangePasswordModal = function() {
+		$scope.newpass = new MePassword();
+		var m = $modal.open({
+      templateUrl: 'change-password.html',
+      size: 'sm',
+      scope: $scope
+    });
+
+    m.result.then(function(email) {
+    });
 	};
 
   $scope.$watch('avatar', function(newval) {

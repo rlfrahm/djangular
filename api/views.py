@@ -4,14 +4,14 @@ from rest_framework import status
 from rest_framework.authtoken.models import Token
 from rest_framework.exceptions import PermissionDenied
 from django.contrib.auth.models import User
-from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth import authenticate, login, logout, update_session_auth_hash
 from rest_framework.authentication import SessionAuthentication
 from rest_framework.permissions import IsAuthenticated
 from django.shortcuts import get_object_or_404
 from django.db.models import Q
 from django.conf import settings
 
-from .serializers import RegisterSerializer, LoginSerializer, BarSerializer, InviteSerializer, SearchSerializer, TabSerializer, CreditCardSerializer, PayBarSerializer, UserSerializer, AcceptTabSerializer, AvatarSerializer
+from .serializers import RegisterSerializer, LoginSerializer, BarSerializer, InviteSerializer, SearchSerializer, TabSerializer, CreditCardSerializer, PayBarSerializer, UserSerializer, AcceptTabSerializer, AvatarSerializer, UserPasswordSerializer
 from .decorators import HasGroupPermission, is_in_group, BAR_OWNERS, DRINKERS
 
 from account.models import UserProfile, USER_PROFILE_DEFAULT
@@ -90,6 +90,23 @@ class UserHandler(APIView):
 			'first_name': request.user.first_name,
 			'last_name': request.user.last_name
 			})
+
+class UserPasswordHandler(APIView):
+	"""
+	Change the user's password
+	"""
+	authentication_classes = (SessionAuthentication,)
+	permission_classes = (IsAuthenticated,)
+
+	def post(self, request, format=None):
+		serializer = UserPasswordSerializer(data=request.data)
+		serializer.is_valid(raise_exception=True)
+		request.user.set_password(serializer.validated_data['password'])
+		request.user.save()
+		update_session_auth_hash(request, request.user)
+		return Response({
+			'success': True
+		})
 
 class UserAvatarHandler(APIView):
 	"""

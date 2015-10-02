@@ -12,15 +12,19 @@ angular.module('Api', ['ngResource'])
 	return $resource('/api/v1/user');
 }])
 
+.factory('MePassword', ['$resource', function($resource) {
+	return $resource('/api/v1/user/password');
+}])
+
 .factory('MyTab', ['$resource', function($resource){
 	return $resource('/api/v1/user/tab');
 }])
 
 .factory('UserAvatar', ['$resource', function($resource) {
-	return $resource('/api/v1/user/avatar', {}, { 
-    save: { 
-        method: 'POST', 
-        // transformRequest: '<THE TRANSFORMATION METHOD DEFINED ABOVE>', 
+	return $resource('/api/v1/user/avatar', {}, {
+    save: {
+        method: 'POST',
+        // transformRequest: '<THE TRANSFORMATION METHOD DEFINED ABOVE>',
         headers: {'Content-Type': undefined}
     }
   });
