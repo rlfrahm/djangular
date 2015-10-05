@@ -108,6 +108,11 @@ class StripeMerchant(models.Model):
 class StripeCustomer(models.Model):
 	user = models.OneToOneField(settings.AUTH_USER_MODEL, related_name='customer')
 	customer_id = models.CharField(max_length=100)
+	# This is the default source to use for things like:
+	# 	- Paying for tabs
+	# The default value for this field is the first source the user adds,
+	# however, the user can change the default if they choose
+	default_source = models.CharField(max_length=100, null=True, blank=True, default='')
 
 class PasswordResetToken(models.Model):
 	user = models.OneToOneField(settings.AUTH_USER_MODEL)

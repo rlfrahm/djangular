@@ -9,7 +9,7 @@
   <div style="margin-top:20%">
     <div class="panel panel-default">
       <div class="panel-body">
-        <form create-card-form name="form" action="{% url 'user:register-step-1' %}" ng-submit="createNewCard(form, newcard, $event)" method="post" enctype="multipart/form-data">
+        <form create-card-form submit="true" name="form" action="{% url 'user:register-step-1' %}" ng-submit="createNewCard(form, newcard, $event)" method="post" enctype="multipart/form-data">
           {% csrf_token %}
           {{ form.non_field_errors }}
           <div create-card-form-body></div>

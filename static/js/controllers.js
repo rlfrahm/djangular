@@ -306,13 +306,6 @@ angular.module('App')
 
 .controller('UserProfileCtrl', ['$rootScope', '$scope', '$http', '$modal', 'Me', 'MePassword', 'Source', 'UserAvatar', 'FileField', 'Analytics', function($rootScope, $scope, $http, $modal, Me, MePassword, Source, UserAvatar, FileField, Analytics) {
 	Analytics.pageview('My Profile');
-	// $rootScope.user = Me.get(function() {
- //  });
-	// var clear = $rootScope.$watch('user.avatar', function(newval) {
-	// 	if (!newval) return;
-	// 	// $scope.avatarSRC = $rootScope.user.avatar;
-	// 	clear();
-	// });
 
   $scope.getCards = function() {
     $scope.cards = Source.query();
@@ -368,6 +361,27 @@ angular.module('App')
       }
     });
   });
+
+	$scope.saveNewCard = function(token) {
+		var source = new Source();
+		source.token = token;
+		source.$save(function() {
+			$scope.getCards();
+		});
+	};
+
+	$scope.newCardDialog = function() {
+		var s = $scope.$new();
+
+		var m = $modal.open({
+      templateUrl: 'credit-card-form.html',
+      size: 'sm',
+      scope: s
+    });
+
+    m.result.then(function(email) {
+    });
+	};
 }])
 
 .controller('UserHandler', ['$scope', '$stateParams', 'User', 'Time', 'Analytics', function($scope, $stateParams, User, Time, Analytics) {

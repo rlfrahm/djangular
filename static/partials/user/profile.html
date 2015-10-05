@@ -41,62 +41,19 @@
       </div>
       <div class="col-sm-4 col-md-3" ng-repeat="card in cards">
         <a href class="thumbnail">
-          <p class="text-center"><span class="label label-info">{[{ card.brand }]}</span> ending in *{[{ card.last4 }]}</p>
+          <img src="/static/images/{[{ card.brand }]}.png" height="100px">
+          <p class="text-center">ending in *{[{ card.last4 }]}</p>
         </a>
       </div>
-      <div class="col-xs-12 col-sm-4 col-md-3">
-        <a href class="thumbnail add-source-box" ng-click="newCardDialog()">
+      <div class="col-sm-4 col-md-3">
+        <a href class="thumbnail add-source-box text-center" ng-click="newCardDialog()">
+          <img src="/static/images/Bank Cards-100.png" height="100px">
           <div class="text-center">
-            <span class="add-source-box-icon">+</span>
+            <span class="add-source-box-icon"><i class="fa fa-plus"></i></span>
           </div>
         </a>
       </div>
     </div>
-    <form name="form" create-card-form ng-submit="createNewCard(form, newcard)">
-      <div class="panel panel-default">
-        <div class="panel-body">
-          <div class="row">
-            <div class="col-sm-6 col-centered">
-              <h4>Add Card</h4>
-              <div class="form-group">
-                <div class="row">
-                  <div class="col-xs-9">
-                    <label>Card Number</label>
-                    <input type="text" class="form-control" ng-model="newcard.number" required>
-                  </div>
-                  <div class="col-xs-3">
-                    <label>CVC</label>
-                    <input type="text" class="form-control" ng-model="newcard.cvc" required>
-                  </div>
-                </div>
-              </div>
-              <div class="form-group">
-                <div class="row">
-                  <div class="col-xs-6">
-                    <label>Month</label>
-                    <div dropdown>
-                      <button type="button" class="btn btn-default btn-block" dropdown-toggle>{[{ months[newcard.month] }]}</button>
-                      <ul class="dropdown-menu select">
-                        <li ng-repeat="(key, month) in months"><a href ng-click="setMonth(key)">{[{ month }]}</a></li>
-                      </ul>
-                    </div>
-                    <!-- <input type="month" class="form-control" placeholder="MM" ng-model="newcard.month" required> -->
-                  </div>
-                  <div class="col-xs-6">
-                    <label>Year</label>
-                    <input type="number" min="2014" max="2999" step="1" class="form-control" placeholder="YYYY" ng-model="newcard.year" required>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div class="form-controls">
-            <span class="pull-right"><button type="submit" class="btn btn-primary btn-lg"><span ng-if="adding"><i class="spin">(&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;)</i>&nbsp;&nbsp;&nbsp;</span>Add</button></span>
-            <button type="button" class="btn btn-link btn-lg pull-right" ng-click="setState(0)">Cancel</button>
-          </div>
-        </div>
-      </div>
-    </form>
     <h4>Change Password</h4>
     <div class="form-group">
       <button type="button" class="btn btn-danger btn-lg" ng-click="openChangePasswordModal()">Change Password</button>
@@ -116,6 +73,20 @@
     </div>
     <div class="modal-footer">
       <button type="submit" class="btn btn-primary btn-lg btn-block">Change</button>
+      <button type="button" class="btn btn-link btn-lg btn-block" ng-click="$dismiss()">Cancel</button>
+    </div>
+  </form>
+</script>
+<script type="text/ng-template" id="credit-card-form.html">
+  <form create-card-form name="form">
+    <div class="modal-header">
+      <h2 class="modal-title">Add new credit/debit card</h2>
+    </div>
+    <div class="modal-body">
+      <div create-card-form-body></div>
+    </div>
+    <div class="modal-footer">
+      <button type="submit" class="btn btn-primary btn-lg btn-block" ng-click="$close('adding')">Add</button>
       <button type="button" class="btn btn-link btn-lg btn-block" ng-click="$dismiss()">Cancel</button>
     </div>
   </form>

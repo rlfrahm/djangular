@@ -190,7 +190,6 @@ def resetPasswordFormHandler(request):
 			passResetToken = PasswordResetToken.objects.filter(user=user)
 			if len(passResetToken) < 1:
 				passResetToken = PasswordResetToken(user=user, token=uuid.uuid4())
-				print passResetToken.token
 				send_password_reset_email(request, passResetToken)
 				passResetToken.save()
 				return redirect(reverse('user:login'))

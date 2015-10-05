@@ -555,33 +555,67 @@ class PayBarHandler(APIView):
 		serializer.is_valid()
 		bar = get_object_or_404(Bar, pk=bar_id)
 		open_tabs = Tab.objects.filter(receiver=request.user).order_by('-created')
-		amount = serializer.validated_data['amount'] # The amount of the sale
+
+		# This is the amount of the sale
+		amount = serializer.validated_data['amount']
+		# This is the amount of the sale left to pay
+		amount_left = amount
+
+		# This is the amount of money in the user's tab
 		total_tab = request.user.profile.tab
 		for tab in open_tabs:
 			# Iterate through open tabs until we
 			# 1) Run out of tabs to extract money from
 			# 2) Suffice the amount of money needed to be withdrawn
-			if amount < tab.amount:
+
+			if amount_left < tab.amount:
+				# When the amount left is less than this tab
 				# Just use this tab
-				tab.amount -= amount
+				# Adjust the amount left on this tab
+				tab.amount -= amount_left
+				# Adjust the user's total tab amount
 				total_tab -= tab.amount
-				charge_source(tab.sender.customer.customer_id, tab.source, bar.owner.merchant.account_id, amount)
+				# Charge the tab source
+				charge_source(tab.sender.customer.customer_id, tab.source, bar.owner.merchant.account_id, amount_left)
+				# Adjust the amount_left
+				amount_left = 0
+				# Save the tab
 				tab.save()
+				# Break out of this loop because we don't need to use any other
+				# tabs
 				break
-			elif amount > tab.amount:
+			elif amount_left > tab.amount:
+				# When the amount left is more than this tab
+				# Use all of this tab
 				total_tab -= tab.amount
+				# Adjust the amount_left
+				amount_left -= tab.amount
+				# Charge the tab source
 				charge_source(tab.sender.customer.customer_id, tab.source, bar.owner.merchant.account_id, tab.amount)
+				# Because we used this tab, we can delete it
 				tab.delete()
 			else:
+				# When the amount left is equal to this tab
 				# Amounts are equal; remove & break
-				total_tab -= amount
-				charge_source(tab.sender.customer.customer_id, tab.source, bar.owner.merchant.account_id, amount)
+				total_tab -= amount_left
+				# Adjust the amount_left
+				amount_left -= tab.amount
+				# Charge the tab source
+				charge_source(tab.sender.customer.customer_id, tab.source, bar.owner.merchant.account_id, tab.amount)
+				# Because we used this tab, we can delete it
 				tab.delete()
+				# The amount_left is 0 so we can stop looking for money
 				break
 		request.user.profile.tab = total_tab
-		request.user.profile.save()
 
-		# TODO: Cover the rest of the costs using the user's account!
+		if amount_left > 0:
+			# We need to use the user's financial source
+			print amount_left
+			cust = request.user.customer
+			# TODO: record source of user
+			# charge_source(request.user.customer.customer_id, request.user.customer.default_source, bar.owner.merchant.account_id, amount_left)
+
+		request.user.profile.save()
 		return Response({'tab': total_tab})
 
 def charge_source(customer_id, source, recipient_id, amount):
@@ -596,4 +630,5 @@ def charge_source(customer_id, source, recipient_id, amount):
 		destination=recipient_id,
 		application_fee=application_fee
 	)
+	# TODO: Send notification to this user!
 	return res

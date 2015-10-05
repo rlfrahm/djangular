@@ -75,7 +75,7 @@ angular.module('Init', ['ui.bootstrap'])
 			};
 
 			function createNewCard() {
-				if (form.$invalid) return;
+				if (scope.form.$invalid) return;
 				scope.form.loading = true;
         var form = scope.form,
           newcard = scope.newcard;
@@ -95,7 +95,6 @@ angular.module('Init', ['ui.bootstrap'])
 			    scope.adding = false;
 
 			    if (response.error) {
-			      scope.$digest();
 			      // Show the errors on the form
 			      // $form.find('.payment-errors').text(response.error.message);
 			      // $form.find('button').prop('disabled', false);
@@ -103,12 +102,14 @@ angular.module('Init', ['ui.bootstrap'])
 			      // response contains id and card, which contains additional card details
 			      var token = response.id;
 			      scope.newcard.token = token;
-            element.submit();
+            console.log(scope.saveNewCard, scope);
+            if (attrs.submit)
+              element.submit();
+            else if (scope.saveNewCard)
+              scope.saveNewCard(token);
 			      // var c = new Source();
 			      // c.token = token;
 			      // c.$save();
-			      if (scope.getCards)
-			      	scope.getCards();
 			    }
   				scope.form.loading = true;
 			  }
