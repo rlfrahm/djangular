@@ -31,7 +31,7 @@ def loginHandler(request):
 			password = form.cleaned_data['password']
 			user = authenticate(username=username, password=password)
 			print user.first_name
-			if user is not None:
+			if user is not None and user.profile.is_active:
 				login(request, user)
 				continue_url = request.GET.get('next')
 				if continue_url:
@@ -73,13 +73,12 @@ def registerHandler(request):
 			user = User.objects.create_user(username, email, password)
 			user.first_name = firstname
 			user.last_name = lastname
-			user.is_active = False
 			user.save()
 
 			group = Group.objects.get(name='Drinkers')
 			user.groups.add(group)
 
-			profile = UserProfile(user=user, dob=dob)
+			profile = UserProfile(user=user, dob=dob, active=False)
 			profile.save()
 
 			# Stripe
@@ -119,7 +118,7 @@ def step1Handler(request):
 	if request.method == 'POST':
 			form = Step1Form(request.POST, request.FILES)
 			if form.is_valid():
-					request.user.profile.picture = form.cleaned_data['avatar']
+					request.user.profile.avatar = form.cleaned_data['avatar']
 					request.user.profile.save()
 			return redirect(reverse('user:register-step-2'))
 	else:
@@ -213,11 +212,12 @@ def resetPasswordHandler(request, token):
 						return redirect(reverse('core:home') + '#/profile')
 		return redirect(reverse('user:login'))
 
+@login_required
 def activeAccountHandler(request, token):
 		if request.method == 'GET':
 				activateAccountToken = get_object_or_404(AccountActivationToken, token=token)
 				if activateAccountToken:
-						activateAccountToken.user.is_active = True
-						activateAccountToken.user.save()
+						activateAccountToken.user.profile.active = True
+						activateAccountToken.user.profile.save()
 						activateAccountToken.delete()
 		return redirect(reverse('core:home'))

@@ -43,6 +43,17 @@ class UserProfile(models.Model):
 	# and not used yet.
 	tab = models.DecimalField(max_digits=6, decimal_places=2, default=0)
 
+	# The Django User model provides an "active" attribute,
+	# but using said attribute causes DRF to return a 403
+	# if the user has not activated their account. We want
+	# to allow the user to use their account before activation.
+	# Therefore, our own "active" attribute is required.
+	active = models.BooleanField(default=False)
+
+	@property
+	def is_active(self):
+		return self.active
+
 	@property
 	def avatar_url(self):
 	    if self.avatar and hasattr(self.avatar, 'url'):
