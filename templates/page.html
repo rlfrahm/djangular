@@ -18,10 +18,8 @@
       <ul class="nav navbar-nav navbar-right">
         <li><a href="{% url 'core:about' %}">About</a></li>
         <li><a href="{% url 'bars:bar-contact' %}">For Bars</a></li>
-        {% if user.pk %}
         <li><a href="{% url 'user:register' %}">Register</a></li>
         <li><a href="{% url 'user:login' %}">Login</a></li>
-        {% endif %}
       </ul>
     </div>
   </div>
