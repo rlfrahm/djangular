@@ -491,7 +491,8 @@ class TabsHandler(APIView):
 			tab.amount = serializer.validated_data['amount']
 			tab.sender = request.user
 			tab.source = serializer.validated_data['source']
-			tab.note = serializer.validated_data['note']
+			if serializer.validated_data.get('note'):
+				tab.note = serializer.validated_data['note']
 			tab = tab.set_receiver(request, serializer.validated_data['email'])
 			tab.save()
 
@@ -636,7 +637,6 @@ class PayBarHandler(APIView):
 
 		if amount_left > 0:
 			# We need to use the user's financial source
-			print amount_left
 			cust = request.user.customer
 			# TODO: record source of user
 			# charge_source(request.user.customer.customer_id, request.user.customer.default_source, bar.owner.merchant.account_id, amount_left)
@@ -648,8 +648,9 @@ class PayBarHandler(APIView):
 		return Response({'tab': total_tab})
 
 def charge_source(customer_id, source, recipient_id, amount):
-	application_fee = int(float(amount) * 0.1 * 100)
-	amount = amount * 100
+	application_fee = float(amount) * 0.1 * 100.00
+	application_fee = int(application_fee)
+	amount = int(amount * 100)
 	res = stripe.Charge.create(
 		amount=amount,
 		currency='usd',
