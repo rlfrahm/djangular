@@ -63,6 +63,9 @@ class Bar(models.Model):
 	def is_owner(self, user_id):
 		return self.owner.pk == user_id
 
+	def __unicode__(self):
+		return self.name
+
 class Bartender(models.Model):
 	user = models.ForeignKey(settings.AUTH_USER_MODEL)
 	bar = models.ForeignKey('Bar')

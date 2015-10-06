@@ -9,6 +9,10 @@ textarea {
 	resize: vertical;
 }
 
+[ng\:cloak], [ng-cloak], .ng-cloak {
+    display: none;
+}
+
 .row-centered {
   position: absolute;
   top: 0;

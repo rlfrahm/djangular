@@ -9,6 +9,12 @@
 			<a ui-sref="bar-settings.financial({id: bar.id})" class="list-group-item" ng-class="{'active':isState('bar-settings.financial')}">Financial</a>
 			<a ui-sref="bar-settings.sales({id: bar.id})" class="list-group-item" ng-class="{'active':isState('bar-settings.sales')}">Sales</a>
 		</div>
+		<div ui-sref="bar-settings.financial({id: bar.id})" class="alert alert-warning pointer text-center" ng-if="!bar.merchant" ng-cloak>
+			<div>
+				<img src="/static/images/high_priority.png" height="40px" style="margin: 0 auto">
+			</div>
+			There is no financial account set for this bar. This needs to be done before you can accept orders.
+		</div>
 	</div>
 	<div class="col-xs-12 col-md-8">
 		<div ui-view></div>

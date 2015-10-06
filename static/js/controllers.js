@@ -29,7 +29,7 @@ angular.module('App')
 	});
 }])
 
-.controller('BarCtrl', ['$scope', '$state', '$stateParams', 'Bar', 'Bartenders', 'Checkin', 'Time', 'Analytics', function($scope, $state, $stateParams, Bar, Bartenders, Checkin, Time, Analytics) {
+.controller('BarCtrl', ['$rootScope', '$scope', '$state', '$stateParams', 'Bar', 'Bartenders', 'Checkin', 'Time', 'Analytics', function($rootScope, $scope, $state, $stateParams, Bar, Bartenders, Checkin, Time, Analytics) {
 	$scope.bar = Bar.get({id: $stateParams.id}, function() {
 		Analytics.pageview($scope.bar.name);
     var map = new google.maps.Map(document.getElementById('map'), {

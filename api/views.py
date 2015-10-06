@@ -227,6 +227,11 @@ class BarHandler(APIView):
 			'owner': b.owner.pk,
 			'avatar': b.avatar_url,
 		}
+		# Check if we need to add any action items
+		if b.owner == request.user:
+			if hasattr(request.user, 'merchant'):
+				# The user has set up a merchant account through Stripe
+				bar['merchant'] = True
 		return Response(bar)
 
 	def post(self, request, bar_id, format=None):

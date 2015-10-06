@@ -1,5 +1,14 @@
 <div class="panel panel-default">
   <div class="panel-body">
-    <a href="https://connect.stripe.com/oauth/authorize?response_type=code&client_id=ca_6m86ozehkURqszIoojH2o0jY7gT3A2Er&scope=read_write" class="btn btn-info btn-lg">Connect Accounts</a>
+    <div class="text-center" ng-switch="bar.merchant">
+      <div ng-switch-when="true">
+        <h4>To view your financial account please click the button below</h4><br>
+        <a href="https://dashboard.stripe.com/dashboard" class="btn btn-info btn-lg">Navigate to Stripe</a>
+      </div>
+      <div ng-switch-when="false">
+        <h4>All payments will be made to this account. Click the button below to begin.</h4><br>
+        <a href="https://connect.stripe.com/oauth/authorize?response_type=code&client_id=ca_6m86ozehkURqszIoojH2o0jY7gT3A2Er&scope=read_write" class="btn btn-info btn-lg">Connect Your Financial Account</a>
+      </div>
+    </div>
   </div>
 </div>

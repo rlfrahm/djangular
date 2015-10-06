@@ -46,7 +46,7 @@ class AvatarSerializer(serializers.Serializer):
 class BarSerializer(serializers.ModelSerializer):
   class Meta:
     model = Bar
-    exclude = ('image',)
+    exclude = ('image', 'avatar')
 
   def create(self, validated_data):
     bar = Bar()
