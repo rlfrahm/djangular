@@ -12,5 +12,5 @@ class ContactForm(forms.Form):
 	name = forms.CharField(label='Your Name', max_length=255)
 	email = forms.EmailField()
 	phone = forms.CharField(label='Phone', max_length=10)
-	license_number = forms.CharField(label='Liquor License Number (last six digits only)', max_length=6)
+	license_number = forms.CharField(label='Liquor License Number', max_length=50)
 	comments = forms.CharField(label='Comments', widget=forms.Textarea, required=False)
