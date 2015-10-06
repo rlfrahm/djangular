@@ -15,7 +15,7 @@ from .serializers import RegisterSerializer, LoginSerializer, BarSerializer, Inv
 from .decorators import HasGroupPermission, is_in_group, BAR_OWNERS, DRINKERS
 
 from account.models import UserProfile, USER_PROFILE_DEFAULT
-from bars.models import Bar, Bartender, BartenderInvite, Checkin, Tab
+from bars.models import Bar, Bartender, BartenderInvite, Checkin, Tab, Sale
 from bars.emails import send_bartender_invite
 
 import uuid, datetime, stripe
@@ -247,6 +247,32 @@ class BarHandler(APIView):
 			return PermissionDenied()
 		bar.delete()
 		return Response({'delete': True})
+
+class BarSalesHandler(APIView):
+	"""
+	CRUD on bar sales
+	"""
+	authentication_classes = (SessionAuthentication,)
+	permission_classes = (IsAuthenticated, HasGroupPermission,)
+	required_groups = {
+		'GET': [BAR_OWNERS],
+	}
+
+	def get(self, request, bar_id, format=None):
+		bar = get_object_or_404(Bar, pk=bar_id)
+		s = bar.sale_set.all().order_by('-created')
+		sales = []
+		for sale in s:
+			sales.append({
+				'id': sale.pk,
+				'amount': sale.amount,
+				'customer_first_name': sale.customer.first_name,
+				'customer_last_name': sale.customer.last_name,
+				'customer_id': sale.customer.pk,
+				'bar_id': sale.bar.pk,
+				'when': sale.created
+			})
+		return Response(sales)
 
 class BarAvatarHandler(APIView):
 	"""
@@ -614,8 +640,11 @@ class PayBarHandler(APIView):
 			cust = request.user.customer
 			# TODO: record source of user
 			# charge_source(request.user.customer.customer_id, request.user.customer.default_source, bar.owner.merchant.account_id, amount_left)
-
 		request.user.profile.save()
+
+		# Track this sale
+		sale = Sale(amount=amount, bar=bar, customer=request.user)
+		sale.save()
 		return Response({'tab': total_tab})
 
 def charge_source(customer_id, source, recipient_id, amount):

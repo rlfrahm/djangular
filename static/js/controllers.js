@@ -83,7 +83,7 @@ angular.module('App')
 	};
 }])
 
-.controller('BarSettingsCtrl', ['$rootScope', '$scope', '$state', '$stateParams', '$modal', '$http', 'Bar', 'Bartenders', 'UserSearch', 'Analytics', function($rootScope, $scope, $state, $stateParams, $modal, $http, Bar, Bartenders, UserSearch, Analytics) {
+.controller('BarSettingsCtrl', ['$rootScope', '$scope', '$state', '$stateParams', '$modal', '$http', 'Bar', 'Bartenders', 'UserSearch', 'Analytics', 'BarSale', function($rootScope, $scope, $state, $stateParams, $modal, $http, Bar, Bartenders, UserSearch, Analytics, BarSale) {
 	$scope.bar = Bar.get({id: $stateParams.id}, function() {
 		Analytics.pageview($scope.bar.name + ' Settings');
     if ($scope.bar.street && $scope.bar.postal)
@@ -91,6 +91,8 @@ angular.module('App')
 		$scope.avatarSRC = $scope.bar.avatar;
   });
   $scope.search = {term:null};
+
+	$scope.sales = BarSale.query({id: $stateParams.id});
 
 	$scope.shouldSave = false;
 

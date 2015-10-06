@@ -30,7 +30,7 @@ def loginHandler(request):
 			username = form.cleaned_data['email'][:30]
 			password = form.cleaned_data['password']
 			user = authenticate(username=username, password=password)
-			if user is not None and user.profile.is_active:
+			if user is not None:
 				login(request, user)
 				continue_url = request.GET.get('next')
 				if continue_url:

@@ -118,3 +118,10 @@ class Tab(models.Model):
 		else:
 			self.receiver = user
 		return self
+
+class Sale(models.Model):
+	amount = models.DecimalField(max_digits=6, decimal_places=2)
+	bar = models.ForeignKey('Bar')
+	customer = models.ForeignKey(settings.AUTH_USER_MODEL)
+	created = models.DateTimeField(auto_now_add=True, auto_now=False)
+	updated = models.DateTimeField(auto_now_add=False, auto_now=True)

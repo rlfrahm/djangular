@@ -34,6 +34,10 @@ angular.module('Api', ['ngResource'])
 	return $resource('/api/v1/bars/:id');
 }])
 
+.factory('BarSale', ['$resource', function($resource) {
+	return $resource('/api/v1/bars/:id/sales');
+}])
+
 .factory('BarPayment', ['$resource', function($resource) {
 	return $resource('/api/v1/bars/:id/pay');
 }])
