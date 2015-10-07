@@ -77,8 +77,9 @@ angular.module('App')
 			$scope.newbar.avatar = fd;
 		}
 
-		$scope.newbar.$save(function() {
-			$state.go('bars-mine');
+		$scope.newbar.$save(function(res) {
+			console.log(res);
+			$state.go('bar-settings.general', {id: res.id});
 		});
 	};
 }])

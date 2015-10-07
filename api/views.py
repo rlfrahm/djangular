@@ -229,9 +229,8 @@ class BarHandler(APIView):
 		}
 		# Check if we need to add any action items
 		if b.owner == request.user:
-			if hasattr(request.user, 'merchant'):
-				# The user has set up a merchant account through Stripe
-				bar['merchant'] = True
+			# The user has set up a merchant account through Stripe
+			bar['merchant'] = hasattr(request.user, 'merchant')
 		return Response(bar)
 
 	def post(self, request, bar_id, format=None):
@@ -322,10 +321,12 @@ class BarsHandler(APIView):
 				})
 		return Response(bars)
 
+	# Create new bar
 	def post(self, request, format=None):
 		serializer = BarSerializer(data=request.data, context={'request': request})
 		if serializer.is_valid():
 			bar = serializer.save()
+			serializer.data['id'] = bar.pk
 			return Response(serializer.data)
 		else:
 			return Response({'error': True})
