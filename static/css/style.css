@@ -66,3 +66,14 @@ textarea {
   width: auto;
   height: 100px;
 }
+
+.icon-toolbar .navbar-nav {
+  display: table;
+  width: 100%;
+}
+
+.icon-toolbar .navbar-nav>li {
+  display: table-cell;
+  width: 25%;
+  text-align: center;
+}
