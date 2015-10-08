@@ -9,7 +9,7 @@ from django.contrib import messages
 
 from .forms import RegisterForm, ContactForm
 from .models import Bar, Bartender, BartenderInvite
-from .emails import send_bartender_invite, send_us_bar_inquiry
+from notifications.emails import send_bartender_invite, send_us_bar_inquiry
 
 # Create your views here.
 @login_required

@@ -12,7 +12,7 @@ from django.views.decorators.http import require_GET
 
 from .forms import LoginForm, RegisterForm, ProfileForm, StripeConnectRedirectForm, Step1Form, EmailForm
 from .models import UserProfile, StripeCustomer, StripeMerchant, PasswordResetToken, AccountActivationToken
-from .emails import send_password_reset_email, send_account_activate_email
+from notifications.emails import send_password_reset_email, send_account_activate_email
 
 from mydrinknation.decorators import anonymous_required
 

@@ -1,13 +1,12 @@
-<div class="page-header clearfix">
-	<div class="pull-left">
+<div class="page-header">
 		<h1>{[{ bar.name }]}</h1>
 		<h2><em><small>{[{ bar.street }]}, {[{ bar.city }]}, {[{ bar.province }]}</small></em></h2>
-	</div>
-	<ul class="list-inline list-unstyled pull-right">
-		<li><button type="button" class="btn btn-danger btn-lg" ng-click="checkin()">Check-in</button></li>
-		<li ng-if="bar.owner==user.id"><a ui-sref="bar-settings.general({id: bar.id})" class="btn btn-default btn-lg"><i class="fa fa-cog"></i></a></li>
-	</ul>
 </div>
+<ul class="list-inline list-unstyled">
+	<li><button type="button" class="btn btn-success btn-lg" ng-click="payForDrink()">Pay Here</button></li>
+	<li><button type="button" class="btn btn-danger btn-lg" ng-click="checkin()">Check-in</button></li>
+	<li ng-if="bar.owner==user.id"><a ui-sref="bar-settings.general({id: bar.id})" class="btn btn-default btn-lg"><i class="fa fa-cog"></i></a></li>
+</ul>
 <div class="row">
 	<div class="col-xs-12">
 		<div id="map" style="width:100%;height:300px"></div>

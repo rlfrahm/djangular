@@ -2,7 +2,7 @@ from django.db import models
 from django.conf import settings
 from django.contrib.auth.models import User
 
-from .emails import send_tab_invite
+from notifications.emails import send_tab_invite
 
 import uuid, os
 
@@ -103,6 +103,11 @@ class Tab(models.Model):
 	created = models.DateTimeField(auto_now_add=True, auto_now=False)
 	updated = models.DateTimeField(auto_now_add=False, auto_now=True)
 	note = models.CharField(max_length=140, default='', null=True)
+	# This holds the pre-authorization "Charge" token from Stripe
+	# This assures us that the sender actually has the money
+	# Note: Stripe puts a 7 day time limit on the charge so we need to expire
+	# tabs
+	charge = models.CharField(max_length=100, default='')
 
 	def set_receiver(self, request, email):
 		if request.user.email is email:

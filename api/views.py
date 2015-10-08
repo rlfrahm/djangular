@@ -16,7 +16,7 @@ from .decorators import HasGroupPermission, is_in_group, BAR_OWNERS, DRINKERS
 
 from account.models import UserProfile, USER_PROFILE_DEFAULT
 from bars.models import Bar, Bartender, BartenderInvite, Checkin, Tab, Sale
-from bars.emails import send_bartender_invite
+from notifications.emails import send_bartender_invite, send_bar_creation_email
 
 import uuid, datetime, stripe
 
@@ -306,7 +306,7 @@ class BarsHandler(APIView):
 	permission_classes = (IsAuthenticated, HasGroupPermission,)
 	required_groups = {
 		'GET': [DRINKERS],
-		'POST': [DRINKERS],
+		'POST': [BAR_OWNERS],
 	}
 
 	def get(self, request, format=None):
@@ -327,6 +327,7 @@ class BarsHandler(APIView):
 		if serializer.is_valid():
 			bar = serializer.save()
 			serializer.data['id'] = bar.pk
+			send_bar_creation_email(request, bar)
 			return Response(serializer.data)
 		else:
 			return Response({'error': True})
@@ -426,7 +427,7 @@ class UserSearchHandler(APIView):
 		serializer = SearchSerializer(data=request.GET)
 		if serializer.is_valid():
 			term = request.GET.get('term')
-			users = User.objects.filter(Q(first_name__icontains=term) | Q(last_name__icontains=term) | Q(email__icontains=term))
+			users = User.objects.filter(Q(first_name__icontains=term) | Q(last_name__icontains=term) | Q(email__icontains=term))[:5]
 			u = []
 			for user in users:
 				u.append({
@@ -434,6 +435,7 @@ class UserSearchHandler(APIView):
 					'first_name': user.first_name,
 					'last_name': user.last_name,
 					'email': user.email,
+					'avatar': user.profile.avatar_url
 				})
 			return Response(u)
 		else:
@@ -490,16 +492,39 @@ class TabsHandler(APIView):
 				})
 		return Response(t)
 
+	# Create new tab
 	def post(self, request, format=None):
 		serializer = TabSerializer(data=request.data)
 		if serializer.is_valid(raise_exception=True):
 			tab = Tab()
+			# The amount in dollars
 			tab.amount = serializer.validated_data['amount']
-			tab.sender = request.user
+			# The user's payment source
 			tab.source = serializer.validated_data['source']
+			# The email associated with the receiver
+			receiver_email = serializer.validated_data['email']
+			# Authorize the payment
+			print int(tab.amount * 100)
+			print tab.source
+			charge = stripe.Charge.create(
+				amount=int(tab.amount * 100),
+				currency='usd',
+				customer=request.user.customer.customer_id,
+				source=tab.source,
+				description='Tab for %s' % receiver_email,
+				capture=False
+			)
+			if not charge:
+				# The authorization failed
+				return Response({
+					'status': 400,
+					'message': 'Authorization of the payment source failed'
+				})
+			tab.charge = charge['id']
+			tab.sender = request.user
 			if serializer.validated_data.get('note'):
 				tab.note = serializer.validated_data['note']
-			tab = tab.set_receiver(request, serializer.validated_data['email'])
+			tab = tab.set_receiver(request, receiver_email)
 			tab.save()
 
 			# Add the amount to the user's tab unless there was an invite sent
@@ -609,7 +634,7 @@ class PayBarHandler(APIView):
 				# Adjust the user's total tab amount
 				total_tab -= tab.amount
 				# Charge the tab source
-				charge_source(tab.sender.customer.customer_id, tab.source, bar.owner.merchant.account_id, amount_left)
+				charge_source(tab.sender.customer.customer_id, tab.source, bar.owner.merchant.account_id, amount_left, tab.charge)
 				# Adjust the amount_left
 				amount_left = 0
 				# Save the tab
@@ -624,7 +649,7 @@ class PayBarHandler(APIView):
 				# Adjust the amount_left
 				amount_left -= tab.amount
 				# Charge the tab source
-				charge_source(tab.sender.customer.customer_id, tab.source, bar.owner.merchant.account_id, tab.amount)
+				charge_source(tab.sender.customer.customer_id, tab.source, bar.owner.merchant.account_id, tab.amount, tab.charge)
 				# Because we used this tab, we can delete it
 				tab.delete()
 			else:
@@ -634,7 +659,7 @@ class PayBarHandler(APIView):
 				# Adjust the amount_left
 				amount_left -= tab.amount
 				# Charge the tab source
-				charge_source(tab.sender.customer.customer_id, tab.source, bar.owner.merchant.account_id, tab.amount)
+				charge_source(tab.sender.customer.customer_id, tab.source, bar.owner.merchant.account_id, tab.amount, tab.charge)
 				# Because we used this tab, we can delete it
 				tab.delete()
 				# The amount_left is 0 so we can stop looking for money
@@ -653,18 +678,22 @@ class PayBarHandler(APIView):
 		sale.save()
 		return Response({'tab': total_tab})
 
-def charge_source(customer_id, source, recipient_id, amount):
-	application_fee = float(amount) * 0.1 * 100.00
-	application_fee = int(application_fee)
+def charge_source(customer_id, source, recipient_id, amount, charge):
+	application_fee = get_application_fee(amount)
 	amount = int(amount * 100)
-	res = stripe.Charge.create(
-		amount=amount,
-		currency='usd',
-		customer=customer_id,
-		source=source,
-		description='Charge for tab',
-		destination=recipient_id,
-		application_fee=application_fee
-	)
+	charge = stripe.Charge.retrieve(charge)
+	charge.capture()
+	# res = stripe.Charge.create(
+	# 	amount=amount,
+	# 	currency='usd',
+	# 	customer=customer_id,
+	# 	source=source,
+	# 	description='Charge for tab',
+	# 	destination=recipient_id,
+	# 	application_fee=application_fee
+	# )
 	# TODO: Send notification to this user!
 	return res
+
+def get_application_fee(amount):
+	return int(float(amount) * 0.1 * 100.00)

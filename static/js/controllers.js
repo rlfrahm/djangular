@@ -245,7 +245,6 @@ angular.module('App')
   $scope.addNewPaymentMethod = function() {
     var m = $modal.open({
       templateUrl: 'select-payment-method.html',
-      size: 'sm'
     });
 
     m.result.then(function(email) {

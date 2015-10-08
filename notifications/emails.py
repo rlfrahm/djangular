@@ -55,3 +55,60 @@ def send_us_bar_inquiry(request, name, bar_name, email, phone, license, comments
   msg.to = ['frahmryan@gmail.com']
   msg.send()
   return msg
+
+def send_password_reset_email(request, token):
+    msg = EmailMessage()
+    msg.subject = 'Password Reset for My Drink Nation'
+    msg.body = """
+    You recently requested to reset your password. To do so, simply follow the link below:
+
+    %s
+
+    Thanks,
+    The My Drink Nation team
+    %s
+    """ % (request.build_absolute_uri(reverse('user:reset-password', args=(token.token,))), request.build_absolute_uri(reverse('core:home')))
+    msg.from_email = settings.EMAIL_FROM_EMAIL
+    msg.to = [token.user.email]
+    msg.send()
+    return msg
+
+def send_account_activate_email(request, token):
+    msg = EmailMessage()
+    msg.subject = 'Thanks for signing up for My Drink Nation'
+    msg.body = """
+    Your newly created account is ready to be activated. To activate, simply follow the link below:
+
+    %s
+
+    Note: If you forgo activation for too long, you run the risk of your account being suspended.
+
+    Thanks,
+    The My Drink Nation team
+    %s
+    """ % (request.build_absolute_uri(reverse('user:activate', args=(token.token,))), request.build_absolute_uri(reverse('core:home')))
+    msg.from_email = settings.EMAIL_FROM_EMAIL
+    msg.to = [token.user.email]
+    msg.send()
+    return msg
+
+def send_bar_creation_email(request, bar):
+    msg = EmailMessage()
+    msg.subject = 'Next steps for %s' % bar.name
+    msg.body = """
+    Thank you for registering your bar with My Drink Nation!
+
+    There are some important next steps you need to take to unlock the full power of My Drink Nation:
+
+    1) Make sure you add a profile image for %s
+    2) Start inviting your bartenders
+    3) Connect your bank account to start receiving drink orders
+
+    Thanks,
+    The My Drink Nation team
+    %s
+    """ % (bar.name, request.build_absolute_uri(reverse('core:home')))
+    msg.from_email = settings.EMAIL_FROM_EMAIL
+    msg.to = [bar.owner.email]
+    msg.send()
+    return msg

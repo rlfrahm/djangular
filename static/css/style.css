@@ -61,3 +61,8 @@ textarea {
 .list-group-item.media {
   margin-top: 0;
 }
+
+.thumbnail>img {
+  width: auto;
+  height: 100px;
+}
