@@ -56,6 +56,10 @@ class Bar(models.Model):
 	    if self.avatar and hasattr(self.avatar, 'url'):
 	        return self.avatar.url
 
+	@property
+	def location(self):
+		return '%s, %s, %s' % (self.street, self.city, self.province)
+
 	@models.permalink
 	def get_absolute_url(self):
 		return 'bars:bar-detail', (self.slug,)

@@ -187,7 +187,7 @@ angular.module('App')
 	$scope.tab.emails = [];
   if ($stateParams.for)
     $scope.tab.emails.push($stateParams.for);
-	$scope.tab.amount = 10;
+	$scope.tab.amount = 20;
 	$scope.selectedSource = null;
 
 	$scope.order = {
@@ -255,20 +255,19 @@ angular.module('App')
 .controller('TabCtrl', ['$scope', '$modal', 'MyTab', 'Tab', 'BarPayment', 'Analytics', function($scope, $modal, MyTab, Tab, BarPayment, Analytics) {
 	Analytics.pageview('My Tab');
   $scope.title = 'Tab';
-	$scope.tabs = Tab.query()
+	$scope.tabs = Tab.query();
+	$scope.payment = {};
 	var t = MyTab.get(function() {
 		$scope.tab = t.tab;
 	});
 
 	$scope.selectBar = function(bar) {
-		$scope.term = bar.name;
-		$scope.bar = bar;
+		$scope.payment.bar = bar;
 	};
 
-	$scope.useTab = function(tab) {
+	$scope.payForDrink = function(tab) {
     var m = $modal.open({
-      templateUrl: 'tab-checkout.html',
-      size: 'sm',
+      templateUrl: 'pay-for-drink-where.html',
       scope: $scope
     });
 
@@ -276,20 +275,48 @@ angular.module('App')
     });
 	};
 
-	$scope.processPayment = function(form, bar_id, amount) {
+	$scope.submitBar = function(form, close) {
+		if (form.$invalid) return;
+		close();
+
+		var m = $modal.open({
+      templateUrl: 'pay-for-drink-bartender.html',
+      scope: $scope
+    });
+
+    m.result.then(function(email) {
+    });
+	};
+
+	$scope.processPayment = function(form, close) {
 		if (form.$invalid) return;
 
 		$scope.processing = true;
 
+		// TEMPORARY OVERRIDE
+		$scope.showTipModal(payment);
+		close();
+		return;
+
     var payment = new BarPayment();
-    payment.amount = amount;
-    var p = payment.$save({id: bar_id});
+    payment.amount = $scope.payment.cost;
+    var p = payment.$save({id: bar_id}, function() {
+			close();
+			$scope.showTipModal(payment);
+		});
 	};
 
-	$scope.confirmTab = function(tab, decision) {
+	$scope.showTipModal = function(payment) {
+		var m = $modal.open({
+      templateUrl: 'pay-for-drink-tip.html',
+      scope: $scope
+    });
+	};
+
+	$scope.confirmTab = function(tab, decision, close) {
 		tab.accepted = decision;
 		tab.$save({id: tab.id});
-		$scope.$close();
+		close();
 	};
 
 	$scope.showTabModal = function(tab) {
@@ -297,7 +324,6 @@ angular.module('App')
 		s.tab = tab;
     var m = $modal.open({
       templateUrl: 'tab-detail.html',
-      size: 'sm',
       scope: s
     });
 

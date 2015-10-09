@@ -9,8 +9,17 @@ textarea {
 	resize: vertical;
 }
 
+.page .view {
+  margin-bottom: 80px;
+}
+
 [ng\:cloak], [ng-cloak], .ng-cloak {
     display: none;
+}
+
+.center {
+  margin: 0 auto;
+  display: block;
 }
 
 .btn, .modal-content, .panel {
@@ -70,10 +79,16 @@ textarea {
 .icon-toolbar .navbar-nav {
   display: table;
   width: 100%;
+  margin: 0;
 }
 
 .icon-toolbar .navbar-nav>li {
   display: table-cell;
   width: 25%;
   text-align: center;
+}
+
+.icon-toolbar .navbar-nav>li>a {
+  padding-left: 0;
+  padding-right: 0;
 }

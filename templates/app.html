@@ -40,18 +40,16 @@
     </div>
   </div>
 </nav>
-<div class="container">
+<div class="container view">
   <div ui-view></div>
 </div>
 <nav class="navbar navbar-default navbar-fixed-bottom icon-toolbar">
-  <div class="container-fluid">
-    <ul class="nav navbar-nav">
-      <li><a href>Bars</a></li>
-      <li><a href>Link</a></li>
-      <li><a href>Open Tab</a></li>
-      <li><a href>Profile</a></li>
-    </ul>
-  </div>
+  <ul class="nav navbar-nav">
+    <li><a ui-sref="bars">Bars</a></li>
+    <li><a href>Link</a></li>
+    <li><a ui-sref="tabs-open.for">Open Tab</a></li>
+    <li><a ui-sref="profile">Profile</a></li>
+  </ul>
 </nav>
 {% endblock %}
 
@@ -66,25 +64,4 @@
 <script type="text/javascript" src="{% static "js/directives.js" %}"></script>
 <script type="text/javascript" src="{% static "js/services.js" %}"></script>
 <script type="text/javascript">var pk = '{{ stripe_pk }}';</script>
-<script type="text/ng-template" id="tab-checkout.html">
-  <form name="form" ng-submit="processPayment(form, bar.id, cost)">
-    <div class="modal-header">
-        <h2 class="modal-title text-center">{[{ bar.name }]}</h2>
-    </div>
-    <div class="modal-body">
-      <div class="form-group">
-        <label>Drink Cost</label>
-        <input type="number" min="10" step="1" class="form-control input-lg" ng-model="cost" focus required>
-      </div>
-    </div>
-    <div class="modal-footer clearfix">
-      <div class="pull-left" ng-if="processing">
-        <div class="throbber-loader">
-          Loading…
-        </div>
-      </div>
-      <button class="btn btn-success btn-lg" type="submit" style="margin:0 auto">Process</button>
-    </div>
-  </form>
-</script>
 {% endblock %}

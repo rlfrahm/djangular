@@ -454,7 +454,8 @@ class BarSearchHandler(APIView):
 			for bar in bs:
 				bars.append({
 					'id': bar.pk,
-					'name': bar.name
+					'name': bar.name,
+					'location': bar.location
 					})
 			return Response(bars)
 		else:

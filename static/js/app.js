@@ -11,15 +11,15 @@ angular.module('App', ['Init', 'Api', 'ui.bootstrap', 'ui.router',])
   $httpProvider.defaults.xsrfHeaderName = 'X-CSRFToken';
 
   // For any unmatched url
-  $urlRouterProvider.otherwise('/tab');
+  $urlRouterProvider.otherwise('/');
 
   // States
   $stateProvider
-    .state('home', {
-      url: '/',
-      templateUrl: 'static/partials/home.html',
-      controller: 'HomeCtrl'
-    })
+    // .state('home', {
+    //   url: '/',
+    //   templateUrl: 'static/partials/home.html',
+    //   controller: 'HomeCtrl'
+    // })
     .state('logout', {
       url: '/logout',
       templateUrl: 'static/partials/user/logout.html',
@@ -33,7 +33,7 @@ angular.module('App', ['Init', 'Api', 'ui.bootstrap', 'ui.router',])
       controller: 'UserProfileCtrl'
     })
     .state('tab', {
-      url: '/tab',
+      url: '/',
       templateUrl: 'static/partials/drinks/tab.html',
       controller: 'TabCtrl'
     })
@@ -153,6 +153,25 @@ angular.module('App', ['Init', 'Api', 'ui.bootstrap', 'ui.router',])
       }
     });
   }
+
+  // Get the user's location
+  // function geo_success(position) {
+  //   console.log(position);
+  // }
+  //
+  // function geo_error() {
+  //
+  // }
+  //
+  // var geo_options = {
+  //   enableHighAccuracy: true,
+  //   maximumAge: 30000,
+  //   timeout: 27000
+  // };
+  //
+  // if ('geolocation' in navigator) {
+  //   var wpid = navigator.geolocation.watchPosition(geo_success, geo_error, geo_options);
+  // }
 }])
 
 .service('Authorization', ['$rootScope', function($rootScope) {
