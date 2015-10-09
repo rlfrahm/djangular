@@ -111,4 +111,81 @@ angular.module('App')
 		  }
 		}
 	};
+}])
+
+.directive('loader', [function() {
+	return {
+		restrict: 'E',
+		template: '<div ng-if="loading"><i class="fa fa-spinner fa-pulse fa-3x"></i></div>'
+	};
+}])
+
+.directive('buyDrinks', ['$modal', 'BarPayment', function($modal, BarPayment) {
+	return {
+		link: function($scope, element, attrs) {
+			$scope.payment = {};
+			$scope.selectBar = function(bar) {
+				$scope.payment.bar = bar;
+			};
+
+			$scope.payForDrinkHere = function(bar) {
+				$scope.payment.bar = bar;
+		    $scope.showPayForDrinkBartenderModal();
+			};
+
+			$scope.payForDrink = function(tab) {
+		    var m = $modal.open({
+		      templateUrl: 'pay-for-drink-where.html',
+		      scope: $scope
+		    });
+
+		    m.result.then(function(email) {
+		    });
+			};
+
+			$scope.submitBar = function(form, close) {
+				if (form.$invalid) return;
+				close();
+
+				$scope.showPayForDrinkBartenderModal();
+			};
+
+			$scope.showPayForDrinkBartenderModal = function() {
+				var m = $modal.open({
+		      templateUrl: 'pay-for-drink-bartender.html',
+		      scope: $scope
+		    });
+
+		    m.result.then(function(email) {
+		    });
+			};
+
+			$scope.processPayment = function(form, close) {
+				if (form.$invalid) return;
+
+				$scope.loading = true;
+
+				// TEMPORARY OVERRIDE
+				$scope.showTipModal(payment);
+				close();
+				$scope.loading = false;
+				return;
+
+		    var payment = new BarPayment();
+		    payment.amount = $scope.payment.cost;
+		    var p = payment.$save({id: bar_id}, function() {
+					$scope.loading = false;
+					close();
+					$scope.showTipModal(payment);
+				});
+			};
+
+			$scope.showTipModal = function(payment) {
+				var m = $modal.open({
+		      templateUrl: 'pay-for-drink-tip.html',
+		      scope: $scope
+		    });
+			};
+		}
+	};
 }]);

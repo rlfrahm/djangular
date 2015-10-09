@@ -1,19 +1,27 @@
 <form name="form" ng-cloak>
-  <div class="list-group-item clearfix" ng-repeat="e in tab.emails">
-    <h4 class="list-group-item-heading pull-left">{[{ e }]}</h4>
-    <button type="button" class="close pull-right" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+  <div class="list-group-item media clearfix" ng-repeat="user in tabUsers">
+    <div class="col-xs-2">
+      <div class="row">
+        <img class="media-object" ng-src="{[{ user.avatar }]}" height="40px">
+      </div>
+    </div>
+    <div class="col-xs-8">
+      <h4 class="media-heading">{[{ user.first_name }]} {[{ user.last_name }]}</h4>
+    </div>
+    <div class="col-xs-2">
+      <button type="button" class="close" aria-label="Close" ng-click="removeUser($index)"><span aria-hidden="true">&times;</span></button>
+    </div>
   </div>
   <div class="list-group-item">
     <div class="form-group" dropdown is-open="searching">
       <input type="text" class="form-control input-lg" placeholder="Search..." ng-model="term" ng-model-options="{ debounce: 500 }" ng-change="search(term)" dropdown-toggle>
       <div class="list-group dropdown-menu" style="width:100%" ng-show="users">
-        <a class="list-group-item media pointer row" ng-repeat="user in users" ng-click="selectUser(user)">
+        <a class="list-group-item media pointer" ng-repeat="user in users" ng-click="selectUser(user)">
           <div class="col-xs-3">
             <img class="media-object" ng-src="{[{ user.avatar }]}" height="40px">
           </div>
           <div class="col-xs-9">
-            <h5 class="media-heading">{[{ user.first_name }]} {[{ user.last_name }]}</h5>
-            <small>{[{ user.email }]}</small>
+            <h4 class="media-heading">{[{ user.first_name }]} {[{ user.last_name }]}</h4>
           </div>
         </a>
       </div>

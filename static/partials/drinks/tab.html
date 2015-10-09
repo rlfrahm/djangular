@@ -4,7 +4,7 @@
 		<h1 class="text-center">{[{ tab | currency }]}</h1>
 	</div>
 </div>
-<button type="button" class="btn btn-success btn-lg center" ng-click="payForDrink()">Pay for Drink</button>
+<button type="button" class="btn btn-success btn-lg center" buy-drinks ng-click="payForDrink()">Pay for Drink</button>
 <br>
 <div class="panel panel-default">
 	<div class="panel-heading">
@@ -20,13 +20,15 @@
         {[{ tab.sender_first_name }]}
       </div>
 			<div class="media-right" ng-if="!tab.accepted">
-				Tap to Accept
+				<img class="media-object" ng-src="static/images/high_priority.png" height="48px">
+				<!-- Tap to Accept -->
 			</div>
 	  </a>
 	</div>
 </div>
 <script type="text/ng-template" id="tab-detail.html">
   <div class="modal-body text-center">
+		<img ng-src="{[{ tab.sender_avatar }]}" height="48px" style="center">
     <h4>{[{ tab.sender_first_name }]} {[{ tab.sender_last_name }]} gave you</h4>
     <h1>{[{ tab.amount | currency }]}</h1>
     <div ng-if="tab.note">
@@ -39,10 +41,13 @@
 			  <button type="button" class="btn btn-danger" ng-click="confirmTab(tab, false, $close)">No Thanks</button>
 			  <button type="button" class="btn btn-success" ng-click="confirmTab(tab, true, $close)">Accept</button>
 			</div>
+			<div class="text-center">
+				<loader></loader>
+			</div>
 		</div>
   </div>
   <div class="modal-footer">
-  	<button type="submit" class="btn btn-link btn-lg btn-block center" ng-click="$dismiss()">Decide Later</button>
+  	<button type="submit" class="btn btn-link btn-lg btn-block center" ng-click="$dismiss()">{[{ (tab.accepted) ? 'Ok' : 'Decide Later' }]}</button>
   </div>
 </script>
 <script type="text/ng-template" id="pay-for-drink-where.html">
@@ -64,53 +69,6 @@
     <div class="modal-footer clearfix">
 			<button class="btn btn-link btn-lg" type="button" ng-click="$dismiss()">Cancel</button>
       <button class="btn btn-success btn-lg" type="submit" ng-disabled="!payment.bar">Process</button>
-    </div>
-  </form>
-</script>
-<script type="text/ng-template" id="pay-for-drink-bartender.html">
-  <form name="form" ng-submit="processPayment(form, $close)">
-    <div class="modal-header">
-        <h2 class="modal-title text-center">{[{ payment.bar.name }]}</h2>
-				<p class="text-center text-danger"><b>Bartender Use Only</b></p>
-    </div>
-    <div class="modal-body">
-      <div class="form-group">
-        <label>Drink Cost</label>
-				<div class="input-group">
-					<span class="input-group-addon">$</span>
-					<input type="number" min="10" step="1" class="form-control input-lg" ng-model="payment.cost" placeholder="Drink cost" focus required>
-				</div>
-      </div>
-    </div>
-    <div class="modal-footer clearfix">
-      <div class="pull-left" ng-if="processing">
-        <div class="throbber-loader">
-          Loading…
-        </div>
-      </div>
-			<button class="btn btn-link btn-lg" type="button" ng-click="$dismiss()">Cancel</button>
-      <button class="btn btn-success btn-lg" type="submit">Process</button>
-    </div>
-  </form>
-</script>
-<script type="text/ng-template" id="pay-for-drink-tip.html">
-  <form name="form" ng-submit="">
-    <div class="modal-header">
-        <h2 class="modal-title text-center">Add a tip?</h2>
-				<p class="text-center text-danger"><b>{[{ payment.bar.name }]}</b></p>
-    </div>
-    <div class="modal-body">
-      <div class="form-group">
-        <label>{[{ payment.cost * (payment.tipPercent / 100) | currency}]}</label>
-				<div class="input-group">
-					<input type="number" min="1" step="1" class="form-control input-lg" ng-model="payment.tipPercent" placeholder="Tip Amount" focus required>
-					<span class="input-group-addon">%</span>
-				</div>
-      </div>
-    </div>
-    <div class="modal-footer clearfix">
-			<button class="btn btn-link btn-lg text-danger" type="button" ng-click="$dismiss()">No Thanks</button>
-      <button class="btn btn-success btn-lg" type="submit">Yes!</button>
     </div>
   </form>
 </script>

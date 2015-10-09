@@ -29,6 +29,7 @@
     <p ng-class="{'text-danger': length > maxLength}">{[{ length || 0 }]} / {[{ maxLength }]}</p>
   </div>
   <div class="list-group-item clearfix">
+    <loader model="loading" class="pull-left"></loader>
     <button type="submit" class="btn btn-primary btn-lg pull-right">Submit</button>
   </div>
 </form>

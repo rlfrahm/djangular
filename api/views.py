@@ -529,9 +529,9 @@ class TabsHandler(APIView):
 			tab.save()
 
 			# Add the amount to the user's tab unless there was an invite sent
-			if tab.receiver or tab.accepted is not True:
-				tab.receiver.profile.tab += tab.amount
-				tab.receiver.profile.save()
+			# if tab.receiver or tab.accepted is not True:
+			# 	tab.receiver.profile.tab += tab.amount
+			# 	tab.receiver.profile.save()
 
 			return Response({
 				'id': tab.pk,

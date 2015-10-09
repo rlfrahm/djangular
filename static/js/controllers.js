@@ -185,6 +185,7 @@ angular.module('App')
 	$scope.buyingType = 'tab';
 	$scope.tab = new Tab();
 	$scope.tab.emails = [];
+	$scope.tabUsers = [];
   if ($stateParams.for)
     $scope.tab.emails.push($stateParams.for);
 	$scope.tab.amount = 20;
@@ -227,7 +228,14 @@ angular.module('App')
 
 	$scope.selectUser = function(user) {
 		$scope.searching = false;
+		$scope.tabUsers.push(user);
 		$scope.tab.emails.push(user.email);
+		$scope.term = '';
+	};
+
+	$scope.removeUser = function($index) {
+		$scope.tabUsers.splice($index, 1);
+		$scope.tab.emails.splice($index, 1);
 	};
 
 	$scope.selectSource = function(source) {
@@ -235,9 +243,19 @@ angular.module('App')
 		$scope.selectedSource = source;
 	};
 
+	$scope.$watch('sources', function(newval) {
+		if (!newval) return;
+
+		$scope.tab.source = newval[0].id;
+		$scope.selectedSource = newval[0];
+	});
+
+	$scope.loading = false;
 	$scope.submit = function() {
+		$scope.loading = true;
 		$scope.tab.email = $scope.tab.emails[0];
 		$scope.tab.$save(function() {
+			$scope.loading = false;
 			$state.go('tab');
 		});
 	};
@@ -256,67 +274,29 @@ angular.module('App')
 	Analytics.pageview('My Tab');
   $scope.title = 'Tab';
 	$scope.tabs = Tab.query();
-	$scope.payment = {};
-	var t = MyTab.get(function() {
-		$scope.tab = t.tab;
-	});
 
-	$scope.selectBar = function(bar) {
-		$scope.payment.bar = bar;
-	};
-
-	$scope.payForDrink = function(tab) {
-    var m = $modal.open({
-      templateUrl: 'pay-for-drink-where.html',
-      scope: $scope
-    });
-
-    m.result.then(function(email) {
-    });
-	};
-
-	$scope.submitBar = function(form, close) {
-		if (form.$invalid) return;
-		close();
-
-		var m = $modal.open({
-      templateUrl: 'pay-for-drink-bartender.html',
-      scope: $scope
-    });
-
-    m.result.then(function(email) {
-    });
-	};
-
-	$scope.processPayment = function(form, close) {
-		if (form.$invalid) return;
-
-		$scope.processing = true;
-
-		// TEMPORARY OVERRIDE
-		$scope.showTipModal(payment);
-		close();
-		return;
-
-    var payment = new BarPayment();
-    payment.amount = $scope.payment.cost;
-    var p = payment.$save({id: bar_id}, function() {
-			close();
-			$scope.showTipModal(payment);
+	var t;
+	function getMyTab() {
+		t = MyTab.get(function() {
+			$scope.tab = t.tab;
 		});
-	};
+	}
+	getMyTab();
 
-	$scope.showTipModal = function(payment) {
-		var m = $modal.open({
-      templateUrl: 'pay-for-drink-tip.html',
-      scope: $scope
-    });
-	};
+	$scope.loading = false;
 
 	$scope.confirmTab = function(tab, decision, close) {
+		$scope.loading = true;
 		tab.accepted = decision;
-		tab.$save({id: tab.id});
-		close();
+		t = angular.copy(tab);
+		t.$save({id: tab.id}, function() {
+			if (!t.accepted)
+				$scope.tabs.splice($scope.tabs.indexOf(tab), 1);
+			else
+				getMyTab();
+			close();
+			$scope.loading = false;
+		});
 	};
 
 	$scope.showTabModal = function(tab) {
