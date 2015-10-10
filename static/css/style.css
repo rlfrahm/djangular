@@ -81,6 +81,12 @@ textarea {
   border: 1px solid #999;
 }
 
+@media (min-width: 768px) {
+  .icon-toolbar {
+    display: none;
+  }
+}
+
 .icon-toolbar .navbar-nav {
   display: table;
   width: 100%;
