@@ -186,13 +186,14 @@ angular.module('App')
 		    });
 			};
 
-			$scope.submitTip = function(form) {
+			$scope.submitTip = function(form, close) {
 				if (form.$invalid) return;
 
 				var bs = new BarSale();
 				bs.tip = $scope.payment.tipPercent;
-				bs.put({id: $scope.payment.bar.id, sid: $scope.payment.sale});
+				// bs.put({id: $scope.payment.bar.id, sid: $scope.payment.sale});
 				console.log(bs);
+				close();
 			};
 		}
 	};

@@ -6,8 +6,8 @@ from . import views
 
 urlpatterns = [
   url(r'^user/bars$', views.UserBarsHandler.as_view(), name='user-bars'),
+  url(r'^user/sources/(?P<source_id>.+)$', views.SourceHandler.as_view(), name='credit-card'),
   url(r'^user/sources$', views.SourcesHandler.as_view(), name='credit-cards'),
-  url(r'^user/sources/(?P<source_id>[0-9]+)$', views.SourceHandler.as_view(), name='credit-card'),
   url(r'^user/tab$', views.UserTabHandler.as_view(), name='user-tab'),
   url(r'^user/avatar$', views.UserAvatarHandler.as_view(), name='user-avatar'),
   url(r'^user/password$', views.UserPasswordHandler.as_view(), name='user-password'),

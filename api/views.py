@@ -522,7 +522,7 @@ class TabsHandler(APIView):
 			# The email associated with the receiver
 			receiver_email = serializer.validated_data['email']
 			# Authorize the payment
-			charge = authorize_charge(tab.smount, request.user.customer.customer_id, tab.source, receiver_email)
+			charge = authorize_source(tab.amount, request.user.customer.customer_id, tab.source, receiver_email)
 			if not charge:
 				# The authorization failed
 				return Response({
@@ -612,8 +612,9 @@ class SourcesHandler(APIView):
 		serializer.is_valid(raise_exception=True)
 		customer = stripe.Customer.retrieve(request.user.customer.customer_id)
 		source = customer.sources.create(source=serializer.validated_data['token'])
-		request.user.customer.default_source = source.get('id')
-		request.user.customer.save()
+		if request.user.customer.default_source == '':
+			request.user.customer.default_source = source.get('id')
+			request.user.customer.save()
 		return Response({'success': True})
 
 class SourceHandler(APIView):
@@ -628,9 +629,12 @@ class SourceHandler(APIView):
 		customer = stripe.Customer.retrieve(request.user.customer.customer_id)
 		source = customer.sources.retrieve(source_id)
 		id = source.get('id')
-		request.user.customer.default_source = source_id
-		request.user.customer.save()
-		return Response({source: source_id})
+		if id == source_id:
+			request.user.customer.default_source = source_id
+			request.user.customer.save()
+			return Response({'source': source_id})
+		else:
+			return Response({'source': False})
 
 class PayBarHandler(APIView):
 	"""
@@ -703,13 +707,12 @@ class PayBarHandler(APIView):
 		print 'Total tab: %s' % total_tab
 		print 'Amount left: %s' % amount_left
 		request.user.profile.tab = total_tab
+		request.user.profile.save()
 
 		if amount_left > 0:
 			# We need to use the user's financial source
-			cust = request.user.customer
-			# TODO: record source of user
-			# charge_source(request.user.customer.customer_id, request.user.customer.default_source, bar.owner.merchant.account_id, amount_left)
-		request.user.profile.save()
+			if request.user.customer.default_source != '':
+				authorize_source(amount_left, request.user.customer.customer_id, request.user.customer.default_source, request.user.email, bar.owner.merchant.account_id)
 
 		# Track this sale
 		sale = Sale(amount=amount, bar=bar, customer=request.user)
@@ -727,7 +730,7 @@ def authorize_source(amount, customer_id, source, receiver_email, recipient_id=N
 		description='Tab for %s' % receiver_email,
 		capture=False,
 		destination=recipient_id,
-		application_fee=get_application_fee(amount)
+		application_fee=get_application_fee(amount) if recipient_id else None
 	)
 	return charge
 

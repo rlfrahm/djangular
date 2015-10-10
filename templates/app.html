@@ -93,14 +93,14 @@
   </form>
 </script>
 <script type="text/ng-template" id="pay-for-drink-tip.html">
-  <form name="form" ng-submit="submitTip(form)">
+  <form name="form" ng-submit="submitTip(form, $close)">
     <div class="modal-header">
         <h2 class="modal-title text-center">Add a tip?</h2>
 				<p class="text-center text-danger"><b>{[{ payment.bar.name }]}</b></p>
     </div>
     <div class="modal-body">
       <div class="form-group">
-        <label>{[{ payment.cost * (payment.tipPercent / 100) | currency}]}</label>
+        <label>{[{ payment.cost | currency }]} x {[{ payment.tipPercent }]}% = {[{ payment.cost * (payment.tipPercent / 100) | currency}]}</label>
 				<div class="input-group">
 					<input type="number" min="1" step="1" class="form-control input-lg" ng-model="payment.tipPercent" ng-init="payment.tipPercent=20" value="20" placeholder="Tip Amount" focus required>
 					<span class="input-group-addon">%</span>
