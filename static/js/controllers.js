@@ -276,12 +276,12 @@ angular.module('App')
 	$scope.tabs = Tab.query();
 
 	var t;
-	function getMyTab() {
+	$scope.getMyTab = function() {
 		t = MyTab.get(function() {
 			$scope.tab = t.tab;
 		});
 	}
-	getMyTab();
+	$scope.getMyTab();
 
 	$scope.loading = false;
 
@@ -293,7 +293,7 @@ angular.module('App')
 			if (!t.accepted)
 				$scope.tabs.splice($scope.tabs.indexOf(tab), 1);
 			else
-				getMyTab();
+				$scope.getMyTab();
 			close();
 			$scope.loading = false;
 		});
@@ -375,6 +375,18 @@ angular.module('App')
 		source.token = token;
 		source.$save(function() {
 			$scope.getCards();
+		});
+	};
+
+	$scope.setDefaultCard = function(card) {
+		var source = new Source();
+		source.$save({id: card.id}, function() {
+			$scope.cards.forEach(function(c) {
+				if (c.id == card.id)
+					c.default_source = true;
+				else
+					c.default_source = false;
+			});
 		});
 	};
 

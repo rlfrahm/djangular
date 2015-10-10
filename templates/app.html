@@ -65,7 +65,7 @@
 <script type="text/javascript" src="{% static "js/services.js" %}"></script>
 <script type="text/javascript">var pk = '{{ stripe_pk }}';</script>
 <script type="text/ng-template" id="pay-for-drink-bartender.html">
-  <form name="form" ng-submit="processPayment(form, $close)">
+  <form name="form" ng-submit="processPayment(form, $close)" class="approval">
     <div class="modal-header">
         <h2 class="modal-title text-center">{[{ payment.bar.name }]}</h2>
 				<p class="text-center text-danger"><b>Bartender Use Only</b></p>
@@ -84,10 +84,16 @@
 			<button class="btn btn-link btn-lg" type="button" ng-click="$dismiss()">Cancel</button>
       <button class="btn btn-success btn-lg" type="submit">Process</button>
     </div>
+    <div class="modal-approval bg-success" ng-if="processed">
+      <img ng-src="static/images/approval.png" height="100px">
+      <h2 class="text-white">Success!</h2>
+      <h4 class="text-white">Payment has been processed.</h4>
+      <button type="button" class="btn btn-primary btn-lg text-white" ng-click="showTipModal($close)" style="margin:0 auto">Next</button>
+    </div>
   </form>
 </script>
 <script type="text/ng-template" id="pay-for-drink-tip.html">
-  <form name="form" ng-submit="">
+  <form name="form" ng-submit="submitTip(form)">
     <div class="modal-header">
         <h2 class="modal-title text-center">Add a tip?</h2>
 				<p class="text-center text-danger"><b>{[{ payment.bar.name }]}</b></p>
@@ -96,7 +102,7 @@
       <div class="form-group">
         <label>{[{ payment.cost * (payment.tipPercent / 100) | currency}]}</label>
 				<div class="input-group">
-					<input type="number" min="1" step="1" class="form-control input-lg" ng-model="payment.tipPercent" placeholder="Tip Amount" focus required>
+					<input type="number" min="1" step="1" class="form-control input-lg" ng-model="payment.tipPercent" ng-init="payment.tipPercent=20" value="20" placeholder="Tip Amount" focus required>
 					<span class="input-group-addon">%</span>
 				</div>
       </div>

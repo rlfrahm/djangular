@@ -7,6 +7,7 @@ from . import views
 urlpatterns = [
   url(r'^user/bars$', views.UserBarsHandler.as_view(), name='user-bars'),
   url(r'^user/sources$', views.SourcesHandler.as_view(), name='credit-cards'),
+  url(r'^user/sources/(?P<source_id>[0-9]+)$', views.SourceHandler.as_view(), name='credit-card'),
   url(r'^user/tab$', views.UserTabHandler.as_view(), name='user-tab'),
   url(r'^user/avatar$', views.UserAvatarHandler.as_view(), name='user-avatar'),
   url(r'^user/password$', views.UserPasswordHandler.as_view(), name='user-password'),
@@ -19,6 +20,7 @@ urlpatterns = [
   url(r'^bars/(?P<bar_id>[0-9]+)/checkin$', views.BarCheckinHandler.as_view(), name='bar-checkin'),
   url(r'^bars/(?P<bar_id>[0-9]+)/pay$', views.PayBarHandler.as_view(), name='bar-pay'),
   url(r'^bars/(?P<bar_id>[0-9]+)/avatar$', views.BarAvatarHandler.as_view(), name='bar-avatar'),
+  url(r'^bars/(?P<bar_id>[0-9]+)/sales/(?P<sale_id>[0-9]+)$', views.BarSaleHandler.as_view(), name='bar-sale'),
   url(r'^bars/(?P<bar_id>[0-9]+)/sales$', views.BarSalesHandler.as_view(), name='bar-sales'),
   url(r'^bars/(?P<bar_id>[0-9]+)$', views.BarHandler.as_view(), name='bar'),
   url(r'^bars$', views.BarsHandler.as_view(), name='bars'),

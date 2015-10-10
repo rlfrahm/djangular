@@ -77,6 +77,10 @@ textarea {
   height: 100px;
 }
 
+.thumbnail.active {
+  border: 1px solid #999;
+}
+
 .icon-toolbar .navbar-nav {
   display: table;
   width: 100%;
@@ -92,4 +96,18 @@ textarea {
 .icon-toolbar .navbar-nav>li>a {
   padding-left: 0;
   padding-right: 0;
+}
+
+.approval {
+  position: relative;
+}
+
+.modal-approval {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  bottom: 20px;
+  left: 20px;
+  z-index: 2;
+  text-align: center;
 }
