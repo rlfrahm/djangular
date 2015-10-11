@@ -60,6 +60,15 @@ angular.module('Init', ['ui.bootstrap'])
 .directive('createCardForm', ['months', function(months) {
 	return {
 		link: function(scope, element, attrs) {
+      Stripe.setPublishableKey(pk);
+
+      scope.valid = {
+        cardNumber: null,
+        expiry: null,
+        cvc: null,
+        type: null
+      };
+
 			scope.months = months;
 			scope.newcard = {
 				month: '01'
@@ -71,16 +80,30 @@ angular.module('Init', ['ui.bootstrap'])
       });
 
 			scope.setMonth = function(month) {
-				$scope.newcard.month = month;
+				scope.newcard.month = month;
+        scope.validateExpiry(month, scope.newcard.year);
 			};
+
+      scope.validateCardNumber = function(number) {
+        if (!number) return;
+        scope.valid.cardNumber = Stripe.card.validateCardNumber(number);
+        scope.valid.type = Stripe.card.cardType(number);
+      };
+
+      scope.validateExpiry = function(month, year) {
+        if (!month || !year) return;
+        scope.valid.expiry = Stripe.card.validateExpiry(month, year);
+      };
+
+      scope.validateCVC = function(cvc) {
+        scope.valid.cvc = Stripe.card.validateCVC(cvc);
+      };
 
 			function createNewCard() {
 				if (scope.form.$invalid) return;
 				scope.form.loading = true;
         var form = scope.form,
           newcard = scope.newcard;
-
-				Stripe.setPublishableKey(pk);
 
 				Stripe.card.createToken({
 		      number: newcard.number,

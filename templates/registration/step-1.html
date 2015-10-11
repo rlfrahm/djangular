@@ -5,8 +5,14 @@
 {% block title %}Step 1{% endblock %}
 
 {% block page %}
+<div class="col-xs-12 col-sm-8 col-centered">
+  <br>
+  <div class="page-header text-center">
+    <h1>Add a profile image.</h1>
+  </div>
+</div>
 <div class="col-xs-12 col-sm-4 col-md-3 col-centered" avatar>
-  <div style="margin-top:20%">
+  <div>
     <div class="panel panel-default">
       <div class="panel-body">
         <form action="{% url 'user:register-step-1' %}" method="post" enctype="multipart/form-data">
