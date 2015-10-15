@@ -91,7 +91,6 @@ class UserProfile(models.Model):
 	def is_owner(self):
 		return self.user.bar_set.count() > 0
 
-
 	def __unicode__(self):
 		return self.user.username
 
@@ -105,6 +104,9 @@ class StripeMerchant(models.Model):
 	refresh_token = models.CharField(max_length=100)
 	access_token = models.CharField(max_length=100)
 
+	def __unicode__(self):
+		return self.user.username
+
 class StripeCustomer(models.Model):
 	user = models.OneToOneField(settings.AUTH_USER_MODEL, related_name='customer')
 	customer_id = models.CharField(max_length=100)
@@ -114,10 +116,19 @@ class StripeCustomer(models.Model):
 	# however, the user can change the default if they choose
 	default_source = models.CharField(max_length=100, null=True, blank=True, default='')
 
+	def __unicode__(self):
+		return self.user.username
+
 class PasswordResetToken(models.Model):
 	user = models.OneToOneField(settings.AUTH_USER_MODEL)
 	token = models.CharField(max_length=100)
 
+	def __unicode__(self):
+		return self.user.username
+
 class AccountActivationToken(models.Model):
 	user = models.OneToOneField(settings.AUTH_USER_MODEL)
 	token = models.CharField(max_length=100)
+
+	def __unicode__(self):
+		return self.user.username

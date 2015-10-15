@@ -286,6 +286,23 @@ class BarSalesHandler(APIView):
 			})
 		return Response(sales)
 
+class BarSaleHandler(APIView):
+	"""
+	Handles operations for individual bar sales
+	"""
+	authentication_classes = (SessionAuthentication,)
+	permission_classes = (IsAuthenticated, HasGroupPermission,)
+	required_groups = {
+		'PUT': [DRINKERS],
+	}
+	# Add a tip to a sale
+	def put(self, request, bar_id, sale_id, format=None):
+		serializer = TipSerializer(data=request.POST)
+		serializer.is_valid(raise_exception=True)
+		sale = get_object_or_404(Sale, pk=sale_id)
+		# Capture the sale with the tip amount
+		return Response({})
+
 class BarAvatarHandler(APIView):
 	"""
 	Sets the user's profile image
@@ -513,16 +530,7 @@ class TabsHandler(APIView):
 			# The email associated with the receiver
 			receiver_email = serializer.validated_data['email']
 			# Authorize the payment
-			print int(tab.amount * 100)
-			print tab.source
-			charge = stripe.Charge.create(
-				amount=int(tab.amount * 100),
-				currency='usd',
-				customer=request.user.customer.customer_id,
-				source=tab.source,
-				description='Tab for %s' % receiver_email,
-				capture=False
-			)
+			charge = authorize_source(tab.amount, request.user.customer.customer_id, tab.source, receiver_email)
 			if not charge:
 				# The authorization failed
 				return Response({
@@ -600,14 +608,41 @@ class SourcesHandler(APIView):
 
 	def get(self, request, format=None):
 		sources = stripe.Customer.retrieve(request.user.customer.customer_id).sources.all()
-		return Response(sources.get('data'))
+		data = sources.get('data')
+		for s in data:
+			if s['id'] == request.user.customer.default_source:
+				s.default_source = True
+		return Response(data)
 
+	# Create new source
 	def post(self, request, format=None):
 		serializer = CreditCardSerializer(data=request.data)
 		serializer.is_valid(raise_exception=True)
 		customer = stripe.Customer.retrieve(request.user.customer.customer_id)
-		customer.sources.create(source=serializer.validated_data['token'])
+		source = customer.sources.create(source=serializer.validated_data['token'])
+		if request.user.customer.default_source == '':
+			request.user.customer.default_source = source.get('id')
+			request.user.customer.save()
 		return Response({'success': True})
+
+class SourceHandler(APIView):
+	"""
+	Handles source
+	"""
+	authentication_classes = (SessionAuthentication,)
+	permission_classes = (IsAuthenticated,)
+
+	# Set default source
+	def post(self, request, source_id, format=None):
+		customer = stripe.Customer.retrieve(request.user.customer.customer_id)
+		source = customer.sources.retrieve(source_id)
+		id = source.get('id')
+		if id == source_id:
+			request.user.customer.default_source = source_id
+			request.user.customer.save()
+			return Response({'source': source_id})
+		else:
+			return Response({'source': False})
 
 class PayBarHandler(APIView):
 	"""
@@ -619,9 +654,11 @@ class PayBarHandler(APIView):
 	# Create new payment
 	def post(self, request, bar_id, format=None):
 		serializer = PayBarSerializer(data=request.data)
-		serializer.is_valid()
+		serializer.is_valid(raise_exception=True)
 		bar = get_object_or_404(Bar, pk=bar_id)
 		open_tabs = Tab.objects.filter(receiver=request.user).order_by('-created')
+		# Hold the last charge id
+		charge = None
 
 		# This is the amount of the sale
 		amount = serializer.validated_data['amount']
@@ -637,13 +674,15 @@ class PayBarHandler(APIView):
 
 			if amount_left < tab.amount:
 				# When the amount left is less than this tab
-				# Just use this tab
+				# Just use this tab and only authorize the tab just in case
+				# a tip is added
 				# Adjust the amount left on this tab
 				tab.amount -= amount_left
 				# Adjust the user's total tab amount
 				total_tab -= tab.amount
 				# Charge the tab source
-				charge_source(tab.sender.customer.customer_id, tab.source, bar.owner.merchant.account_id, amount_left, tab.charge)
+				charge = authorize_source(amount_left, tab.sender.customer.customer_id, tab.source, request.user.email)
+				# charge_source(tab.sender.customer.customer_id, tab.source, bar.owner.merchant.account_id, amount_left, tab.charge)
 				# Adjust the amount_left
 				amount_left = 0
 				# Save the tab
@@ -653,7 +692,7 @@ class PayBarHandler(APIView):
 				break
 			elif amount_left > tab.amount:
 				# When the amount left is more than this tab
-				# Use all of this tab
+				# Use all of this tab and capture the charge
 				total_tab -= tab.amount
 				# Adjust the amount_left
 				amount_left -= tab.amount
@@ -673,25 +712,40 @@ class PayBarHandler(APIView):
 				tab.delete()
 				# The amount_left is 0 so we can stop looking for money
 				break
+		print 'Total tab: %s' % total_tab
+		print 'Amount left: %s' % amount_left
 		request.user.profile.tab = total_tab
+		request.user.profile.save()
 
 		if amount_left > 0:
 			# We need to use the user's financial source
-			cust = request.user.customer
-			# TODO: record source of user
-			# charge_source(request.user.customer.customer_id, request.user.customer.default_source, bar.owner.merchant.account_id, amount_left)
-		request.user.profile.save()
+			if request.user.customer.default_source != '':
+				authorize_source(amount_left, request.user.customer.customer_id, request.user.customer.default_source, request.user.email, bar.owner.merchant.account_id)
 
 		# Track this sale
 		sale = Sale(amount=amount, bar=bar, customer=request.user)
+		if charge:
+			sale.charge_id = charge.get('id')
 		sale.save()
-		return Response({'tab': total_tab})
+		return Response({'tab': total_tab, 'sale': sale.pk})
+
+def authorize_source(amount, customer_id, source, receiver_email, recipient_id=None):
+	charge = stripe.Charge.create(
+		amount=int(amount * 100),
+		currency='usd',
+		customer=customer_id,
+		source=source,
+		description='Tab for %s' % receiver_email,
+		capture=False,
+		destination=recipient_id,
+		application_fee=get_application_fee(amount) if recipient_id else None
+	)
+	return charge
 
 def charge_source(customer_id, source, recipient_id, amount, charge):
 	application_fee = get_application_fee(amount)
 	amount = int(amount * 100)
 	charge = stripe.Charge.retrieve(charge)
-	charge.capture()
 	# res = stripe.Charge.create(
 	# 	amount=amount,
 	# 	currency='usd',
@@ -702,7 +756,7 @@ def charge_source(customer_id, source, recipient_id, amount, charge):
 	# 	application_fee=application_fee
 	# )
 	# TODO: Send notification to this user!
-	return res
+	return charge.capture()
 
 def get_application_fee(amount):
 	return int(float(amount) * 0.1 * 100.00)

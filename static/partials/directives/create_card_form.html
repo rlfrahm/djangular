@@ -1,19 +1,20 @@
 <div class="row">
   <div class="col-xs-12">
-    <h4>Add Card</h4>
-    <div class="form-group">
-      <div class="row">
-        <div class="col-xs-8">
+    <div class="row">
+      <div class="col-xs-8">
+        <div class="form-group" ng-class="{'has-success':valid.cardNumber==true,'has-error':valid.cardNumber==false}">
           <label>Card Number</label>
-          <input type="text" class="form-control" ng-model="newcard.number" required>
+          <input type="text" class="form-control" ng-model="newcard.number" ng-blur="validateCardNumber(newcard.number)" required>
         </div>
-        <div class="col-xs-4">
+      </div>
+      <div class="col-xs-4">
+        <div class="form-group" ng-class="{'has-success':valid.cvc==true,'has-error':valid.cvc==false}">
           <label>CVC</label>
-          <input type="text" class="form-control" ng-model="newcard.cvc" required>
+          <input type="text" class="form-control" ng-model="newcard.cvc" ng-blur="validateCVC(newcard.cvc)" required>
         </div>
       </div>
     </div>
-    <div class="form-group">
+    <div class="form-group" ng-class="{'has-success':valid.expiry==true,'has-error':valid.expiry==false}">
       <div class="row">
         <div class="col-xs-6">
           <label>Month</label>
@@ -27,7 +28,7 @@
         </div>
         <div class="col-xs-6">
           <label>Year</label>
-          <input type="number" min="2014" max="2999" step="1" class="form-control" placeholder="YYYY" ng-model="newcard.year" required>
+          <input type="number" min="2014" max="2999" step="1" class="form-control" placeholder="YYYY" ng-model="newcard.year" ng-blur="validateExpiry(newcard.month, newcard.year)" required>
         </div>
       </div>
     </div>

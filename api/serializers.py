@@ -102,3 +102,6 @@ class CreditCardSerializer(serializers.Serializer):
 
 class PayBarSerializer(serializers.Serializer):
   amount = serializers.DecimalField(max_digits=8, decimal_places=2)
+
+class TipSerializer(serializers.Serializer):
+    tip = serializers.IntegerField(min_value=1)

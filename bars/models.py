@@ -137,3 +137,4 @@ class Sale(models.Model):
 	customer = models.ForeignKey(settings.AUTH_USER_MODEL)
 	created = models.DateTimeField(auto_now_add=True, auto_now=False)
 	updated = models.DateTimeField(auto_now_add=False, auto_now=True)
+	charge_id = models.CharField(max_length=100, null=True, default='')

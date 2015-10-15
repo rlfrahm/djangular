@@ -35,7 +35,11 @@ angular.module('Api', ['ngResource'])
 }])
 
 .factory('BarSale', ['$resource', function($resource) {
-	return $resource('/api/v1/bars/:id/sales');
+	return $resource('/api/v1/bars/:id/sales/:sid', {}, {
+		put: {
+			method: 'PUT'
+		}
+	});
 }])
 
 .factory('BarPayment', ['$resource', function($resource) {
@@ -91,5 +95,5 @@ angular.module('Api', ['ngResource'])
 }])
 
 .factory('Source', ['$resource', function($resource) {
-	return $resource('/api/v1/user/sources');
+	return $resource('/api/v1/user/sources/:id');
 }]);

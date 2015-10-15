@@ -125,6 +125,8 @@ angular.module('App', ['Init', 'Api', 'ui.bootstrap', 'ui.router',])
 .run(['$rootScope', '$state', 'Auth', 'Me', 'Authorization', '$sce', function($rootScope, $state, Auth, Me, Authorization, $sce) {
   if (!$rootScope.user) {
     $rootScope.user = Me.get(function() {
+      if (!$rootScope.user.avatar)
+        $rootScope.user.avatar = 'files/user_profile_default.png';
       authorize();
     });
   } else {

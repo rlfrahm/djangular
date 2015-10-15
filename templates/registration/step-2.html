@@ -5,11 +5,18 @@
 {% block title %}Step 2{% endblock %}
 
 {% block page %}
-<div class="col-xs-12 col-sm-6 col-md-4 col-centered" avatar>
-  <div style="margin-top:20%">
+<div class="col-xs-12 col-sm-8 col-centered">
+  <br>
+  <div class="page-header text-center">
+    <h1>Add a credit or debit card.</h1>
+    <p>Cards are used to purchase drinks for your friends.</p>
+  </div>
+</div>
+<div class="col-xs-12 col-sm-6 col-md-4 col-centered">
+  <div>
     <div class="panel panel-default">
       <div class="panel-body">
-        <form create-card-form submit="true" name="form" action="{% url 'user:register-step-1' %}" ng-submit="createNewCard(form, newcard, $event)" method="post" enctype="multipart/form-data">
+        <form create-card-form submit="true" name="form" action="{% url 'user:register-step-1' %}" method="post" enctype="multipart/form-data">
           {% csrf_token %}
           {{ form.non_field_errors }}
           <div create-card-form-body></div>
@@ -20,6 +27,10 @@
     <div class="form-group text-center">
       <a href="{% url 'core:home' %}" class="btn btn-link btn-block btn-lg">Skip</a>
     </div>
+    <div class="text-center">
+      <img src="/static/images/lock.png" height="25px">
+      <img src="/static/images/stripe.png" height="25px">
+    </div>
   </div>
 </div>
 {% endblock %}
@@ -28,4 +39,9 @@
 <script>
 ga('send', 'pageview');
 </script>
+{% endblock %}
+
+{% block scripts %}
+<script type="text/javascript">var pk = '{{ stripe_pk }}';</script>
+<script type="text/javascript" src="https://js.stripe.com/v2/"></script>
 {% endblock %}
