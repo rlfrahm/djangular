@@ -15,34 +15,38 @@
 <br>
 <div class="row">
 	<div class="col-xs-12 col-sm-12 col-md-6">
-		<div class="list-group">
-			<div class="list-group-item">
-				<h2 class="list-group-item-heading">Recent Checkins</h2>
+		<div class="panel panel-default">
+			<div class="panel-heading">
+				<h3>Recent Checkins</h3>
 			</div>
-			<a ui-sref="user({id: checkin.user})" class="list-group-item media" ng-repeat="checkin in checkins">
-				<div class="media-left">
-					<img class="media-object" ng-src="{[{ checkin.avatar }]}" height="48px">
-				</div>
-				<div class="media-body">
-					<h4 class="media-heading">{[{ checkin.firstname || 'Joe Blow' }]}</h4>
-					{[{ checkin.when }]}
-				</div>
-			</a>
+			<div class="list-group">
+				<a ui-sref="user({id: checkin.user})" class="list-group-item media" ng-repeat="checkin in checkins">
+					<div class="media-left">
+						<img class="media-object" ng-src="{[{ checkin.avatar }]}" height="48px">
+					</div>
+					<div class="media-body">
+						<h4 class="media-heading">{[{ checkin.firstname || 'Joe Blow' }]}</h4>
+						{[{ checkin.when }]}
+					</div>
+				</a>
+			</div>
 		</div>
 	</div>
 	<div class="col-xs-12 col-sm-12 col-md-6">
-		<div class="list-group">
-			<div class="list-group-item">
-				<h2 class="list-group-item-heading">Bartenders</h2>
+		<div class="panel panel-default">
+			<div class="panel-heading">
+				<h3>Bartenders</h3>
 			</div>
-			<a ui-sref="user({id: bartender.id})" class="list-group-item media" ng-repeat="bartender in bartenders">
-				<div class="media-left">
-					<img class="media-object" ng-src="{[{ bartender.avatar }]}" height="48px">
-				</div>
-				<div class="media-body">
-					<h4 class="media-heading">{[{ bartender.firstname || 'Joe Blow' }]}</h4>
-				</div>
-			</a>
+			<div class="list-group">
+				<a ui-sref="user({id: bartender.id})" class="list-group-item media" ng-repeat="bartender in bartenders">
+					<div class="media-left">
+						<img class="media-object" ng-src="{[{ bartender.avatar }]}" height="48px">
+					</div>
+					<div class="media-body">
+						<h4 class="media-heading">{[{ bartender.firstname || 'Joe Blow' }]}</h4>
+					</div>
+				</a>
+			</div>
 		</div>
 	</div>
 </div>

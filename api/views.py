@@ -233,18 +233,26 @@ class BarHandler(APIView):
 			bar['merchant'] = hasattr(request.user, 'merchant')
 		return Response(bar)
 
+	# Update bar details
 	def post(self, request, bar_id, format=None):
 		serializer = BarSerializer(data=request.data, context={'request': request})
 		if serializer.is_valid():
 			bar = get_object_or_404(Bar, pk=bar_id)
-			if bar.owner is not request.user:
+			if bar.owner != request.user:
 				return PermissionDenied()
-			bar.name = request.data.get('name')
+			bar.name = serializer.validated_data['name']
+			bar.street = serializer.validated_data['street']
+			bar.city = serializer.validated_data['city']
+			bar.province = serializer.validated_data['province']
+			bar.postal = serializer.validated_data['postal']
+			bar.lat = serializer.validated_data['lat']
+			bar.lng = serializer.validated_data['lng']
 			bar.save()
 			return Response(serializer.data)
 		else:
 			return Response({'error': True})
 
+	# Delete bar
 	def delete(self, request, bar_id, format=None):
 		bar = get_object_or_404(Bar, pk=bar_id)
 		if bar.owner is not request.user:

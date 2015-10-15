@@ -88,7 +88,7 @@ angular.module('App')
 	$scope.bar = Bar.get({id: $stateParams.id}, function() {
 		Analytics.pageview($scope.bar.name + ' Settings');
     if ($scope.bar.street && $scope.bar.postal)
-      $scope.bar.address = $scope.bar.street + ', ' + $scope.bar.city + ', ' + $scope.bar.province + ' ' + $scope.bar.postal;
+      $scope.bar.address = buildAddress($scope.bar);
 		$scope.avatarSRC = $scope.bar.avatar;
   });
   $scope.search = {term:null};
@@ -111,12 +111,27 @@ angular.module('App')
 		$scope.shouldSave = true;
 	};
 
+	$scope.locationChange = function() {
+		console.log($scope.bar);
+		submitSave();
+	};
+
 	$scope.save = function(form) {
 		if (form.$invalid || !$scope.shouldSave) return;
-
-		$scope.bar.$save();
-		$scope.shouldSave = false;
+		submitSave();
 	};
+
+	function submitSave() {
+		console.log($scope.bar);
+		$scope.bar.$save({id: $scope.bar.id}, function() {
+			$scope.bar.address = buildAddress($scope.bar);
+		});
+		$scope.shouldSave = false;
+	}
+
+	function buildAddress(bar) {
+		return bar.street + ', ' + bar.city + ', ' + bar.province + ' ' + bar.postal;
+	}
 
   $scope.search = function(term) {
     $scope.users = UserSearch.query({term: term}, function() {
@@ -315,8 +330,11 @@ angular.module('App')
 .controller('UserProfileCtrl', ['$rootScope', '$scope', '$http', '$modal', 'Me', 'MePassword', 'Source', 'UserAvatar', 'FileField', 'Analytics', function($rootScope, $scope, $http, $modal, Me, MePassword, Source, UserAvatar, FileField, Analytics) {
 	Analytics.pageview('My Profile');
 
+	$scope.loading = true;
   $scope.getCards = function() {
-    $scope.cards = Source.query();
+    $scope.cards = Source.query(function() {
+			$scope.loading = false;
+		});
   };
 
   $scope.getCards();

@@ -1,5 +1,6 @@
 body {
-  background: #f2f2f2;
+  font: 18px/1.533 "Lato", Arial, Helvetica, sans-serif;
+  background: #f3f3f3;
   -webkit-font-smoothing: antialiased;
 	-moz-osx-font-smoothing: grayscale;
 	text-shadow: 1px 1px 1px rgba(0,0,0,0.004);
@@ -7,6 +8,32 @@ body {
 
 textarea {
 	resize: vertical;
+}
+
+.navbar-default, .btn-primary {
+  background-color: #3d4254;
+}
+
+body,
+a.list-group-item,
+button.list-group-item,
+.panel-default>.panel-heading,
+.thumbnail .caption,
+.form-control {
+  color: #5a6b7c;
+}
+
+a.list-group-item:hover, button.list-group-item:hover, a.list-group-item:focus, button.list-group-item:focus {
+  background-color: #f9f9f9;
+  color: #5a6b7c;
+}
+
+.panel-heading, .modal-header {
+  text-align: center;
+}
+
+.panel-default>.panel-heading {
+  background-color: #fff;
 }
 
 .page .view {

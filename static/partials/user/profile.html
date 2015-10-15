@@ -7,6 +7,7 @@
           <img ng-src="{[{ user.avatar }]}" class="pointer" width="100%" onclick="document.getElementById('uploadImage').click()" style="display:block">
           <input type="file" id="uploadImage" name="avatar" accept="image/*" style="display:none" file-model="avatar">
         </div>
+        <p class="text-center text-muted">Tap to edit</p>
       </div>
     </div>
   </div>
@@ -39,6 +40,9 @@
       <div class="col-xs-12">
         <h4>Credit/Debit Cards</h4>
       </div>
+      <div class="col-sm-4 col-md-3" ng-if="loading">
+        <loader style="width:100%;height:135px" class="text-center"></loader>
+      </div>
       <div class="col-sm-4 col-md-3" ng-repeat="card in cards">
         <a href class="thumbnail">
           <img src="/static/images/{[{ card.brand }]}.png" height="100px">
@@ -67,13 +71,13 @@
     </div>
     <div class="modal-body text-center">
       <div class="form-group">
-        <label>Enter a new password</label>
+        <label class="text-muted">Enter a new password</label>
         <input type="password" name="password" ng-model="newpass.password" class="form-control input-lg" placeholder="Password" required focus>
       </div>
     </div>
     <div class="modal-footer">
       <button type="submit" class="btn btn-primary btn-lg btn-block">Change</button>
-      <button type="button" class="btn btn-link btn-lg btn-block" ng-click="$dismiss()">Cancel</button>
+      <button type="button" class="btn btn-link btn-lg btn-block text-muted" ng-click="$dismiss()">Cancel</button>
     </div>
   </form>
 </script>

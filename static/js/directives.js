@@ -39,12 +39,11 @@ angular.module('App')
 	};
 }])
 
-.directive('addressAutocomplete', ['$parse', function($parse) {
+.directive('addressAutocomplete', ['$rootScope', '$parse', function($rootScope, $parse) {
 	return {
 		link: function(scope, element, attrs) {
 			var model = $parse(attrs.model),
         modelSetter = model.assign;
-
       // console.log(scope[attrs.model]);
 
 			var autocomplete, placeSearch;
@@ -64,6 +63,7 @@ angular.module('App')
 		  autocomplete.addListener('place_changed', fillInAddress);
 
 		  function fillInAddress() {
+				scope[attrs.model].geocoding = true;
 		    // Get the place details from the autocomplete object.
 		    var place = autocomplete.getPlace();
 
@@ -90,6 +90,9 @@ angular.module('App')
       //     modelSetter(scope, obj);
       //     console.log(scope);
       //   });
+				scope[attrs.model].geocoding = true;
+
+				if (scope.locationChange) scope.locationChange();
 		  }
 
 		  // Bias the autocomplete object to the user's geographical location,
