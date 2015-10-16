@@ -1,6 +1,9 @@
-from django.db import models
+# from django.db import models
 from django.conf import settings
 from django.contrib.auth.models import User
+from django.contrib.gis.db import models
+from django.contrib.gis.geos import *
+from django.contrib.gis.measure import D
 
 from notifications.emails import send_tab_invite
 
@@ -47,6 +50,8 @@ class Bar(models.Model):
 	lat = models.DecimalField(max_digits=16, decimal_places=14)
 	lng = models.DecimalField(max_digits=16, decimal_places=14)
 
+	location = models.PointField(srid=4326, verbose_name="Location")
+
 	avatar = models.ImageField(upload_to=path_and_rename, blank=True, storage=OverwriteStorage(), default=BAR_PROFILE_DEFAULT)
 	# Image
 	image = models.ImageField(upload_to='bars', blank=True, null=True)
@@ -66,6 +71,11 @@ class Bar(models.Model):
 
 	def is_owner(self, user_id):
 		return self.owner.pk == user_id
+
+	@classmethod
+	def get_all_within_distance(cls, lat, lng, distance):
+		ref_location = Point(lat, lng)
+		return cls.objects.filter(location__distance_lte=(ref_location, D(m=distance))).distance(ref_location).order_by('distance')
 
 	def __unicode__(self):
 		return self.name

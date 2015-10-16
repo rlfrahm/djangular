@@ -105,3 +105,8 @@ class PayBarSerializer(serializers.Serializer):
 
 class TipSerializer(serializers.Serializer):
     tip = serializers.IntegerField(min_value=1)
+
+class BarsWithinDistanceSerializer(serializers.Serializer):
+    distance = serializers.IntegerField(min_value=0)
+    lat = serializers.DecimalField(max_digits=12, decimal_places=10)
+    lng = serializers.DecimalField(max_digits=12, decimal_places=10)
