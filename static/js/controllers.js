@@ -17,9 +17,42 @@ angular.module('App')
 	};
 }])
 
-.controller('BarsCtrl', ['$scope', 'Bars', 'Analytics', function($scope, Bars, Analytics) {
+.controller('BarsCtrl', ['$rootScope', '$scope', 'Bars', 'Analytics', 'buildAddress', function($rootScope, $scope, Bars, Analytics, buildAddress) {
 	Analytics.pageview('Bars');
-	$scope.bars = Bars.query();
+	var markers = [];
+	$scope.bars = Bars.query(function() {
+		console.log($rootScope.map);
+		$scope.bars.forEach(function(b) {
+			markers.push(new google.maps.Marker({
+				position: new google.maps.LatLng(b.lat, b.lng),
+				title: b.name,
+				map: $rootScope.map
+			}));
+		});
+	});
+
+	$scope.address = function(bar) {
+		return buildAddress(bar);
+	};
+
+	var coords = {lat: null, lng: null};
+
+	$rootScope.map = new google.maps.Map(document.getElementById('map'), {
+		zoom: 10
+	});
+
+	$scope.initMap = function() {
+		var watcher = $rootScope.$watch('position.coords', function(newval) {
+			if (!newval) return;
+
+			coords.lat = newval.latitude;
+			coords.lng = newval.longitude;
+
+			$rootScope.map.setCenter(coords);
+		});
+	};
+
+
 }])
 
 .controller('UserBarsCtrl', ['$scope', '$state', 'UserBars', 'Analytics', function($scope, $state, UserBars, Analytics) {
@@ -84,7 +117,7 @@ angular.module('App')
 	};
 }])
 
-.controller('BarSettingsCtrl', ['$rootScope', '$scope', '$state', '$stateParams', '$modal', '$http', 'Bar', 'Bartenders', 'UserSearch', 'Analytics', 'BarSale', function($rootScope, $scope, $state, $stateParams, $modal, $http, Bar, Bartenders, UserSearch, Analytics, BarSale) {
+.controller('BarSettingsCtrl', ['$rootScope', '$scope', '$state', '$stateParams', '$modal', '$http', 'Bar', 'Bartenders', 'UserSearch', 'Analytics', 'BarSale', 'buildAddress', function($rootScope, $scope, $state, $stateParams, $modal, $http, Bar, Bartenders, UserSearch, Analytics, BarSale, buildAddress) {
 	$scope.bar = Bar.get({id: $stateParams.id}, function() {
 		Analytics.pageview($scope.bar.name + ' Settings');
     if ($scope.bar.street && $scope.bar.postal)
@@ -127,10 +160,6 @@ angular.module('App')
 			$scope.bar.address = buildAddress($scope.bar);
 		});
 		$scope.shouldSave = false;
-	}
-
-	function buildAddress(bar) {
-		return bar.street + ', ' + bar.city + ', ' + bar.province + ' ' + bar.postal;
 	}
 
   $scope.search = function(term) {

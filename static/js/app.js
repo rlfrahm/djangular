@@ -157,23 +157,24 @@ angular.module('App', ['Init', 'Api', 'ui.bootstrap', 'ui.router',])
   }
 
   // Get the user's location
-  // function geo_success(position) {
-  //   console.log(position);
-  // }
-  //
-  // function geo_error() {
-  //
-  // }
-  //
-  // var geo_options = {
-  //   enableHighAccuracy: true,
-  //   maximumAge: 30000,
-  //   timeout: 27000
-  // };
-  //
-  // if ('geolocation' in navigator) {
-  //   var wpid = navigator.geolocation.watchPosition(geo_success, geo_error, geo_options);
-  // }
+  function geo_success(position) {
+    $rootScope.position = position;
+  }
+
+  function geo_error() {
+
+  }
+
+  var geo_options = {
+    enableHighAccuracy: true,
+    maximumAge: 30000,
+    timeout: 27000
+  };
+
+  if ('geolocation' in navigator) {
+    navigator.geolocation.getCurrentPosition(geo_success, geo_error);
+    var wpid = navigator.geolocation.watchPosition(geo_success, geo_error, geo_options);
+  }
 }])
 
 .service('Authorization', ['$rootScope', function($rootScope) {

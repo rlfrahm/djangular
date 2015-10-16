@@ -343,6 +343,12 @@ class BarsHandler(APIView):
 				'name': bar.name,
 				'owner': bar.owner.pk,
 				'avatar': bar.avatar_url,
+				'street': bar.street,
+				'city': bar.city,
+				'province': bar.province,
+				'postal': bar.postal,
+				'lat': bar.lat,
+				'lng': bar.lng
 				})
 		return Response(bars)
 

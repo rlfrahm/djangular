@@ -108,6 +108,10 @@ a.list-group-item:hover, button.list-group-item:hover, a.list-group-item:focus, 
   border: 1px solid #999;
 }
 
+.row.bars-list .thumbnail {
+  min-height: 200px;
+}
+
 @media (min-width: 768px) {
   .icon-toolbar {
     display: none;
@@ -143,4 +147,32 @@ a.list-group-item:hover, button.list-group-item:hover, a.list-group-item:focus, 
   left: 20px;
   z-index: 2;
   text-align: center;
+}
+
+.full-height {
+  height: 100%;
+}
+
+.bars-list {
+  position: absolute;
+  top: 60px;
+  right: 0;
+  bottom: 0;
+  left: 0;
+}
+
+.left-pane {
+  position: absolute;
+  top: 0;
+  right: 50%;
+  bottom: 0;
+  left: 0;
+}
+
+.right-pane {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 50%;
 }
