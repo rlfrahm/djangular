@@ -4,17 +4,27 @@
   </div>
   <div class="full-height right-pane">
     <div class="col-xs-12">
-      <div class="row">
-        <div class="col-xs-12 col-sm-6 col-md-3" ng-repeat="bar in bars">
-          <a ui-sref="bar-detail({id:bar.id})" class="thumbnail">
-          	<img ng-src="{[{ bar.avatar }]}" height="200px" style="display:block;margin: 0 auto">
-            <div class="caption">
-              <h4>{[{ bar.name }]}</h4>
-              <p class="text-muted"><small>{[{ address(bar) }]}</small></p>
-            </div>
-        	</a>
+      <br>
+      <form name="form">
+        <div class="form-group">
+          <div class="input-group">
+            <input type="text" class="form-control" placeholder="Search for a bar">
+            <span class="input-group-addon"><span class="glyphicon glyphicon-search"></span></span>
+          </div>
         </div>
+      </form>
+      <div class="list-group">
+        <a ui-sref="bar-detail({id:bar.id})" class="media list-group-item" ng-repeat="bar in bars">
+          <div class="media-left">
+            <img ng-src="{[{ bar.avatar }]}" height="100px">
+          </div>
+          <div class="media-body">
+            <h4 class="media-heading">{[{ bar.name }]}</h4>
+            <p class="text-muted"><small>{[{ address(bar) }]}</small></p>
+          </div>
+        </a>
       </div>
+      <br><br>
     </div>
   </div>
 </div>

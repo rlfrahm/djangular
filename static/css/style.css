@@ -154,7 +154,7 @@ a.list-group-item:hover, button.list-group-item:hover, a.list-group-item:focus, 
 }
 
 .bars-list {
-  position: absolute;
+  position: fixed;
   top: 60px;
   right: 0;
   bottom: 0;
@@ -175,4 +175,5 @@ a.list-group-item:hover, button.list-group-item:hover, a.list-group-item:focus, 
   right: 0;
   bottom: 0;
   left: 50%;
+  overflow-y: auto;
 }

@@ -21,7 +21,6 @@ angular.module('App')
 	Analytics.pageview('Bars');
 	var markers = [];
 	$scope.bars = Bars.query(function() {
-		console.log($rootScope.map);
 		$scope.bars.forEach(function(b) {
 			markers.push(new google.maps.Marker({
 				position: new google.maps.LatLng(b.lat, b.lng),
@@ -38,7 +37,7 @@ angular.module('App')
 	var coords = {lat: null, lng: null};
 
 	$rootScope.map = new google.maps.Map(document.getElementById('map'), {
-		zoom: 10
+		zoom: 16
 	});
 
 	$scope.initMap = function() {
