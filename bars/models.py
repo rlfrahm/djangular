@@ -7,7 +7,7 @@ from django.contrib.gis.measure import D
 
 from notifications.emails import send_tab_invite
 
-import uuid, os
+import uuid, os, stripe
 
 from account.storage import OverwriteStorage
 
@@ -149,4 +149,58 @@ class Sale(models.Model):
 	customer = models.ForeignKey(settings.AUTH_USER_MODEL)
 	created = models.DateTimeField(auto_now_add=True, auto_now=False)
 	updated = models.DateTimeField(auto_now_add=False, auto_now=True)
-	charge_id = models.CharField(max_length=100, null=True, default='')
+
+class Transaction(models.Model):
+	sale = models.ForeignKey('Sale', null=True, blank=True, default='')
+	owner = models.ForeignKey(settings.AUTH_USER_MODEL)
+	amount = models.DecimalField(max_digits=6, decimal_places=2)
+	source = models.CharField(max_length=100, null=True, blank=True, default='')
+	processed = models.BooleanField(default=False)
+	charge = models.CharField(max_length=100, null=True, default='')
+	created = models.DateTimeField(auto_now_add=True, auto_now=False)
+	updated = models.DateTimeField(auto_now_add=False, auto_now=True)
+
+	def process(self):
+		if not self.charge:
+			return False
+		print self.charge
+		charge = charge_source(self.amount, self.owner.customer.customer_id, self.source, self.sale.bar.owner.merchant.account_id, self.charge)
+		# TODO: Account for failed charge
+		return True
+
+	def authorize(self):
+		charge = authorize_source(self.amount, self.owner.customer.customer_id, self.source, self.sale.bar.owner.merchant.account_id)
+		# TODO: Account for failed authorization
+		self.charge = charge.get('id')
+		return True
+
+def authorize_source(amount, customer_id, source, recipient_id=None):
+	charge = stripe.Charge.create(
+		amount=int(amount * 100),
+		currency='usd',
+		customer=customer_id,
+		source=source,
+		capture=False,
+		destination=recipient_id,
+		application_fee=get_application_fee(amount) if recipient_id else None
+	)
+	return charge
+
+def charge_source(amount, customer_id, source, recipient_id, charge):
+	application_fee = get_application_fee(amount)
+	amount = int(amount * 100)
+	charge = stripe.Charge.retrieve(charge)
+	# res = stripe.Charge.create(
+	# 	amount=amount,
+	# 	currency='usd',
+	# 	customer=customer_id,
+	# 	source=source,
+	# 	description='Charge for tab',
+	# 	destination=recipient_id,
+	# 	application_fee=application_fee
+	# )
+	# TODO: Send notification to this user!
+	return charge.capture()
+
+def get_application_fee(amount):
+	return int(float(amount) * 0.1 * 100.00)

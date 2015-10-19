@@ -15,7 +15,7 @@ from .serializers import RegisterSerializer, LoginSerializer, BarSerializer, Inv
 from .decorators import HasGroupPermission, is_in_group, BAR_OWNERS, DRINKERS
 
 from account.models import UserProfile, USER_PROFILE_DEFAULT
-from bars.models import Bar, Bartender, BartenderInvite, Checkin, Tab, Sale
+from bars.models import Bar, Bartender, BartenderInvite, Checkin, Tab, Sale, Transaction, authorize_source
 from notifications.emails import send_bartender_invite, send_bar_creation_email
 
 import uuid, datetime, stripe
@@ -540,7 +540,7 @@ class TabsHandler(APIView):
 			# The email associated with the receiver
 			receiver_email = serializer.validated_data['email']
 			# Authorize the payment
-			charge = authorize_source(tab.amount, request.user.customer.customer_id, tab.source, receiver_email)
+			charge = authorize_source(tab.amount, request.user.customer.customer_id, tab.source)
 			if not charge:
 				# The authorization failed
 				return Response({
@@ -552,6 +552,10 @@ class TabsHandler(APIView):
 			if serializer.validated_data.get('note'):
 				tab.note = serializer.validated_data['note']
 			tab = tab.set_receiver(request, receiver_email)
+			if tab.sender == tab.receiver:
+				tab.accepted = True
+				request.user.profile.tab += tab.amount
+				request.user.profile.save()
 			tab.save()
 
 			# Add the amount to the user's tab unless there was an invite sent
@@ -681,31 +685,41 @@ class PayBarHandler(APIView):
 		# This is the amount of the sale left to pay
 		amount_left = amount
 
+		# Open a new sale
+		sale = Sale(amount=amount, bar=bar, customer=request.user)
+		sale.save()
+
 		# This is the amount of money in the user's tab
 		total_tab = request.user.profile.tab
-
+		print open_tabs
 		# Track the each tab used in this transaction
 		tabs_used = []
 		for tab in open_tabs:
 			# Iterate through open tabs until we
 			# 1) Run out of tabs to extract money from
 			# 2) Suffice the amount of money needed to be withdrawn
+			authorize = False
+			charge_amt = 0
+
+			print amount_left
 
 			# Check to make sure that the rest of the amount is greater
 			# than the minimum amount that can be put on a card.
 			# If the amount left is less than the minimum we need
 			# to alert the client.
-			if amount_left < settings.MIN_CARD_COST:
+			if amount_left == 0:
+				break
+			elif amount_left < settings.MIN_CARD_COST:
 				tabs_used.append({
 					'id': tab.pk,
-					'sender_first_name': sender.first_name,
-					'sender_last_name': sender.last_name,
-					'sender': sender.pk,
+					'sender_first_name': tab.sender.first_name,
+					'sender_last_name': tab.sender.last_name,
+					'sender': tab.sender.pk,
 					'amount': amount_left,
 					'error': True,
 					'type': 'tab'
 				})
-				return Response({error: True})
+				return Response({'error': True})
 
 			if amount_left < tab.amount:
 				# When the amount left is less than this tab
@@ -715,62 +729,62 @@ class PayBarHandler(APIView):
 				tab.amount -= amount_left
 				# Adjust the user's total tab amount
 				total_tab -= tab.amount
-				# Charge the tab source
-				charge = authorize_source(amount_left, tab.sender.customer.customer_id, tab.source, request.user.email)
-				# charge_source(tab.sender.customer.customer_id, tab.source, bar.owner.merchant.account_id, amount_left, tab.charge)
+				charge_amt = amount_left
 				# Adjust the amount_left
 				amount_left = 0
-				# Save the tab
-				tab.save()
-				tabs_used.append({
-					'id': tab.pk,
-					'sender_first_name': sender.first_name,
-					'sender_last_name': sender.last_name,
-					'sender': sender.pk,
-					'amount': amount_left,
-					'type': 'tab'
-				})
-				# Break out of this loop because we don't need to use any other
-				# tabs
-				break
+				authorize = True
 			elif amount_left > tab.amount:
 				# When the amount left is more than this tab
 				# Use all of this tab and capture the charge
 				total_tab -= tab.amount
+				charge_amt = tab.amount
 				# Adjust the amount_left
 				amount_left -= tab.amount
-				# Charge the tab source
-				charge_source(tab.sender.customer.customer_id, tab.source, bar.owner.merchant.account_id, tab.amount, tab.charge)
-				# Because we used this tab, we can delete it
-				tab.delete()
-				tabs_used.append({
-					'id': tab.pk,
-					'sender_first_name': sender.first_name,
-					'sender_last_name': sender.last_name,
-					'sender': sender.pk,
-					'amount': tab.amount,
-					'type': 'tab'
-				})
+				authorize = False
 			else:
 				# When the amount left is equal to this tab
 				# Amounts are equal; remove & break
 				total_tab -= amount_left
+				charge_amt = amount_left
 				# Adjust the amount_left
 				amount_left -= tab.amount
-				# Charge the tab source
-				charge_source(tab.sender.customer.customer_id, tab.source, bar.owner.merchant.account_id, tab.amount, tab.charge)
-				# Because we used this tab, we can delete it
+				authorize = True
+
+			t_data = {
+				'tab_id': tab.pk,
+				'sender_first_name': tab.sender.first_name,
+				'sender_last_name': tab.sender.last_name,
+				'sender': tab.sender.pk,
+				'amount': charge_amt,
+				'type': 'tab'
+			}
+
+			transaction = Transaction(sale=sale, owner=tab.sender, source=tab.source, amount=charge_amt)
+
+			if authorize:
+				# We want to only authorize this charge just in case
+				# the user adds a tip
+				status = transaction.authorize()
+				if status:
+					t_data['status'] = 'authorized'
+				else:
+					# TODO: account for failed authorization
+					print 'Authorization failed for tab: %s' % tab.pk
+				# charge = authorize_source(amount_left, tab.sender.customer.customer_id, tab.source, request.user.email)
+			else:
+				# We want to charge the source
+				status = transaction.process()
+				if status:
+					t_data['status'] = 'charged'
+				else:
+					# TODO: account for failed charge
+					print 'Charge failed for tab: %s' % tab.pk
 				tab.delete()
-				tabs_used.append({
-					'id': tab.pk,
-					'sender_first_name': sender.first_name,
-					'sender_last_name': sender.last_name,
-					'sender': sender.pk,
-					'amount': amount_left,
-					'type': 'tab'
-				})
-				# The amount_left is 0 so we can stop looking for money
-				break
+				# charge_source(tab.sender.customer.customer_id, tab.source, bar.owner.merchant.account_id, tab.amount, tab.charge)
+			transaction.save()
+			t_data['transaction_id'] = transaction.pk
+			tabs_used.append(t_data)
+
 		print 'Total tab: %s' % total_tab
 		print 'Amount left: %s' % amount_left
 		request.user.profile.tab = total_tab
@@ -781,45 +795,11 @@ class PayBarHandler(APIView):
 			if request.user.customer.default_source != '':
 				tabs_used.append({
 					'type': 'user',
-					'amount': amount_left
+					'amount': amount_left,
+					'status': 'authorized'
 				})
-				authorize_source(amount_left, request.user.customer.customer_id, request.user.customer.default_source, request.user.email, bar.owner.merchant.account_id)
-
-		# Track this sale
-		sale = Sale(amount=amount, bar=bar, customer=request.user)
-		if charge:
-			sale.charge_id = charge.get('id')
-		sale.save()
-		return Response({'tab': total_tab, 'sale': sale.pk, 'tabs': tabs_used})
-
-def authorize_source(amount, customer_id, source, receiver_email, recipient_id=None):
-	charge = stripe.Charge.create(
-		amount=int(amount * 100),
-		currency='usd',
-		customer=customer_id,
-		source=source,
-		description='Tab for %s' % receiver_email,
-		capture=False,
-		destination=recipient_id,
-		application_fee=get_application_fee(amount) if recipient_id else None
-	)
-	return charge
-
-def charge_source(customer_id, source, recipient_id, amount, charge):
-	application_fee = get_application_fee(amount)
-	amount = int(amount * 100)
-	charge = stripe.Charge.retrieve(charge)
-	# res = stripe.Charge.create(
-	# 	amount=amount,
-	# 	currency='usd',
-	# 	customer=customer_id,
-	# 	source=source,
-	# 	description='Charge for tab',
-	# 	destination=recipient_id,
-	# 	application_fee=application_fee
-	# )
-	# TODO: Send notification to this user!
-	return charge.capture()
-
-def get_application_fee(amount):
-	return int(float(amount) * 0.1 * 100.00)
+				transaction = Transaction(sale=sale, owner=request.user, source=request.user.customer.default_source, amount=amount_left)
+				status = transaction.authorize()
+				transaction.save()
+				# authorize_source(amount_left, request.user.customer.customer_id, request.user.customer.default_source, request.user.email, bar.owner.merchant.account_id)
+		return Response({'tab': total_tab, 'sale': sale.pk, 'transactions': tabs_used})
