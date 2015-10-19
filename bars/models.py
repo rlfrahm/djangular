@@ -50,7 +50,7 @@ class Bar(models.Model):
 	lat = models.DecimalField(max_digits=16, decimal_places=14)
 	lng = models.DecimalField(max_digits=16, decimal_places=14)
 
-	location = models.PointField(srid=4326, verbose_name="Location")
+	# location = models.PointField(srid=4326, verbose_name="Location")
 
 	avatar = models.ImageField(upload_to=path_and_rename, blank=True, storage=OverwriteStorage(), default=BAR_PROFILE_DEFAULT)
 	# Image
@@ -74,7 +74,9 @@ class Bar(models.Model):
 
 	@classmethod
 	def get_all_within_distance(cls, lat, lng, distance):
-		ref_location = Point(lat, lng)
+		print lat
+		print lng
+		ref_location = Point(float(lat), float(lng))
 		return cls.objects.filter(location__distance_lte=(ref_location, D(m=distance))).distance(ref_location).order_by('distance')
 
 	def __unicode__(self):

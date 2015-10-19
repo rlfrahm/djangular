@@ -129,11 +129,16 @@ angular.module('App')
 			$scope.payment = {};
 			$scope.selectBar = function(bar) {
 				$scope.payment.bar = bar;
+				$scope.payment.barSearch = bar.name;
 			};
 
 			$scope.payForDrinkHere = function(bar) {
 				$scope.payment.bar = bar;
 		    $scope.showPayForDrinkBartenderModal();
+			};
+
+			$scope.barIsSelected = function() {
+				return !!$scope.payment.bar;
 			};
 
 			$scope.payForDrink = function(tab) {

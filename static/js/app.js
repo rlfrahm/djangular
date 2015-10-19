@@ -158,6 +158,7 @@ angular.module('App', ['Init', 'Api', 'ui.bootstrap', 'ui.router',])
 
   // Get the user's location
   function geo_success(position) {
+    console.log(position);
     $rootScope.position = position;
   }
 

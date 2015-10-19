@@ -57,7 +57,7 @@
     </div>
     <div class="modal-body">
       <div class="form-group" bar-search dropdown>
-        <input type="text" class="form-control input-lg" placeholder="Search for bar.." ng-model="payment.bar.name" ng-model-options="{ debounce: 500 }" ng-change="searchForBar(payment.bar.name)" dropdown-toggle required>
+        <input type="text" class="form-control input-lg" placeholder="Search for bar.." ng-model="payment.barSearch" ng-model-options="{ debounce: 500 }" ng-change="searchForBar(payment.barSearch)" dropdown-toggle required>
         <div class="dropdown-menu list-group" style="width:100%" ng-show="barslist">
           <a ng-repeat="bar in barslist" class="list-group-item" href ng-click="selectBar(bar)">
             <h5 class="list-group-item-heading">{[{ bar.name }]}</h5>
@@ -68,7 +68,7 @@
     </div>
     <div class="modal-footer clearfix">
 			<button class="btn btn-link btn-lg" type="button" ng-click="$dismiss()">Cancel</button>
-      <button class="btn btn-success btn-lg" type="submit" ng-disabled="!payment.bar">Process</button>
+      <button class="btn btn-success btn-lg" type="submit" ng-disabled="!barIsSelected()">Process</button>
     </div>
   </form>
 </script>

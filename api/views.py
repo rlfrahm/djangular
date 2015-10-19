@@ -11,7 +11,7 @@ from django.shortcuts import get_object_or_404
 from django.db.models import Q
 from django.conf import settings
 
-from .serializers import RegisterSerializer, LoginSerializer, BarSerializer, InviteSerializer, SearchSerializer, TabSerializer, CreditCardSerializer, PayBarSerializer, UserSerializer, AcceptTabSerializer, AvatarSerializer, UserPasswordSerializer
+from .serializers import RegisterSerializer, LoginSerializer, BarSerializer, InviteSerializer, SearchSerializer, TabSerializer, CreditCardSerializer, PayBarSerializer, UserSerializer, AcceptTabSerializer, AvatarSerializer, UserPasswordSerializer, BarsWithinDistanceSerializer
 from .decorators import HasGroupPermission, is_in_group, BAR_OWNERS, DRINKERS
 
 from account.models import UserProfile, USER_PROFILE_DEFAULT
@@ -335,7 +335,10 @@ class BarsHandler(APIView):
 	}
 
 	def get(self, request, format=None):
-		bs = Bar.objects.all()
+		if request.GET.get('distance') and request.GET.get('lat') and request.GET.get('lng'):
+			bs = Bar.get_all_within_distance(request.GET.get('lat'), request.GET.get('lng'), request.GET.get('distance'))
+		else:
+			bs = Bar.objects.all()
 		bars = []
 		for bar in bs:
 			bars.append({
