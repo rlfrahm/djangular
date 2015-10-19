@@ -661,12 +661,18 @@ class PayBarHandler(APIView):
 	permission_classes = (IsAuthenticated,)
 
 	# Create new payment
+	# Payments from individual sources must be at least
+	# $5. We iterate through the total payment amount
+	# and select, then use, tabs that are open. If we
+	# run out of open tabs we use the user's card on
+	# file.
 	def post(self, request, bar_id, format=None):
 		serializer = PayBarSerializer(data=request.data)
 		serializer.is_valid(raise_exception=True)
 		bar = get_object_or_404(Bar, pk=bar_id)
 		open_tabs = Tab.objects.filter(receiver=request.user).order_by('-created')
-		# Hold the last charge id
+		# Hold the last charge id so we know what source
+		# to charge the rest of the payment.
 		charge = None
 
 		# This is the amount of the sale
@@ -680,6 +686,14 @@ class PayBarHandler(APIView):
 			# Iterate through open tabs until we
 			# 1) Run out of tabs to extract money from
 			# 2) Suffice the amount of money needed to be withdrawn
+
+			# Check to make sure that the rest of the amount is greater
+			# than the minimum amount that can be put on a card.
+			# If the amount left is less than the minimum we need
+			# to alert the client.
+			if amount_left < settings.MIN_CARD_COST:
+				print 'Tab less than min card cost'
+				return Response({error: True})
 
 			if amount_left < tab.amount:
 				# When the amount left is less than this tab

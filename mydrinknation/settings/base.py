@@ -128,3 +128,7 @@ STRIPE_PUB_API_KEY = 'pk_test_qaFAo6YehAQXe4Bvd03pE1zu'
 
 # Emails
 EMAIL_FROM_EMAIL = 'My Drink Nation <no-reply@mydrinknation.com>'
+
+# App Constants
+# The minimum amount that is allowed to be charged to a source
+MIN_CARD_COST = 5

@@ -2,6 +2,7 @@ from rest_framework import serializers
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate
 from django.shortcuts import get_object_or_404
+from django.conf import settings
 
 from account.models import UserProfile
 from bars.models import Bar, BartenderInvite
@@ -101,7 +102,7 @@ class CreditCardSerializer(serializers.Serializer):
   token = serializers.CharField(max_length=100)
 
 class PayBarSerializer(serializers.Serializer):
-  amount = serializers.DecimalField(max_digits=8, decimal_places=2)
+  amount = serializers.DecimalField(max_digits=8, decimal_places=2, min_value=settings.MIN_CARD_COST)
 
 class TipSerializer(serializers.Serializer):
     tip = serializers.IntegerField(min_value=1)
