@@ -32,43 +32,45 @@ angular.module('App')
 
 	var coords = {lat: null, lng: null};
 
-	$rootScope.map = new google.maps.Map(document.getElementById('map'), {
-		zoom: 16
-	});
+	// $rootScope.map = new google.maps.Map(document.getElementById('map'), {
+	// 	zoom: 16
+	// });
+	//
+	// $scope.initMap = function() {
+	// 	var watcher = $rootScope.$watch('position.coords', function(newval) {
+	// 		if (!newval) return;
+	//
+	// 		coords.lat = newval.latitude;
+	// 		coords.lng = newval.longitude;
+	//
+	// 		$rootScope.map.setCenter(coords);
+	// 		mapUpdate.dragend = true;
+	// 		watcher();
+	// 	});
+	// };
+	//
+	// google.maps.event.addListener($rootScope.map, 'bounds_changed', function() {
+	// 	mapUpdate.bounds = true;
+	//  	updateMap();
+  // });
+	//
+	// google.maps.event.addListener($rootScope.map, 'dragend', function() {
+	// 	mapUpdate.dragend = true;
+	//  	updateMap();
+  // });
+	//
+	// function updateMap() {
+	// 	if (!mapUpdate.bounds && !mapUpdate.dragend) return;
+	// 	var mapBounds = $rootScope.map.getBounds();
+	// 	console.log(mapBounds, coords, $rootScope.map.getBounds());
+	// 	var distance = google.maps.geometry.spherical.computeDistanceBetween(mapBounds.getNorthEast(), mapBounds.getSouthWest()) / 2;
+	// 	console.log(distance);
+	// 	getBars(distance, coords.lat, coords.lng);
+	// 	mapUpdate.bounds = false;
+	// 	mapUpdate.dragend = false;
+	// }
 
-	$scope.initMap = function() {
-		var watcher = $rootScope.$watch('position.coords', function(newval) {
-			if (!newval) return;
-
-			coords.lat = newval.latitude;
-			coords.lng = newval.longitude;
-
-			$rootScope.map.setCenter(coords);
-			mapUpdate.dragend = true;
-			watcher();
-		});
-	};
-
-	google.maps.event.addListener($rootScope.map, 'bounds_changed', function() {
-		mapUpdate.bounds = true;
-	 	updateMap();
-  });
-
-	google.maps.event.addListener($rootScope.map, 'dragend', function() {
-		mapUpdate.dragend = true;
-	 	updateMap();
-  });
-
-	function updateMap() {
-		if (!mapUpdate.bounds && !mapUpdate.dragend) return;
-		var mapBounds = $rootScope.map.getBounds();
-		console.log(mapBounds, coords, $rootScope.map.getBounds());
-		var distance = google.maps.geometry.spherical.computeDistanceBetween(mapBounds.getNorthEast(), mapBounds.getSouthWest()) / 2;
-		console.log(distance);
-		getBars(distance, coords.lat, coords.lng);
-		mapUpdate.bounds = false;
-		mapUpdate.dragend = false;
-	}
+	getBars();
 
 	function getBars(distance, lat, lng) {
 		var q = {};

@@ -30,10 +30,38 @@ def path_and_rename(instance, filename):
 	# return the whole path to the file
 	return os.path.join(path, filename)
 
+class LocationManager(models.Manager):
+    def nearby(self, lat, lng, proximity):
+        """
+        Return all object which distance to specified coordinates
+        is less than proximity given in kilometers
+        """
+        # Great circle distance formula
+        gcd = """
+              6371 * acos(
+               cos(radians(%s)) * cos(radians(lat))
+               * cos(radians(lng) - radians(%s)) +
+               sin(radians(%s)) * sin(radians(lat))
+              )
+              """
+        gcd_lt = "{} < %s".format(gcd)
+        return self.get_queryset()\
+                   .exclude(lat=None)\
+                   .exclude(lng=None)\
+                   .extra(
+                       select={'distance': gcd},
+                       select_params=[lat, lng, lat],
+                       where=[gcd_lt],
+                       params=[lat, lng, lat, proximity],
+                       order_by=['distance']
+                   )
+
 # Create your models here.
 class Bar(models.Model):
 	class Meta:
 		app_label = 'bars'
+
+	objects = LocationManager()
 	# Details
 	name = models.CharField(max_length=255)
 	# slug = models.SlugField(unique=True)

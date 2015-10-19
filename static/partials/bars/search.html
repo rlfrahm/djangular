@@ -1,4 +1,15 @@
-<div class="bars-list full-height">
+<div class="row">
+  <div class="col-xs-12 col-sm-6 col-md-4" ng-repeat="bar in bars">
+    <a class="thumbnail" ui-sref="bar-detail({id: bar.id})" style="height: 250px">
+      <img ng-src="{[{ bar.avatar }]}" height="100px">
+      <div class="caption">
+        <h3>{[{ bar.name }]}</h3>
+        <p>{[{ address(bar) }]}</p>
+      </div>
+    </a>
+  </div>
+</div>
+<!-- <div class="bars-list full-height">
   <div class="full-height left-pane">
     <div class="map" id="map" ng-init="initMap()" style="height:100%"></div>
   </div>
@@ -27,4 +38,4 @@
       <br><br>
     </div>
   </div>
-</div>
+</div> -->

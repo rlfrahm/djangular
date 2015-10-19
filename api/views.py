@@ -336,7 +336,7 @@ class BarsHandler(APIView):
 
 	def get(self, request, format=None):
 		if request.GET.get('distance') and request.GET.get('lat') and request.GET.get('lng'):
-			bs = Bar.get_all_within_distance(request.GET.get('lat'), request.GET.get('lng'), request.GET.get('distance'))
+			bs = Bar.objects.nearby(request.GET.get('lat'), request.GET.get('lng'), request.GET.get('distance'))
 		else:
 			bs = Bar.objects.all()
 		bars = []
