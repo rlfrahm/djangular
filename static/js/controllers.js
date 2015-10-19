@@ -392,7 +392,7 @@ angular.module('App')
   };
 }])
 
-.controller('UserProfileCtrl', ['$rootScope', '$scope', '$http', '$modal', 'Me', 'MePassword', 'Source', 'UserAvatar', 'FileField', 'Analytics', function($rootScope, $scope, $http, $modal, Me, MePassword, Source, UserAvatar, FileField, Analytics) {
+.controller('UserProfileCtrl', ['$rootScope', '$scope', '$http', '$modal', 'Me', 'MePassword', 'Source', 'UserAvatar', 'FileField', 'Analytics', 'toastr', function($rootScope, $scope, $http, $modal, Me, MePassword, Source, UserAvatar, FileField, Analytics, toastr) {
 	Analytics.pageview('My Profile');
 
 	$scope.loading = true;
@@ -457,6 +457,7 @@ angular.module('App')
 		var source = new Source();
 		source.token = token;
 		source.$save(function() {
+			toastr.success('Success!', 'Your card has been added!');
 			$scope.getCards();
 		});
 	};

@@ -1,0 +1,3 @@
+[submodule "static/libs/angular-toastr"]
+	path = static/libs/angular-toastr
+	url = git@github.com:Foxandxss/angular-toastr.git
