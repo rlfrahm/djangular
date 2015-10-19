@@ -489,7 +489,8 @@ class BarSearchHandler(APIView):
 				bars.append({
 					'id': bar.pk,
 					'name': bar.name,
-					'location': bar.location
+					'location': bar.location,
+					'avatar': bar.avatar_url
 					})
 			return Response(bars)
 		else:
@@ -682,6 +683,9 @@ class PayBarHandler(APIView):
 
 		# This is the amount of money in the user's tab
 		total_tab = request.user.profile.tab
+
+		# Track the each tab used in this transaction
+		tabs_used = []
 		for tab in open_tabs:
 			# Iterate through open tabs until we
 			# 1) Run out of tabs to extract money from
@@ -692,7 +696,15 @@ class PayBarHandler(APIView):
 			# If the amount left is less than the minimum we need
 			# to alert the client.
 			if amount_left < settings.MIN_CARD_COST:
-				print 'Tab less than min card cost'
+				tabs_used.append({
+					'id': tab.pk,
+					'sender_first_name': sender.first_name,
+					'sender_last_name': sender.last_name,
+					'sender': sender.pk,
+					'amount': amount_left,
+					'error': True,
+					'type': 'tab'
+				})
 				return Response({error: True})
 
 			if amount_left < tab.amount:
@@ -710,6 +722,14 @@ class PayBarHandler(APIView):
 				amount_left = 0
 				# Save the tab
 				tab.save()
+				tabs_used.append({
+					'id': tab.pk,
+					'sender_first_name': sender.first_name,
+					'sender_last_name': sender.last_name,
+					'sender': sender.pk,
+					'amount': amount_left,
+					'type': 'tab'
+				})
 				# Break out of this loop because we don't need to use any other
 				# tabs
 				break
@@ -723,6 +743,14 @@ class PayBarHandler(APIView):
 				charge_source(tab.sender.customer.customer_id, tab.source, bar.owner.merchant.account_id, tab.amount, tab.charge)
 				# Because we used this tab, we can delete it
 				tab.delete()
+				tabs_used.append({
+					'id': tab.pk,
+					'sender_first_name': sender.first_name,
+					'sender_last_name': sender.last_name,
+					'sender': sender.pk,
+					'amount': tab.amount,
+					'type': 'tab'
+				})
 			else:
 				# When the amount left is equal to this tab
 				# Amounts are equal; remove & break
@@ -733,6 +761,14 @@ class PayBarHandler(APIView):
 				charge_source(tab.sender.customer.customer_id, tab.source, bar.owner.merchant.account_id, tab.amount, tab.charge)
 				# Because we used this tab, we can delete it
 				tab.delete()
+				tabs_used.append({
+					'id': tab.pk,
+					'sender_first_name': sender.first_name,
+					'sender_last_name': sender.last_name,
+					'sender': sender.pk,
+					'amount': amount_left,
+					'type': 'tab'
+				})
 				# The amount_left is 0 so we can stop looking for money
 				break
 		print 'Total tab: %s' % total_tab
@@ -743,6 +779,10 @@ class PayBarHandler(APIView):
 		if amount_left > 0:
 			# We need to use the user's financial source
 			if request.user.customer.default_source != '':
+				tabs_used.append({
+					'type': 'user',
+					'amount': amount_left
+				})
 				authorize_source(amount_left, request.user.customer.customer_id, request.user.customer.default_source, request.user.email, bar.owner.merchant.account_id)
 
 		# Track this sale
@@ -750,7 +790,7 @@ class PayBarHandler(APIView):
 		if charge:
 			sale.charge_id = charge.get('id')
 		sale.save()
-		return Response({'tab': total_tab, 'sale': sale.pk})
+		return Response({'tab': total_tab, 'sale': sale.pk, 'tabs': tabs_used})
 
 def authorize_source(amount, customer_id, source, receiver_email, recipient_id=None):
 	charge = stripe.Charge.create(

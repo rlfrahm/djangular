@@ -56,12 +56,23 @@
         <h2 class="modal-title text-center">Select a bar</h2>
     </div>
     <div class="modal-body">
-      <div class="form-group" bar-search dropdown>
+			<div ng-if="barIsSelected()" class="form-group text-center clearfix">
+				<button type="button" class="close pull-right" aria-label="Close" ng-click="unselectBar()"><span aria-hidden="true">&times;</span></button>
+				<img ng-src="{[{ payment.bar.avatar }]}" height="75px" style="margin:0 auto;display: block">
+				<h4>{[{ payment.bar.name }]}</h4>
+				<p>{[{ payment.bar.location }]}</p>
+			</div>
+      <div ng-if="!barIsSelected()" class="form-group" bar-search dropdown>
         <input type="text" class="form-control input-lg" placeholder="Search for bar.." ng-model="payment.barSearch" ng-model-options="{ debounce: 500 }" ng-change="searchForBar(payment.barSearch)" dropdown-toggle required>
         <div class="dropdown-menu list-group" style="width:100%" ng-show="barslist">
-          <a ng-repeat="bar in barslist" class="list-group-item" href ng-click="selectBar(bar)">
-            <h5 class="list-group-item-heading">{[{ bar.name }]}</h5>
-            <p class="list-group-item-text"><small>{[{ bar.location }]}</small></p>
+          <a ng-repeat="bar in barslist" class="list-group-item media pointer" ng-click="selectBar(bar)">
+						<div class="col-xs-3">
+							<img class="media-object" ng-src="{[{ bar.avatar }]}" height="40px">
+						</div>
+						<div class="col-xs-9">
+							<h5 class="media-heading">{[{ bar.name }]}</h5>
+							<p><small>{[{ bar.location }]}</small></p>
+	          </div>
           </a>
         </div>
       </div>
