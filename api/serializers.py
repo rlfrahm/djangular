@@ -105,7 +105,7 @@ class PayBarSerializer(serializers.Serializer):
   amount = serializers.DecimalField(max_digits=8, decimal_places=2, min_value=settings.MIN_CARD_COST)
 
 class TipSerializer(serializers.Serializer):
-    tip = serializers.IntegerField(min_value=1)
+    tip = serializers.DecimalField(max_digits=8, decimal_places=2, min_value=0.01)
 
 class BarsWithinDistanceSerializer(serializers.Serializer):
     distance = serializers.IntegerField(min_value=0)

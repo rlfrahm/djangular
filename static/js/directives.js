@@ -182,10 +182,12 @@ angular.module('App')
 
 		    var payment = new BarPayment();
 		    payment.amount = $scope.payment.cost;
-		    var p = payment.$save({id: $scope.payment.bar.id}, function() {
+		    var p = payment.$save({id: $scope.payment.bar.id}, function(res) {
 					$scope.loading = false;
 					$scope.processed = true;
 					$scope.payment.sale = p.sale;
+					console.log(res);
+					$scope.payment.transactions = res.transactions;
 					if ($scope.getMyTab)
 						$scope.getMyTab();
 				});
@@ -199,6 +201,11 @@ angular.module('App')
 		    });
 			};
 
+			$scope.skipTip = function(dismiss) {
+				dismiss();
+				$scope.showPaymentSummaryModal();
+			};
+
 			$scope.submitTip = function(form, close) {
 				if (form.$invalid) return;
 
@@ -207,6 +214,14 @@ angular.module('App')
 				// bs.put({id: $scope.payment.bar.id, sid: $scope.payment.sale});
 				console.log(bs);
 				close();
+				$scope.showPaymentSummaryModal();
+			};
+
+			$scope.showPaymentSummaryModal = function() {
+				var m = $modal.open({
+		      templateUrl: 'pay-for-drink-summary.html',
+		      scope: $scope
+		    });
 			};
 		}
 	};

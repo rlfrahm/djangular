@@ -748,7 +748,7 @@ class PayBarHandler(APIView):
 				charge_amt = amount_left
 				# Adjust the amount_left
 				amount_left -= tab.amount
-				authorize = True
+				authorize = False
 
 			t_data = {
 				'tab_id': tab.pk,

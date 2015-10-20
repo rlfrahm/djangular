@@ -112,8 +112,32 @@
       </div>
     </div>
     <div class="modal-footer clearfix">
-			<button class="btn btn-link btn-lg text-danger" type="button" ng-click="$dismiss()">No Thanks</button>
+			<button class="btn btn-link btn-lg text-danger" type="button" ng-click="skipTip($dismiss)">No Thanks</button>
       <button class="btn btn-success btn-lg" type="submit">Yes!</button>
+    </div>
+  </form>
+</script>
+<script type="text/ng-template" id="pay-for-drink-summary.html">
+  <form name="form" ng-submit="submitPayment(form, $close)">
+    <div class="modal-header">
+        <h2 class="modal-title text-center">Summary of Payments</h2>
+				<p class="text-center text-danger"><b>{[{ payment.bar.name }]}</b></p>
+    </div>
+    <div class="list-group">
+      <a ui-sref="user({id: transaction.sender})" class="list-group-item container-fluid" ng-repeat="transaction in payment.transactions">
+        <div class="col-xs-6">
+          <h4 class="list-group-item-heading">{[{ transaction.sender_first_name + ' ' + transaction.sender_last_name }]}</h4>
+        </div>
+        <div class="col-xs-6 text-right">
+          <h4 class="list-group-item-heading">{[{ transaction.amount | currency }]}</h4>
+        </div>
+      </a>
+    </div>
+    <div class="modal-body">
+      <p class="text-right">Total: {[{ payment.amount | currency }]}</p>
+    </div>
+    <div class="modal-footer clearfix">
+      <button class="btn btn-success btn-lg" type="submit">Ok</button>
     </div>
   </form>
 </script>
