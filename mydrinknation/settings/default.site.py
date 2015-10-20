@@ -3,6 +3,8 @@
 
 import os
 
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = '!+=s&=o_x8t^j8b0(-bb$*%6@f7g+f6^wmirwu6k(rr2r28l#)'
 
