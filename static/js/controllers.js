@@ -415,6 +415,7 @@ angular.module('App')
 		if (form.$invalid) return;
 		newpass.$save();
 		console.log($scope);
+		toastr.success('Success!', 'Your password has been changed! Please use it the next time you login!');
 		$close('saved');
 	};
 
