@@ -359,7 +359,7 @@ class BarsHandler(APIView):
 	def post(self, request, format=None):
 		serializer = BarSerializer(data=request.data, context={'request': request})
 		if serializer.is_valid():
-			bar = serializer.save()
+			bar = Bar.new(serializer.validated_data['name'], serializer.validated_data)
 			serializer.data['id'] = bar.pk
 			send_bar_creation_email(request, bar)
 			return Response(serializer.data)

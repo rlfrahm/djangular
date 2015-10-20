@@ -69,24 +69,8 @@ def registerHandler(request):
 			password = form.cleaned_data['password']
 			dob = form.cleaned_data['dob']
 
-			user = User.objects.create_user(username, email, password)
-			user.first_name = firstname
-			user.last_name = lastname
-			user.save()
-
-			group = Group.objects.get(name='Drinkers')
-			user.groups.add(group)
-
-			profile = UserProfile(user=user, dob=dob, active=False)
-			profile.save()
-
-			# Stripe
-			cus = stripe.Customer.create(
-				description=user.email,
-				email=user.email
-			)
-			stripe_customer = StripeCustomer(user=user, customer_id=cus.get('id'))
-			stripe_customer.save()
+			# Shiny new saved user
+			user = UserProfile.new(email, password, firstname, lastname, dob)
 
 			# Email activation
 			token = AccountActivationToken(user=user, token=uuid.uuid4())

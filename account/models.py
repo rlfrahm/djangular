@@ -1,8 +1,11 @@
 from django.db import models
 from django.contrib.auth.models import User
 from django.conf import settings
+from django.contrib.auth.models import Group
 
-import datetime, os, uuid
+import datetime, os, uuid, stripe
+
+stripe.api_key = settings.STRIPE_API_KEY
 
 from bars.models import Bar
 
@@ -93,6 +96,29 @@ class UserProfile(models.Model):
 
 	def __unicode__(self):
 		return self.user.username
+
+	@classmethod
+	def new(cls, email, password, firstname, lastname, dob):
+		username = email[:30]
+		user = User.objects.create_user(username, email, password)
+		user.first_name = firstname
+		user.last_name = lastname
+		user.save()
+
+		group = Group.objects.get(name='Drinkers')
+		user.groups.add(group)
+
+		profile = UserProfile(user=user, dob=dob, active=False)
+		profile.save()
+
+		# Stripe
+		cus = stripe.Customer.create(
+			description=user.email,
+			email=user.email
+		)
+		stripe_customer = StripeCustomer(user=user, customer_id=cus.get('id'))
+		stripe_customer.save()
+		return user
 
 	class Meta:
 		unique_together = ("user",)

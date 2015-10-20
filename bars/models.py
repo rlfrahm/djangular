@@ -107,6 +107,20 @@ class Bar(models.Model):
 	def __unicode__(self):
 		return self.name
 
+	@classmethod
+	def new(cls, name, location):
+		bar = Bar(name=name)
+		bar.street = location.get('street')
+		bar.city = location.get('city')
+		bar.province = location.get('province')
+		bar.postal = location.get('postal')
+		if location.get('country'):
+			bar.country = location.get('country')
+		bar.lat = location.get('lat')
+		bar.lng = location.get('lng')
+		bar.save()
+		return bar
+
 class Bartender(models.Model):
 	user = models.ForeignKey(settings.AUTH_USER_MODEL)
 	bar = models.ForeignKey('Bar')
