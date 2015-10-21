@@ -358,6 +358,9 @@ class BarsHandler(APIView):
 	# Create new bar
 	def post(self, request, format=None):
 		serializer = BarSerializer(data=request.data, context={'request': request})
+		print request.data
+		print request.user
+		print serializer.is_valid()
 		if serializer.is_valid():
 			bar = Bar.new(serializer.validated_data['name'], serializer.validated_data)
 			serializer.data['id'] = bar.pk
