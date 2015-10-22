@@ -8,7 +8,7 @@ from django.contrib.auth.models import Group
 from bars.models import Bar
 from account.models import UserProfile
 
-import datetime
+import datetime, mock
 
 # Create your tests here.
 class ApiTests(APITestCase):
@@ -94,9 +94,14 @@ class ApiTests(APITestCase):
         url = reverse('api:tabs')
         return True
 
-    def test_bar_payment_user_pays_their_own_bill(self):
+    @mock.patch('bars.models.authorize_source')
+    def test_bar_payment_user_pays_their_own_bill(self, mock_authorize_source):
         """
         Ensure that a user's card is used when they don't have tabs
+        For this test you need:
+        - A bar
+        - A user
         """
+        mock_authorize_source.return_value = True
         url = reverse('api:bar-pay', args=(1,))
         return True
