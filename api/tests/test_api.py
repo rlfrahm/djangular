@@ -93,3 +93,10 @@ class ApiTests(APITestCase):
         """
         url = reverse('api:tabs')
         return True
+
+    def test_bar_payment_user_pays_their_own_bill(self):
+        """
+        Ensure that a user's card is used when they don't have tabs
+        """
+        url = reverse('api:bar-pay', args=(1,))
+        return True
