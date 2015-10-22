@@ -10,7 +10,7 @@ from django.core.exceptions import ValidationError
 from django.contrib import messages
 from django.views.decorators.http import require_GET
 
-from .forms import LoginForm, RegisterForm, ProfileForm, StripeConnectRedirectForm, Step1Form, EmailForm
+from .forms import LoginForm, RegisterForm, ProfileForm, StripeConnectRedirectForm, Step1Form, EmailForm, Step2Form
 from .models import UserProfile, StripeCustomer, StripeMerchant, PasswordResetToken, AccountActivationToken
 from notifications.emails import send_password_reset_email, send_account_activate_email
 
@@ -110,15 +110,19 @@ def step1Handler(request):
 
 @login_required
 def step2Handler(request):
-		if request.method == 'POST':
-			form = Step1Form(request.POST, request.FILES)
-			if form.is_valid():
-					request.user.profile.picture = form.cleaned_data['avatar']
-					request.user.profile.save()
-			return redirect(reverse('core:home'))
-		else:
-				form = Step1Form()
-		return render(request, 'registration/step-2.html')
+	if request.method == 'POST':
+		form = Step2Form(request.POST)
+		print request.POST
+		if form.is_valid():
+			customer = stripe.Customer.retrieve(request.user.customer.customer_id)
+			source = customer.sources.create(source=form.cleaned_data['token'])
+			if request.user.customer.default_source == '':
+				request.user.customer.default_source = source.get('id')
+				request.user.customer.save()
+		return redirect(reverse('core:home'))
+	else:
+			form = Step1Form()
+	return render(request, 'registration/step-2.html', {'stripe_pk': settings.STRIPE_PUB_API_KEY})
 
 def logoutHandler(request):
 	logout(request)

@@ -16,7 +16,7 @@
   <div>
     <div class="panel panel-default">
       <div class="panel-body">
-        <form create-card-form submit="true" name="form" action="{% url 'user:register-step-1' %}" method="post" enctype="multipart/form-data">
+        <form create-card-form submit="true" name="form" action="{% url 'user:register-step-2' %}" method="post">
           {% csrf_token %}
           {{ form.non_field_errors }}
           <div create-card-form-body></div>

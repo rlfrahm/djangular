@@ -124,10 +124,11 @@ angular.module('Init', ['ui.bootstrap'])
 			    } else {
 			      // response contains id and card, which contains additional card details
 			      var token = response.id;
+            console.log(token);
 			      scope.newcard.token = token;
-            console.log(scope.saveNewCard, scope);
+            scope.$digest();
             if (attrs.submit)
-              element.submit();
+              element[0].submit();
             else if (scope.saveNewCard)
               scope.saveNewCard(token);
 			      // var c = new Source();

@@ -33,4 +33,5 @@ class StripeConnectRedirectForm(forms.Form):
 class Step1Form(forms.Form):
   avatar = forms.ImageField(label='Avatar')
 
-# class Step2Form(forms.Form):
+class Step2Form(forms.Form):
+    token = forms.CharField(max_length=100)
