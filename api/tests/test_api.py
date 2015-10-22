@@ -24,7 +24,7 @@ class ApiTests(APITestCase):
         self.firstname = 'Bob'
         self.lastname = 'Dyllan'
         self.dob = datetime.datetime.now()
-        self.user = UserProfile.new(email, password, self.firstname, self.lastname, self.dob, stripe=False)
+        self.user = UserProfile.new(email, password, self.firstname, self.lastname, self.dob, add_stripe=False)
         self.user.groups.add(group)
         self.client = APIClient(enforce_csrf_checks=True)
         self.client.force_authenticate(user=self.user)
