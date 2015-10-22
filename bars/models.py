@@ -108,7 +108,7 @@ class Bar(models.Model):
 		return self.name
 
 	@classmethod
-	def new(cls, name, location):
+	def new(cls, name, location, owner, avatar=None):
 		bar = Bar(name=name)
 		bar.street = location.get('street')
 		bar.city = location.get('city')
@@ -118,6 +118,9 @@ class Bar(models.Model):
 			bar.country = location.get('country')
 		bar.lat = location.get('lat')
 		bar.lng = location.get('lng')
+		bar.owner = owner
+		if avatar:
+			bar.avatar = avatar
 		bar.save()
 		return bar
 

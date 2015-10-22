@@ -98,7 +98,7 @@ class UserProfile(models.Model):
 		return self.user.username
 
 	@classmethod
-	def new(cls, email, password, firstname, lastname, dob):
+	def new(cls, email, password, firstname, lastname, dob, stripe=True):
 		username = email[:30]
 		user = User.objects.create_user(username, email, password)
 		user.first_name = firstname
@@ -112,12 +112,13 @@ class UserProfile(models.Model):
 		profile.save()
 
 		# Stripe
-		cus = stripe.Customer.create(
-			description=user.email,
-			email=user.email
-		)
-		stripe_customer = StripeCustomer(user=user, customer_id=cus.get('id'))
-		stripe_customer.save()
+		if stripe:
+			cus = stripe.Customer.create(
+				description=user.email,
+				email=user.email
+			)
+			stripe_customer = StripeCustomer(user=user, customer_id=cus.get('id'))
+			stripe_customer.save()
 		return user
 
 	class Meta:

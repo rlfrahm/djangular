@@ -142,8 +142,6 @@ class UserProfileHandler(APIView):
 				'bar_name': checkin.bar.name
 				})
 		return Response({
-			'username': user.username,
-			'email': user.email,
 			'id': user.id,
 			'first_name': user.first_name,
 			'last_name': user.last_name,
@@ -358,16 +356,14 @@ class BarsHandler(APIView):
 	# Create new bar
 	def post(self, request, format=None):
 		serializer = BarSerializer(data=request.data, context={'request': request})
-		print request.data
-		print request.user
-		print serializer.is_valid()
 		if serializer.is_valid():
-			bar = Bar.new(serializer.validated_data['name'], serializer.validated_data)
+			# bar = Bar.new(serializer.validated_data['name'], serializer.validated_data, request.user, serializer.validated_data.get('avatar'))
+			bar = serializer.save()
 			serializer.data['id'] = bar.pk
 			send_bar_creation_email(request, bar)
 			return Response(serializer.data)
 		else:
-			return Response({'error': True})
+			return Response({'error': True, 'errors': serializer.errors})
 
 class BartendersHandler(APIView):
 	"""
