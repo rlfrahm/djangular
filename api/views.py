@@ -534,6 +534,9 @@ class TabsHandler(APIView):
 			tab = Tab()
 			# The amount in dollars
 			tab.amount = serializer.validated_data['amount']
+			if tab.amount < settings.MIN_CARD_COST:
+				error = 'Tab amount is less than the minimum of $%0.00f' % settings.MIN_CARD_COST
+				return Response({'error': error}, status=status.HTTP_400_BAD_REQUEST)
 			# The user's payment source
 			tab.source = serializer.validated_data['source']
 			# The email associated with the receiver
@@ -545,7 +548,7 @@ class TabsHandler(APIView):
 				return Response({
 					'status': 400,
 					'message': 'Authorization of the payment source failed'
-				})
+				}, status=status.HTTP_400_BAD_REQUEST)
 			tab.charge = charge['id']
 			tab.sender = request.user
 			if serializer.validated_data.get('note'):

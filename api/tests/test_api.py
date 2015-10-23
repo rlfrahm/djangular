@@ -4,6 +4,7 @@ from rest_framework.test import APITestCase, APIClient
 
 from django.contrib.auth.models import User
 from django.contrib.auth.models import Group
+from django.conf import settings
 
 from bars.models import Bar
 from account.models import UserProfile, StripeMerchant
@@ -154,7 +155,6 @@ class ApiTests(APITestCase):
         self.assertEqual(response.data.get('email'), d['email'])
         self.assertEqual(response.data.get('amount'), d['amount'])
 
-    # TODO: Test tab authorize_source failed
     @mock.patch('api.views.authorize_source')
     def test_tab_authorize_failed(self, mock_bar_models_authorize_source):
         """
@@ -170,10 +170,24 @@ class ApiTests(APITestCase):
         err = {}
         mock_bar_models_authorize_source.return_value = err
         response = self.client.post(url, d, format='json')
-        self.assertIsNotNone(response.data.get('id'))
-        self.assertEqual(response.data.get('receiver'), self.user.pk)
-        self.assertEqual(response.data.get('amount'), d['amount'])
-    # TODO: Test tab amount less than minimum
+        self.assertEqual(response.data.get('status'), 400)
+
+    @mock.patch('api.views.authorize_source')
+    def test_tab_less_than_minimum(self, mock_bar_models_authorize_source):
+        """
+        Ensure that the tab is denied when the amount is less than our minimum
+        """
+        url = reverse('api:tabs')
+        d = {
+            'amount': settings.MIN_CARD_COST - 0.01,
+            'source': '123',
+            'email': self.user.email,
+            'note': 'Testy test notes!'
+        }
+        mock_bar_models_authorize_source.return_value = {'id': 'jnsdflkgj34r'}
+        response = self.client.post(url, d, format='json')
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertIsNotNone(response.data.get('error'))
 
     @mock.patch('bars.models.authorize_source')
     @mock.patch('bars.models.charge_source')
