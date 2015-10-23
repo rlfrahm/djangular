@@ -205,7 +205,6 @@ class Transaction(models.Model):
 	def process(self):
 		if not self.charge:
 			return False
-		print self.charge
 		charge = charge_source(self.amount, self.owner.customer.customer_id, self.source, self.sale.bar.owner.merchant.account_id, self.charge)
 		# TODO: Account for failed charge
 		return True
