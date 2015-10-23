@@ -77,6 +77,17 @@ a.list-group-item:hover, button.list-group-item:hover, a.list-group-item:focus, 
 	border-radius: 0;
 }
 
+.navbar .input-group-addon {
+  background-color: transparent;
+  color: #fff;
+  border: none;
+}
+
+.navbar .form-control {
+  background-color: transparent;
+  border: none;
+}
+
 .dropdown-menu.select {
 	width: 100%;
 }

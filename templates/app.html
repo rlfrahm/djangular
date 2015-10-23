@@ -24,6 +24,14 @@
       <ul class="nav navbar-nav navbar-left">
         <li><a ui-sref="bars">Bars</a></li>
       </ul>
+      <form class="navbar-form navbar-left" role="search">
+        <div class="form-group">
+          <div class="input-group">
+            <input type="text" class="form-control" id="search" placeholder="Search">
+            <span class="input-group-addon pointer" onclick="document.getElementById('search').focus()"><span class="glyphicon glyphicon-search"></span></span>
+          </div>
+        </div>
+      </form>
       <ul class="nav navbar-nav navbar-right">
         <li><a ui-sref="tabs-open.for">Open a Tab</a></li>
         <li class="dropdown" dropdown>
