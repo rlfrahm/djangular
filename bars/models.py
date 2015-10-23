@@ -167,28 +167,39 @@ class Tab(models.Model):
 	# tabs
 	charge = models.CharField(max_length=100, default='')
 
-	def set_receiver(self, request, email):
-		if request.user.email is email:
-			self.receiver = request.user
-			self.accepted = True
-			self.save()
-			return self
-		users = User.objects.filter(email=email)
-		invite = None
-		if len(users) < 1:
-			# There is no user with this email, send email
-			invite = TabInvite()
-			invite.email = email
-			invite.token = uuid.uuid4()
-			self.email = email
+	@classmethod
+	def new(cls, request, amount, email, source, user, note=None):
+		# Authorize the payment
+		charge = authorize_source(amount, user.customer.customer_id, source)
+		if not charge:
+			# The authorization failed
+			raise Exception()
+		tab = Tab(amount=amount, source=source, sender=user, note=note, email=email)
+		if user.email is email:
+			# The user is buying themselves a tab
+			tab.receiver = request.user
+			tab.accepted = True
 		else:
-			self.receiver = users[0]
-		self.save()
+			# Figure out if this user is in the system
+			users = User.objects.filter(email=email)
+			invite = None
+			if len(users) < 1:
+				# There is no user with this email, send email
+				invite = TabInvite(email=email, token=uuid.uuid4())
+			else:
+				tab.receiver = users[0]
+		# At this point the tab is fully built out and we can save
+		tab.save()
+		# We still need to finish the invite if needed
 		if invite:
-			invite.tab = self
+			invite.tab = tab
 			invite.save()
-			send_tab_invite(request, self, invite)
-		return self
+			send_tab_invite(request, tab, invite)
+		# Add the amount to the user's tab if the tab has been accepted
+		if tab.accepted:
+			user.profile.tab += tab.amount
+			user.profile.save()
+		return tab
 
 class Sale(models.Model):
 	amount = models.DecimalField(max_digits=6, decimal_places=2)
@@ -231,11 +242,11 @@ def authorize_source(amount, customer_id, source, recipient_id=None):
 			destination=recipient_id,
 			application_fee=get_application_fee(amount) if recipient_id else None
 		)
+		return charge
 	except stripe.error.CardError, e:
 		# Since it's a decline, stripe.error.CardError will be caughtbody = e.json_body
 	  	err  = e.json_body['error']
 		return err
-		print "Status is: %s" % e.http_status
 	except stripe.error.RateLimitError, e:
 		# Too many requests made to the API too quickly
 	  	err  = e.json_body['error']
@@ -262,8 +273,6 @@ def authorize_source(amount, customer_id, source, recipient_id=None):
 		# Something else happened
 	  	err  = e.json_body['error']
 		return err
-	finally:
-		return charge
 
 def charge_source(amount, customer_id, source, recipient_id, charge):
 	application_fee = get_application_fee(amount)

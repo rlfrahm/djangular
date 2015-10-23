@@ -97,7 +97,7 @@ class ApiTests(APITestCase):
         response = self.client.get(url, format='json')
         self.assertIsInstance(response.data, list)
 
-    @mock.patch('api.views.authorize_source')
+    @mock.patch('bars.models.authorize_source')
     def test_tab_create_for_myself(self, mock_bar_models_authorize_source):
         """
         Ensure we can create a tab for ourselves
@@ -115,7 +115,7 @@ class ApiTests(APITestCase):
         self.assertEqual(response.data.get('receiver'), self.user.pk)
         self.assertEqual(response.data.get('amount'), d['amount'])
 
-    @mock.patch('api.views.authorize_source')
+    @mock.patch('bars.models.authorize_source')
     def test_tab_create_for_another_user(self, mock_bar_models_authorize_source):
         """
         Ensure we can create a tab for another registered user
@@ -137,7 +137,7 @@ class ApiTests(APITestCase):
         self.assertEqual(response.data.get('amount'), d['amount'])
 
     @mock.patch('bars.models.send_tab_invite')
-    @mock.patch('api.views.authorize_source')
+    @mock.patch('bars.models.authorize_source')
     def test_tab_create_for_someone_else(self, mock_bar_models_authorize_source, mock_bar_models_send_tab_invite):
         """
         Ensure we can create a tab for another user that is NOT registered
@@ -155,7 +155,7 @@ class ApiTests(APITestCase):
         self.assertEqual(response.data.get('email'), d['email'])
         self.assertEqual(response.data.get('amount'), d['amount'])
 
-    @mock.patch('api.views.authorize_source')
+    @mock.patch('bars.models.authorize_source')
     def test_tab_authorize_failed(self, mock_bar_models_authorize_source):
         """
         Ensure that tab creation fails gently when card authorization fails
@@ -172,7 +172,7 @@ class ApiTests(APITestCase):
         response = self.client.post(url, d, format='json')
         self.assertEqual(response.data.get('status'), 400)
 
-    @mock.patch('api.views.authorize_source')
+    @mock.patch('bars.models.authorize_source')
     def test_tab_less_than_minimum(self, mock_bar_models_authorize_source):
         """
         Ensure that the tab is denied when the amount is less than our minimum
@@ -187,7 +187,7 @@ class ApiTests(APITestCase):
         mock_bar_models_authorize_source.return_value = {'id': 'jnsdflkgj34r'}
         response = self.client.post(url, d, format='json')
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
-        self.assertIsNotNone(response.data.get('error'))
+        self.assertIsNotNone(response.data.get('amount'))
 
     @mock.patch('bars.models.authorize_source')
     @mock.patch('bars.models.charge_source')
