@@ -170,19 +170,24 @@ class Tab(models.Model):
 	def set_receiver(self, request, email):
 		if request.user.email is email:
 			self.receiver = request.user
+			self.accepted = True
+			self.save()
 			return self
-		user = User.objects.get(email=email)
-		if not user:
+		users = User.objects.filter(email=email)
+		invite = None
+		if len(users) < 1:
 			# There is no user with this email, send email
 			invite = TabInvite()
-			invite.tab = self
 			invite.email = email
 			invite.token = uuid.uuid4()
-			invite.save()
-			send_tab_invite(request, self, invite)
 			self.email = email
 		else:
-			self.receiver = user
+			self.receiver = users[0]
+		self.save()
+		if invite:
+			invite.tab = self
+			invite.save()
+			send_tab_invite(request, self, invite)
 		return self
 
 class Sale(models.Model):
@@ -216,16 +221,49 @@ class Transaction(models.Model):
 		return True
 
 def authorize_source(amount, customer_id, source, recipient_id=None):
-	charge = stripe.Charge.create(
-		amount=int(amount * 100),
-		currency='usd',
-		customer=customer_id,
-		source=source,
-		capture=False,
-		destination=recipient_id,
-		application_fee=get_application_fee(amount) if recipient_id else None
-	)
-	return charge
+	try:
+		charge = stripe.Charge.create(
+			amount=int(amount * 100),
+			currency='usd',
+			customer=customer_id,
+			source=source,
+			capture=False,
+			destination=recipient_id,
+			application_fee=get_application_fee(amount) if recipient_id else None
+		)
+	except stripe.error.CardError, e:
+		# Since it's a decline, stripe.error.CardError will be caughtbody = e.json_body
+	  	err  = e.json_body['error']
+		return err
+		print "Status is: %s" % e.http_status
+	except stripe.error.RateLimitError, e:
+		# Too many requests made to the API too quickly
+	  	err  = e.json_body['error']
+		return err
+	except stripe.error.InvalidRequestError, e:
+		# Invalid parameters were supplied to Stripe's API
+	  	err  = e.json_body['error']
+		return err
+	except stripe.error.AuthenticationError, e:
+		# Authentication with Stripe's API failed
+  		# (maybe you changed API keys recently)
+	  	err  = e.json_body['error']
+		return err
+	except stripe.error.APIConnectionError, e:
+		# Network communication with Stripe failed
+	  	err  = e.json_body['error']
+		return err
+	except stripe.error.StripeError, e:
+		# Display a very generic error to the user, and maybe send
+  		# yourself an email
+	  	err  = e.json_body['error']
+		return err
+	except Exception, e:
+		# Something else happened
+	  	err  = e.json_body['error']
+		return err
+	finally:
+		return charge
 
 def charge_source(amount, customer_id, source, recipient_id, charge):
 	application_fee = get_application_fee(amount)

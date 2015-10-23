@@ -552,22 +552,24 @@ class TabsHandler(APIView):
 				tab.note = serializer.validated_data['note']
 			tab = tab.set_receiver(request, receiver_email)
 			if tab.sender == tab.receiver:
-				tab.accepted = True
 				request.user.profile.tab += tab.amount
 				request.user.profile.save()
-			tab.save()
 
 			# Add the amount to the user's tab unless there was an invite sent
 			# if tab.receiver or tab.accepted is not True:
 			# 	tab.receiver.profile.tab += tab.amount
 			# 	tab.receiver.profile.save()
-
-			return Response({
+			d = {
 				'id': tab.pk,
 				'sender': tab.sender.pk,
-				'email': tab.email,
 				'amount': tab.amount,
-				})
+			}
+			if tab.email:
+				d['email'] = tab.email
+			if tab.receiver:
+				d['receiver'] = tab.receiver.pk
+
+			return Response(d)
 
 class TabsAccepted(APIView):
 	authentication_classes = (SessionAuthentication,)
@@ -784,8 +786,6 @@ class PayBarHandler(APIView):
 			t_data['transaction_id'] = transaction.pk
 			tabs_used.append(t_data)
 
-		print 'Total tab: %s' % total_tab
-		print 'Amount left: %s' % amount_left
 		request.user.profile.tab = total_tab
 		request.user.profile.save()
 
