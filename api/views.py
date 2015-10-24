@@ -719,12 +719,15 @@ class PayBarHandler(APIView):
 			if amount_left == 0:
 				break
 			elif amount_left < settings.MIN_CARD_COST:
+				# The amount left is less than the MIN_CARD_COST
+				# We need them to add more money to the charge
 				tabs_used.append({
 					'tab_id': tab.pk,
 					'sender_first_name': tab.sender.first_name,
 					'sender_last_name': tab.sender.last_name,
 					'sender': tab.sender.pk,
 					'amount': amount_left,
+					'amount_needed': settings.MIN_CARD_COST - amount_left,
 					'error': True,
 					'type': 'tab'
 				})
@@ -809,13 +812,19 @@ class PayBarHandler(APIView):
 		if amount_left > 0:
 			# We need to use the user's financial source
 			if request.user.customer.default_source != '':
-				tabs_used.append({
-					'type': 'user',
-					'amount': amount_left,
-					'status': 'authorized'
-				})
 				transaction = Transaction(sale=sale, owner=request.user, source=request.user.customer.default_source, amount=amount_left)
-				status = transaction.authorize()
+				t = {
+					'type': 'user',
+					'amount': amount_left
+				}
+				if amount_left < settings.MIN_CARD_COST:
+					t['amount_needed'] = settings.MIN_CARD_COST - amount_left
+					t['error'] = True
+				else:
+					t['status'] = 'authorized'
+					status = transaction.authorize()
 				transaction.save()
+				t['transaction_id'] = transaction.pk
+				tabs_used.append(t)
 				# authorize_source(amount_left, request.user.customer.customer_id, request.user.customer.default_source, request.user.email, bar.owner.merchant.account_id)
 		return Response({'tab': total_tab, 'sale': sale.pk, 'transactions': tabs_used, 'removed': tabs_deleted})

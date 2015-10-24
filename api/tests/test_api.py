@@ -266,6 +266,33 @@ class ApiTests(APITestCase):
 
     @mock.patch('bars.models.authorize_source')
     @mock.patch('bars.models.charge_source')
+    def test_bar_payment_returns_notification_of_more_money_needed(self, mock_bar_models_charge_source, mock_bar_models_authorize_source):
+        """
+        Ensure that a user's tab is used if they have one
+        For this test you need:
+        - A bar
+        - A user
+        - A tab
+        """
+        self.user.customer.default_source = '123'
+        self.user.customer.save()
+        mock_bar_models_authorize_source.return_value = {'id': 'jnsdflkgj34r'}
+        mock_bar_models_charge_source.return_value = {'id': 'jnsdflkgj34r'}
+        # Create a tab
+        tab = Tab.new(20.00, self.user.email, 'ijbwflgkbsdf', self.user)
+        url = reverse('api:bar-pay', args=(1,))
+        amount = 21
+        d = {
+            'amount': amount
+        }
+        response = self.client.post(url, d, format='json')
+        # The user's tab should now be $10
+        transactions = response.data.get('transactions')
+        self.assertEqual(transactions[1]['amount_needed'], settings.MIN_CARD_COST - 1)
+        self.assertTrue(transactions[1]['error'])
+
+    @mock.patch('bars.models.authorize_source')
+    @mock.patch('bars.models.charge_source')
     def test_bar_payment_user_uses_2_tabs(self, mock_bar_models_charge_source, mock_bar_models_authorize_source):
         """
         Ensure that a user's 2 tabs are used if they have one
