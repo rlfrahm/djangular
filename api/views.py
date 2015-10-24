@@ -686,7 +686,7 @@ class PayBarHandler(APIView):
 		serializer = PayBarSerializer(data=request.data)
 		serializer.is_valid(raise_exception=True)
 		bar = get_object_or_404(Bar, pk=bar_id)
-		open_tabs = Tab.objects.filter(receiver=request.user).order_by('-created')
+		open_tabs = Tab.objects.filter(receiver=request.user, accepted=True).order_by('created')
 		# Hold the last charge id so we know what source
 		# to charge the rest of the payment.
 		charge = None
@@ -719,7 +719,7 @@ class PayBarHandler(APIView):
 				break
 			elif amount_left < settings.MIN_CARD_COST:
 				tabs_used.append({
-					'id': tab.pk,
+					'tab_id': tab.pk,
 					'sender_first_name': tab.sender.first_name,
 					'sender_last_name': tab.sender.last_name,
 					'sender': tab.sender.pk,
@@ -781,6 +781,7 @@ class PayBarHandler(APIView):
 				# charge = authorize_source(amount_left, tab.sender.customer.customer_id, tab.source, request.user.email)
 			else:
 				# We want to charge the source
+				transaction.charge = tab.charge
 				status = transaction.process()
 				if status:
 					t_data['status'] = 'charged'
