@@ -704,6 +704,7 @@ class PayBarHandler(APIView):
 		total_tab = request.user.profile.tab
 		# Track the each tab used in this transaction
 		tabs_used = []
+		tabs_deleted = []
 		for tab in open_tabs:
 			# Iterate through open tabs until we
 			# 1) Run out of tabs to extract money from
@@ -727,7 +728,8 @@ class PayBarHandler(APIView):
 					'error': True,
 					'type': 'tab'
 				})
-				return Response({'error': True})
+				# return Response({'error': True})
+				continue
 
 			if amount_left < tab.amount:
 				# When the amount left is less than this tab
@@ -790,6 +792,12 @@ class PayBarHandler(APIView):
 					print 'Charge failed for tab: %s' % tab.pk
 				tab.delete()
 				# charge_source(tab.sender.customer.customer_id, tab.source, bar.owner.merchant.account_id, tab.amount, tab.charge)
+			if tab.amount < settings.MIN_CARD_COST:
+				tabs_deleted.append({
+					'sender_first_name': tab.sender.first_name,
+					'sender_last_name': tab.sender.last_name,
+					'amount': tab.amount
+				})
 			transaction.save()
 			t_data['transaction_id'] = transaction.pk
 			tabs_used.append(t_data)
@@ -809,4 +817,4 @@ class PayBarHandler(APIView):
 				status = transaction.authorize()
 				transaction.save()
 				# authorize_source(amount_left, request.user.customer.customer_id, request.user.customer.default_source, request.user.email, bar.owner.merchant.account_id)
-		return Response({'tab': total_tab, 'sale': sale.pk, 'transactions': tabs_used})
+		return Response({'tab': total_tab, 'sale': sale.pk, 'transactions': tabs_used, 'removed': tabs_deleted})

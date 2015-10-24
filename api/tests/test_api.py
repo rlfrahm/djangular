@@ -428,3 +428,35 @@ class ApiTests(APITestCase):
         transactions = response.data.get('transactions')
         self.assertEqual(transactions[0]['status'], 'authorized')
         self.assertEqual(transactions[0]['amount'], amount)
+
+    @mock.patch('bars.models.authorize_source')
+    @mock.patch('bars.models.charge_source')
+    def test_bar_payment_tab_is_removed_if_lt_minimum(self, mock_bar_models_charge_source, mock_bar_models_authorize_source):
+        """
+        Ensure that a tab is staged to be removed if it is less than the minimum
+        For this test you need:
+        - A bar
+        - A user
+        - A tab
+        """
+        self.user.customer.default_source = '123'
+        self.user.customer.save()
+        mock_bar_models_authorize_source.return_value = {'id': 'jnsdflkgj34r'}
+        mock_bar_models_charge_source.return_value = {'id': 'jnsdflkgj34r'}
+        # Create a tab
+        tabamt = 20.00
+        tab = Tab.new(20.00, self.user.email, 'ijbwflgkbsdf', self.user)
+        url = reverse('api:bar-pay', args=(1,))
+        amount = tabamt - settings.MIN_CARD_COST + 0.01
+        d = {
+            'amount': amount
+        }
+        response = self.client.post(url, d, format='json')
+        self.assertEqual(len(response.data.get('transactions')), 1)
+        self.assertIsNotNone(response.data.get('sale'))
+        # The user's tab should now be $10
+        self.assertEqual(response.data.get('tab'), amount)
+        transactions = response.data.get('transactions')
+        self.assertEqual(transactions[0]['status'], 'authorized')
+        self.assertEqual(float(transactions[0]['amount']), amount)
+        self.assertEqual(len(response.data.get('removed')), 1)
