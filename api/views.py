@@ -798,6 +798,7 @@ class PayBarHandler(APIView):
 					'sender_last_name': tab.sender.last_name,
 					'amount': tab.amount
 				})
+				tab.delete()
 			transaction.save()
 			t_data['transaction_id'] = transaction.pk
 			tabs_used.append(t_data)
