@@ -6,7 +6,7 @@ from django.contrib.auth.models import User
 from django.contrib.auth.models import Group
 from django.conf import settings
 
-from bars.models import Bar
+from bars.models import Bar, Tab
 from account.models import UserProfile, StripeMerchant
 
 import datetime, mock, stripe
@@ -213,26 +213,37 @@ class ApiTests(APITestCase):
         transactions = response.data.get('transactions')
         self.assertEqual(transactions[0]['status'], 'authorized')
 
-    # @mock.patch('bars.models.authorize_source')
-    # @mock.patch('bars.models.charge_source')
-    # def test_bar_payment_user_uses_someone_elses_tab(self, mock_bar_models_charge_source, mock_bar_models_authorize_source):
-    #     """
-    #     Ensure that a user's card is used when they don't have tabs
-    #     For this test you need:
-    #     - A bar
-    #     - A user
-    #     """
-    #     self.user.customer.default_source = '123'
-    #     self.user.customer.save()
-    #     mock_bar_models_authorize_source.return_value = {'id': 'jnsdflkgj34r'}
-    #     mock_bar_models_charge_source.return_value = {'id': 'jnsdflkgj34r'}
-    #     url = reverse('api:bar-pay', args=(1,))
-    #     d = {
-    #         'amount': 10
-    #     }
-    #     response = self.client.post(url, d, format='json')
-    #     self.assertEqual(len(response.data.get('transactions')), 1)
-    #     self.assertIsNotNone(response.data.get('sale'))
-    #     self.assertEqual(response.data.get('tab'), 0)
-    #     transactions = response.data.get('transactions')
-    #     self.assertEqual(transactions[0]['status'], 'authorized')
+    # TODO: User uses tab to pay for drink
+    # TODO: User uses multiple tabs to pay for drink
+    # TODO: User uses tab and their own money to pay for drink
+    # TODO: User buys drink less than minimum amount
+
+    @mock.patch('bars.models.authorize_source')
+    @mock.patch('bars.models.charge_source')
+    def test_bar_payment_user_uses_tab(self, mock_bar_models_charge_source, mock_bar_models_authorize_source):
+        """
+        Ensure that a user's tab is used if they have one
+        For this test you need:
+        - A bar
+        - A user
+        - A tab
+        """
+        self.user.customer.default_source = '123'
+        self.user.customer.save()
+        mock_bar_models_authorize_source.return_value = {'id': 'jnsdflkgj34r'}
+        mock_bar_models_charge_source.return_value = {'id': 'jnsdflkgj34r'}
+        # Create a tab
+        tab = Tab.new(20.00, self.user.email, 'ijbwflgkbsdf', self.user)
+        url = reverse('api:bar-pay', args=(1,))
+        amount = 10
+        d = {
+            'amount': amount
+        }
+        response = self.client.post(url, d, format='json')
+        self.assertEqual(len(response.data.get('transactions')), 1)
+        self.assertIsNotNone(response.data.get('sale'))
+        # The user's tab should now be $10
+        self.assertEqual(response.data.get('tab'), amount)
+        transactions = response.data.get('transactions')
+        self.assertEqual(transactions[0]['status'], 'authorized')
+        self.assertEqual(transactions[0]['amount'], amount)

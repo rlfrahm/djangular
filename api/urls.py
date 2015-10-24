@@ -26,6 +26,7 @@ urlpatterns = [
   url(r'^bars$', views.BarsHandler.as_view(), name='bars'),
   url(r'^search/users$', views.UserSearchHandler.as_view(), name='search-user'),
   url(r'^search/bars$', views.BarSearchHandler.as_view(), name='search-bar'),
+  url(r'^search$', views.SearchHandler.as_view(), name='search'),
   # url(r'^tabs/(?P<tab_id>[0-9]+)/accept$', views.TabsAcceptedHandler.as_view(), name='tab-accept'),
   url(r'^tabs/(?P<tab_id>[0-9]+)$', views.TabHandler.as_view(), name='tab'),
   url(r'^tabs$', views.TabsHandler.as_view(), name='tabs'),

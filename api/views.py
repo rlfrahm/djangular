@@ -452,6 +452,27 @@ class BarCheckinHandler(APIView):
 			'when': checkin.when,
 			})
 
+class SearchHandler(APIView):
+	authentication_classes = (SessionAuthentication,)
+	permission_classes = (IsAuthenticated,)
+
+	def get(self, request, format=None):
+		serializer = SearchSerializer(data=request.GET)
+		if serializer.is_valid():
+			term = serializer.validated_data['term']
+			bs = Bar.objects.filter(Q(name__icontains=term))
+			bars = []
+			for bar in bs:
+				bars.append({
+					'id': bar.pk,
+					'name': bar.name,
+					'location': bar.location,
+					'avatar': bar.avatar_url
+					})
+			return Response(bars)
+		else:
+			return Response([])
+
 class UserSearchHandler(APIView):
 	authentication_classes = (SessionAuthentication,)
 	permission_classes = (IsAuthenticated,)
@@ -541,7 +562,7 @@ class TabsHandler(APIView):
 			note = serializer.validated_data.get('note')
 			# Create a new note
 			try:
-				tab = Tab.new(request, amount, receiver_email, source, request.user, note)
+				tab = Tab.new(amount, receiver_email, source, request.user, request=request, note=note)
 			except Exception, e:
 				return Response({
 					'status': 400,
@@ -681,7 +702,6 @@ class PayBarHandler(APIView):
 
 		# This is the amount of money in the user's tab
 		total_tab = request.user.profile.tab
-		print open_tabs
 		# Track the each tab used in this transaction
 		tabs_used = []
 		for tab in open_tabs:
@@ -690,8 +710,6 @@ class PayBarHandler(APIView):
 			# 2) Suffice the amount of money needed to be withdrawn
 			authorize = False
 			charge_amt = 0
-
-			print amount_left
 
 			# Check to make sure that the rest of the amount is greater
 			# than the minimum amount that can be put on a card.
@@ -718,7 +736,7 @@ class PayBarHandler(APIView):
 				# Adjust the amount left on this tab
 				tab.amount -= amount_left
 				# Adjust the user's total tab amount
-				total_tab -= tab.amount
+				total_tab -= float(tab.amount)
 				charge_amt = amount_left
 				# Adjust the amount_left
 				amount_left = 0
@@ -726,7 +744,7 @@ class PayBarHandler(APIView):
 			elif amount_left > tab.amount:
 				# When the amount left is more than this tab
 				# Use all of this tab and capture the charge
-				total_tab -= tab.amount
+				total_tab -= float(tab.amount)
 				charge_amt = tab.amount
 				# Adjust the amount_left
 				amount_left -= tab.amount
@@ -734,7 +752,7 @@ class PayBarHandler(APIView):
 			else:
 				# When the amount left is equal to this tab
 				# Amounts are equal; remove & break
-				total_tab -= amount_left
+				total_tab -= float(amount_left)
 				charge_amt = amount_left
 				# Adjust the amount_left
 				amount_left -= tab.amount

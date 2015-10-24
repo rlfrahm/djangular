@@ -168,21 +168,21 @@ class Tab(models.Model):
 	charge = models.CharField(max_length=100, default='')
 
 	@classmethod
-	def new(cls, request, amount, email, source, user, note=None):
+	def new(cls, amount, email, source, user, request=None, note=None):
 		# Authorize the payment
 		charge = authorize_source(amount, user.customer.customer_id, source)
 		if not charge:
 			# The authorization failed
 			raise Exception()
 		tab = Tab(amount=amount, source=source, sender=user, note=note, email=email)
+		invite = None
 		if user.email is email:
 			# The user is buying themselves a tab
-			tab.receiver = request.user
+			tab.receiver = user
 			tab.accepted = True
 		else:
 			# Figure out if this user is in the system
 			users = User.objects.filter(email=email)
-			invite = None
 			if len(users) < 1:
 				# There is no user with this email, send email
 				invite = TabInvite(email=email, token=uuid.uuid4())
@@ -194,7 +194,8 @@ class Tab(models.Model):
 		if invite:
 			invite.tab = tab
 			invite.save()
-			send_tab_invite(request, tab, invite)
+			if request:
+				send_tab_invite(request, tab, invite)
 		# Add the amount to the user's tab if the tab has been accepted
 		if tab.accepted:
 			user.profile.tab += tab.amount
