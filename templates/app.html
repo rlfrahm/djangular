@@ -24,10 +24,10 @@
       <ul class="nav navbar-nav navbar-left">
         <li><a ui-sref="bars">Bars</a></li>
       </ul>
-      <form class="navbar-form navbar-left" role="search">
+      <form name="form" ng-submit="search(form, s.q)" class="navbar-form navbar-left" role="search">
         <div class="form-group">
           <div class="input-group">
-            <input type="text" class="form-control" id="search" placeholder="Search">
+            <input type="text" ng-model="s.q" class="form-control" id="search" placeholder="Search" required>
             <span class="input-group-addon pointer" onclick="document.getElementById('search').focus()"><span class="glyphicon glyphicon-search"></span></span>
           </div>
         </div>

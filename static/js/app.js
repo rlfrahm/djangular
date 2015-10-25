@@ -122,7 +122,7 @@ angular.module('App', ['Init', 'Api', 'ui.bootstrap', 'ui.router', 'toastr'])
     });
 }])
 
-.run(['$rootScope', '$state', 'Auth', 'Me', 'Authorization', '$sce', function($rootScope, $state, Auth, Me, Authorization, $sce) {
+.run(['$rootScope', '$state', 'Auth', 'Me', 'Authorization', '$sce', 'Search', function($rootScope, $state, Auth, Me, Authorization, $sce, Search) {
   if (!$rootScope.user) {
     $rootScope.user = Me.get(function() {
       if (!$rootScope.user.avatar)
@@ -176,6 +176,13 @@ angular.module('App', ['Init', 'Api', 'ui.bootstrap', 'ui.router', 'toastr'])
     navigator.geolocation.getCurrentPosition(geo_success, geo_error);
     var wpid = navigator.geolocation.watchPosition(geo_success, geo_error, geo_options);
   }
+
+  $rootScope.search = function(form, term) {
+    if (form.$invalid) return;
+    $rootScope.s.r = Search.query({term: term}, function() {
+      // Loading indicator
+    });
+  };
 }])
 
 .service('Authorization', ['$rootScope', function($rootScope) {

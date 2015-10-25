@@ -78,6 +78,10 @@ angular.module('Api', ['ngResource'])
 	});
 }])
 
+.factory('Search', ['$resource', function($resource) {
+	return $resource('/api/v1/search', {term: '@term'});
+}])
+
 .factory('UserSearch', ['$resource', function($resource) {
 	return $resource('/api/v1/search/users', {term: '@term'});
 }])
