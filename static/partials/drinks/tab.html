@@ -4,7 +4,7 @@
 		<h1 class="text-center">{[{ tab | currency }]}</h1>
 	</div>
 </div>
-<button type="button" class="btn btn-success btn-lg center" buy-drinks ng-click="payForDrink()">Pay for Drink</button>
+<button type="button" class="btn btn-success btn-lg center" buy-drinks ng-click="payForDrink()"><span ng-cloak ng-if="!user.sources"><img src="/static/images/high_priority.png" height="20px">&nbsp;&nbsp;</span>Pay for Drink</button>
 <br>
 <div class="panel panel-default">
 	<div class="panel-heading">

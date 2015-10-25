@@ -123,7 +123,7 @@ angular.module('App')
 	};
 }])
 
-.directive('buyDrinks', ['$modal', 'BarPayment', 'BarSale', function($modal, BarPayment, BarSale) {
+.directive('buyDrinks', ['$rootScope', '$modal', 'BarPayment', 'BarSale', function($rootScope, $modal, BarPayment, BarSale) {
 	return {
 		link: function($scope, element, attrs) {
 			$scope.payment = {};
@@ -138,6 +138,11 @@ angular.module('App')
 			}
 
 			$scope.payForDrinkHere = function(bar) {
+				if (!$rootScope.user.sources) {
+					$scope.showNoPaymentSourcesModal();
+					return;
+				}
+
 				$scope.payment.bar = bar;
 		    $scope.showPayForDrinkBartenderModal();
 			};
@@ -146,7 +151,19 @@ angular.module('App')
 				return !!$scope.payment.bar;
 			};
 
+			$scope.showNoPaymentSourcesModal = function() {
+				var m = $modal.open({
+		      templateUrl: 'no-drink-sources.html',
+		      scope: $scope
+		    });
+			};
+
 			$scope.payForDrink = function(tab) {
+				if (!$rootScope.user.sources) {
+					$scope.showNoPaymentSourcesModal();
+					return;
+				}
+
 		    var m = $modal.open({
 		      templateUrl: 'pay-for-drink-where.html',
 		      scope: $scope

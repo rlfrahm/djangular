@@ -462,6 +462,7 @@ angular.module('App')
 		source.$save(function() {
 			toastr.success('Success!', 'Your card has been added!');
 			$scope.getCards();
+			$rootScope.user.sources = true;
 		});
 	};
 

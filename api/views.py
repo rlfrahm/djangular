@@ -67,7 +67,7 @@ class UserHandler(APIView):
 	permission_classes = (IsAuthenticated,)
 
 	def get(self, request, format=None):
-		return Response({
+		d = {
 			'username': request.user.username,
 			'email': request.user.email,
 			'id': request.user.pk,
@@ -75,7 +75,10 @@ class UserHandler(APIView):
 			'last_name': request.user.last_name,
 			'bar_owner': is_in_group(request.user, BAR_OWNERS),
 			'avatar': request.user.profile.avatar_url
-			})
+		}
+		if request.user.customer.default_source:
+			d['sources'] = True
+		return Response(d)
 
 	def post(self, request, format=None):
 		serializer = UserSerializer(data=request.data)
