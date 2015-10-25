@@ -10,6 +10,7 @@ from rest_framework.permissions import IsAuthenticated
 from django.shortcuts import get_object_or_404
 from django.db.models import Q
 from django.conf import settings
+from django.utils import timezone
 
 from .serializers import RegisterSerializer, LoginSerializer, BarSerializer, InviteSerializer, SearchSerializer, TabSerializer, CreditCardSerializer, PayBarSerializer, UserSerializer, AcceptTabSerializer, AvatarSerializer, UserPasswordSerializer, BarsWithinDistanceSerializer
 from .decorators import HasGroupPermission, is_in_group, BAR_OWNERS, DRINKERS
@@ -443,11 +444,7 @@ class BarCheckinHandler(APIView):
 		return Response(checkins)
 
 	def post(self, request, bar_id, format=None):
-		checkin = Checkin()
-		checkin.bar = get_object_or_404(Bar, pk=bar_id)
-		checkin.user = request.user
-		checkin.when = datetime.datetime.now()
-		checkin.save()
+		checkin = Checkin.new(bar_id, request.user)
 		return Response({
 			'id': checkin.pk,
 			'user': checkin.user.pk,

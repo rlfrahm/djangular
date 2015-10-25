@@ -1,6 +1,8 @@
 from django.db import models
 from django.conf import settings
 from django.contrib.auth.models import User
+from django.shortcuts import get_object_or_404
+from django.utils import timezone
 
 from notifications.emails import send_tab_invite
 
@@ -144,6 +146,15 @@ class Checkin(models.Model):
 	bar = models.ForeignKey('Bar')
 	created = models.DateTimeField(auto_now_add=True, auto_now=False)
 	updated = models.DateTimeField(auto_now_add=False, auto_now=True)
+
+	@classmethod
+	def new(cls, bar_id, user):
+		checkin = Checkin()
+		checkin.bar = get_object_or_404(Bar, pk=bar_id)
+		checkin.when = timezone.now()
+		checkin.user = user
+		checkin.save()
+		return checkin
 
 class TabInvite(models.Model):
 	tab = models.ForeignKey('Tab')

@@ -6,7 +6,7 @@ from django.contrib.auth.models import User
 from django.contrib.auth.models import Group
 from django.conf import settings
 
-from bars.models import Bar, Tab
+from bars.models import Bar, Tab, Checkin
 from account.models import UserProfile, StripeMerchant
 
 import datetime, mock, stripe
@@ -487,3 +487,26 @@ class ApiTests(APITestCase):
         self.assertEqual(transactions[0]['status'], 'authorized')
         self.assertEqual(float(transactions[0]['amount']), amount)
         self.assertEqual(len(response.data.get('removed')), 1)
+
+    def test_bar_checkin(self):
+        """
+        Ensure that we can checkin to a bar
+        """
+        url = reverse('api:bar-checkin', args=(1,))
+        response = self.client.post(url, format='json')
+        self.assertEqual(response.data.get('id'), 1)
+        self.assertEqual(response.data.get('user'), self.user.pk)
+        self.assertIsNotNone(response.data.get('when'))
+        self.assertEqual(response.data.get('bar'), 1)
+
+    def test_bar_checkin_get(self):
+        """
+        Ensure that we can get checkins at a bar
+        """
+        url = reverse('api:bar-checkin', args=(1,))
+        c1 = Checkin.new(1, self.user)
+        c2 = Checkin.new(1, self.user)
+        response = self.client.get(url, format='json')
+        self.assertEqual(len(response.data), 2)
+        self.assertEqual(response.data[0]['user'], self.user.pk)
+        self.assertEqual(response.data[1]['user'], self.user.pk)
