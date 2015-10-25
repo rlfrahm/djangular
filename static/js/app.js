@@ -177,11 +177,19 @@ angular.module('App', ['Init', 'Api', 'ui.bootstrap', 'ui.router', 'toastr'])
     var wpid = navigator.geolocation.watchPosition(geo_success, geo_error, geo_options);
   }
 
+  $rootScope.s = {};
+
   $rootScope.search = function(form, term) {
     if (form.$invalid) return;
+    $rootScope.s.searching = true;
     $rootScope.s.r = Search.query({term: term}, function() {
       // Loading indicator
     });
+  };
+
+  $rootScope.cancelSearch = function() {
+    $rootScope.s.searching = false;
+    $rootScope.s.q = '';
   };
 }])
 

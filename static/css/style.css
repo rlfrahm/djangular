@@ -10,6 +10,10 @@ textarea {
 	resize: vertical;
 }
 
+img {
+  max-width: 100%;
+}
+
 .navbar-default, .btn-primary {
   background-color: #3d4254;
 }
@@ -123,9 +127,27 @@ a.list-group-item:hover, button.list-group-item:hover, a.list-group-item:focus, 
   min-height: 200px;
 }
 
+.navbar-header {
+  display: none;
+}
+
+.navbar-search {
+  margin-top: 0;
+  margin-bottom: 0;
+}
+
 @media (min-width: 768px) {
   .icon-toolbar {
     display: none;
+  }
+
+  .navbar-header {
+    display: block;
+  }
+
+  .navbar-search {
+    margin-top: 7.5px;
+    margin-bottom: 7.5px;
   }
 }
 

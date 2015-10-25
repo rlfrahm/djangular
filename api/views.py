@@ -460,16 +460,16 @@ class SearchHandler(APIView):
 		serializer = SearchSerializer(data=request.GET)
 		if serializer.is_valid():
 			term = serializer.validated_data['term']
-			bs = Bar.objects.filter(Q(name__icontains=term))
-			bars = []
-			for bar in bs:
-				bars.append({
-					'id': bar.pk,
-					'name': bar.name,
-					'location': bar.location,
-					'avatar': bar.avatar_url
+			r = User.objects.filter(Q(first_name__icontains=term) | Q(last_name__icontains=term))[:10]
+			results = []
+			for result in r:
+				results.append({
+					'id': result.pk,
+					'first_name': result.first_name,
+					'last_name': result.last_name,
+					'avatar': result.profile.avatar_url
 					})
-			return Response(bars)
+			return Response(results)
 		else:
 			return Response([])
 
@@ -481,14 +481,13 @@ class UserSearchHandler(APIView):
 		serializer = SearchSerializer(data=request.GET)
 		if serializer.is_valid():
 			term = request.GET.get('term')
-			users = User.objects.filter(Q(first_name__icontains=term) | Q(last_name__icontains=term) | Q(email__icontains=term))[:5]
+			users = User.objects.filter(Q(first_name__icontains=term) | Q(last_name__icontains=term) | Q(email__icontains=term))[:10]
 			u = []
 			for user in users:
 				u.append({
 					'id': user.pk,
 					'first_name': user.first_name,
 					'last_name': user.last_name,
-					'email': user.email,
 					'avatar': user.profile.avatar_url
 				})
 			return Response(u)
