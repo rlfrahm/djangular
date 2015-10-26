@@ -153,6 +153,12 @@ class PasswordResetToken(models.Model):
 	def __unicode__(self):
 		return self.user.username
 
+	@classmethod
+	def new(cls, user):
+		prt = cls(user=user, token=uuid.uuid4())
+		prt.save()
+		return prt
+
 class AccountActivationToken(models.Model):
 	user = models.OneToOneField(settings.AUTH_USER_MODEL)
 	token = models.CharField(max_length=100)

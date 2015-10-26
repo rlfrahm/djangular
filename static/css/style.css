@@ -127,11 +127,11 @@ a.list-group-item:hover, button.list-group-item:hover, a.list-group-item:focus, 
   min-height: 200px;
 }
 
-.navbar-header {
+.app .navbar-header {
   display: none;
 }
 
-.navbar-search {
+.app .navbar-search {
   margin-top: 0;
   margin-bottom: 0;
 }
@@ -141,11 +141,11 @@ a.list-group-item:hover, button.list-group-item:hover, a.list-group-item:focus, 
     display: none;
   }
 
-  .navbar-header {
+  .app .navbar-header {
     display: block;
   }
 
-  .navbar-search {
+  .app .navbar-search {
     margin-top: 7.5px;
     margin-bottom: 7.5px;
   }
@@ -154,7 +154,6 @@ a.list-group-item:hover, button.list-group-item:hover, a.list-group-item:focus, 
 .icon-toolbar .navbar-nav {
   display: table;
   width: 100%;
-  margin: 0;
 }
 
 .icon-toolbar .navbar-nav>li {
