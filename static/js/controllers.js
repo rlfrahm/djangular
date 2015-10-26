@@ -259,7 +259,7 @@ angular.module('App')
   });
 }])
 
-.controller('TabOpenCtrl', ['$rootScope', '$scope', '$state', '$stateParams', '$modal', 'toastr', 'UserSearch', 'Tab', 'Source', 'Analytics', function($rootScope, $scope, $state, $stateParams, $modal, toastr, UserSearch, Tab, Source, Analytics) {
+.controller('TabOpenCtrl', ['$rootScope', '$scope', '$state', '$stateParams', '$modal', '$location', 'toastr', 'UserSearch', 'Tab', 'Source', 'Analytics', 'User', function($rootScope, $scope, $state, $stateParams, $modal, $location, toastr, UserSearch, Tab, Source, Analytics, User) {
 	Analytics.pageview('Open A Tab');
 	$scope.users = [];
 	$scope.searching = false;
@@ -267,8 +267,13 @@ angular.module('App')
 	$scope.buyingType = 'tab';
 	$scope.tab = {};
 	$scope.tab.users = [];
-  if ($stateParams.for)
-    $scope.tab.users.push($stateParams.for);
+	console.log($location.search().id);
+  if ($location.search().id) {
+		var u = User.get({id: $location.search().id}, function() {
+			$scope.tab.users.push(u);
+		});
+	}
+
 	$scope.tab.amount = 20;
 	$scope.tab.total = 0;
 	$scope.selectedSource = null;

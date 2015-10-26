@@ -50,7 +50,7 @@ angular.module('App', ['Init', 'Api', 'ui.bootstrap', 'ui.router', 'toastr'])
       }
     })
     .state('tabs-open.find', {
-      url: '/find',
+      url: '/find?user=:id',
       templateUrl: 'static/partials/drinks/open-tab.find.html',
       controller: function($scope) {
         $scope.order.title = 'For who?';
