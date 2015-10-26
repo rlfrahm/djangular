@@ -76,8 +76,8 @@ class BarSerializer(serializers.ModelSerializer):
 
 class RoleSerializer(serializers.Serializer):
   email = serializers.EmailField(required=False)
-  uid = serializer.IntegerField(min_value=1, required=False)
-  role = serializer.CharField(max_length=100)
+  uid = serializers.IntegerField(min_value=1, required=False)
+  role = serializers.CharField(max_length=100)
 
 class SearchSerializer(serializers.Serializer):
   term = serializers.CharField(max_length=25)
