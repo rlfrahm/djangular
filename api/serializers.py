@@ -74,17 +74,10 @@ class BarSerializer(serializers.ModelSerializer):
     bar.save()
     return bar
 
-class InviteSerializer(serializers.Serializer):
-  email = serializers.EmailField()
-
-  def create(self, validated_data):
-    user = self.context['request'].user
-    print self.context['bar_id']
-    bar = get_object_or_404(Bar, pk=self.context['bar_id'])
-    print bar
-    invite = BartenderInvite(bar=bar, email=validated_data.get('email'))
-    invite.save()
-    return invite
+class RoleSerializer(serializers.Serializer):
+  email = serializers.EmailField(required=False)
+  uid = serializer.IntegerField(min_value=1, required=False)
+  role = serializer.CharField(max_length=100)
 
 class SearchSerializer(serializers.Serializer):
   term = serializers.CharField(max_length=25)

@@ -12,11 +12,11 @@ from django.db.models import Q
 from django.conf import settings
 from django.utils import timezone
 
-from .serializers import RegisterSerializer, LoginSerializer, BarSerializer, InviteSerializer, SearchSerializer, TabSerializer, CreditCardSerializer, PayBarSerializer, UserSerializer, AcceptTabSerializer, AvatarSerializer, UserPasswordSerializer, BarsWithinDistanceSerializer
+from .serializers import RegisterSerializer, LoginSerializer, BarSerializer, RoleSerializer, SearchSerializer, TabSerializer, CreditCardSerializer, PayBarSerializer, UserSerializer, AcceptTabSerializer, AvatarSerializer, UserPasswordSerializer, BarsWithinDistanceSerializer
 from .decorators import HasGroupPermission, is_in_group, BAR_OWNERS, DRINKERS
 
 from account.models import UserProfile, USER_PROFILE_DEFAULT
-from bars.models import Bar, Bartender, BartenderInvite, Checkin, Tab, Sale, Transaction, authorize_source
+from bars.models import Bar, Bartender, BartenderInvite, Checkin, Tab, Sale, Transaction, authorize_source, Role
 from notifications.emails import send_bartender_invite, send_bar_creation_email
 
 import uuid, datetime, stripe
@@ -368,7 +368,7 @@ class BarsHandler(APIView):
 		else:
 			return Response({'error': True, 'errors': serializer.errors})
 
-class BartendersHandler(APIView):
+class RolesHandler(APIView):
 	"""
 	CRUD operations for Bartenders
 	"""
@@ -388,15 +388,44 @@ class BartendersHandler(APIView):
 				})
 		return Response(bartenders)
 
-	# Creates and returns a BartenderInvite
+	# Creates a role and returns an invite if needed
 	def post(self, request, bar_id, format=None):
-		serializer = InviteSerializer(data=request.data, context={'request': request, 'bar_id': bar_id})
+		serializer = RoleSerializer(data=request.data)
 		if serializer.is_valid(raise_exception=True):
-			# invite = serializer.save()
+			new_roles = serializer.validated_data.get('role').split(',')
+			email = serializer.validated_data.get('email')
+			uid = serializer.validated_data.get('uid')
+			if not email or not uid:
+				return Response(status=status.HTTP_400_BAD_REQUEST)
+			# Get the bar
 			bar = get_object_or_404(Bar, pk=bar_id)
-			invite = BartenderInvite(bar=bar, email=request.data.get('email'), token=uuid.uuid4())
-			invite.save()
-			send_bartender_invite(request, invite)
+			user = None
+			if uid:
+				user = User.objects.get(pk=uid)
+			if not user:
+				user = User.objects.filter(email=email)[:1]
+				if len(user) > 0:
+					user = user[0]
+			if user:
+				# Use the user's account
+				# First, see if this user has a role for this bar
+				user_role = user.role_set.filter(bar=bar)[:1]
+				if len(user_role) > 0:
+					# A role exists, use it
+					user_role = user_role[0].split(',') # [role, role, ..]
+					for r in new_roles:
+						# Check if user already has this role
+						if r not in user_role:
+							user_role.append(r)
+				else:
+					# A role does not exist, create a new one
+					user_role = Role(user=request.user, bar=bar, roles=''.join(new_roles))
+					user_role.save()
+			else:
+				# Send an email invite
+				invite = BartenderInvite(bar=bar, email=request.data.get('email'), token=uuid.uuid4())
+				invite.save()
+				send_bartender_invite(request, invite)
 			return Response({
 				'bar_id': invite.bar.pk,
 				'email': invite.email,

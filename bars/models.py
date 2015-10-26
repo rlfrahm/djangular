@@ -127,8 +127,7 @@ class Bar(models.Model):
 		return bar
 
 class Bartender(models.Model):
-	user = models.ForeignKey(settings.AUTH_USER_MODEL)
-	bar = models.ForeignKey('Bar')
+	user = models.OneToOneField(settings.AUTH_USER_MODEL)
 	working = models.BooleanField(default=False)
 
 class BartenderInvite(models.Model):
@@ -304,3 +303,14 @@ def charge_source(amount, customer_id, source, recipient_id, charge):
 
 def get_application_fee(amount):
 	return int(float(amount) * 0.1 * 100.00)
+
+class Role(models.Model):
+	bar = models.ForeignKey('Bar')
+	user = models.ForeignKey(settings.AUTH_USER_MODEL)
+	# Comma separated list of roles: "admin, manager, bartender"
+	ADMIN = 0
+	MANAGER = 1
+	BARTENDER = 2
+	roles = models.CharField(max_length=100)
+	created = models.DateTimeField(auto_now_add=True, auto_now=False)
+	updated = models.DateTimeField(auto_now_add=False, auto_now=True)
