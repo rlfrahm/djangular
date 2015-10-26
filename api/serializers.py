@@ -91,7 +91,7 @@ class SearchSerializer(serializers.Serializer):
 
 class TabSerializer(serializers.Serializer):
   amount = serializers.DecimalField(max_digits=6, decimal_places=2, min_value=settings.MIN_CARD_COST)
-  email = serializers.EmailField()
+  users = serializers.ListField()
   source = serializers.CharField(max_length=100)
   note = serializers.CharField(max_length=140, required=False)
 

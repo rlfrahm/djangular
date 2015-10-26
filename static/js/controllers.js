@@ -259,24 +259,24 @@ angular.module('App')
   });
 }])
 
-.controller('TabOpenCtrl', ['$rootScope', '$scope', '$state', '$stateParams', '$modal', 'UserSearch', 'Tab', 'Source', 'Analytics', function($rootScope, $scope, $state, $stateParams, $modal, UserSearch, Tab, Source, Analytics) {
+.controller('TabOpenCtrl', ['$rootScope', '$scope', '$state', '$stateParams', '$modal', 'toastr', 'UserSearch', 'Tab', 'Source', 'Analytics', function($rootScope, $scope, $state, $stateParams, $modal, toastr, UserSearch, Tab, Source, Analytics) {
 	Analytics.pageview('Open A Tab');
 	$scope.users = [];
 	$scope.searching = false;
 	$scope.term = '';
 	$scope.buyingType = 'tab';
-	$scope.tab = new Tab();
-	$scope.tab.emails = [];
-	$scope.tabUsers = [];
+	$scope.tab = {};
+	$scope.tab.users = [];
   if ($stateParams.for)
-    $scope.tab.emails.push($stateParams.for);
+    $scope.tab.users.push($stateParams.for);
 	$scope.tab.amount = 20;
+	$scope.tab.total = 0;
 	$scope.selectedSource = null;
 
 	$scope.order = {
     bar: '',
     bartender: '',
-    emails: [],
+    users: [],
     drinks: [
       { name: 'Beer', cost: 5 }
     ],
@@ -289,16 +289,13 @@ angular.module('App')
   $scope.isState = function(s) {
     return (s == $scope.state);
   };
-  $scope.addAnotherEmail = function() {
-    if ($scope.tab.emails[$scope.tab.emails.length - 1] != '')
-      $scope.tab.emails.push('');
-  };
+
   $scope.setType = function(t) {
     $scope.tab.type = t;
     if (t == 'me') {
-      $scope.tab.emails = [$rootScope.user.email];
+      $scope.tab.users = [$rootScope.user];
     } else {
-      $scope.tab.emails = [];
+      $scope.tab.users = [];
     }
   };
 
@@ -309,15 +306,20 @@ angular.module('App')
 	};
 
 	$scope.selectUser = function(user) {
+		if ($scope.tab.users.indexOf(user) > -1) return;
 		$scope.searching = false;
-		$scope.tabUsers.push(user);
-		$scope.tab.emails.push(user.email);
+		$scope.tab.users.push(user);
 		$scope.term = '';
+		$scope.total();
+	};
+
+	$scope.total = function() {
+		$scope.tab.total = $scope.tab.users.length * $scope.tab.amount;
 	};
 
 	$scope.removeUser = function($index) {
-		$scope.tabUsers.splice($index, 1);
-		$scope.tab.emails.splice($index, 1);
+		$scope.tab.users.splice($index, 1);
+		$scope.total();
 	};
 
 	$scope.selectSource = function(source) {
@@ -335,9 +337,26 @@ angular.module('App')
 	$scope.loading = false;
 	$scope.submit = function() {
 		$scope.loading = true;
-		$scope.tab.email = $scope.tab.emails[0];
-		$scope.tab.$save(function() {
+		var t = new Tab();
+		t.users = [];
+		$scope.tab.users.forEach(function(user) {
+			if (user.id)
+				t.users.push({id:user.id});
+			else
+				t.users.push({email:user.email});
+		});
+		t.amount = $scope.tab.amount;
+		t.source = $scope.tab.source;
+		if ($scope.tab.note)
+			t.note = $scope.tab.note;
+
+		t.$save(function() {
 			$scope.loading = false;
+			if (t.users.length > 1)
+				toastr.success('Tabs successfully created!', 'The users have been notified.');
+			else
+			 	toastr.success('Tab successfully created for ' + $scope.tab.users[0].first_name, 'They have been notified');
+			return;
 			$state.go('tab');
 		});
 	};
@@ -350,6 +369,10 @@ angular.module('App')
     m.result.then(function(email) {
     });
   };
+
+	$scope.filterOutUserRepeats = function(user) {
+		return ($scope.tab.users.indexOf(user) < 0);
+	};
 }])
 
 .controller('TabCtrl', ['$scope', '$modal', 'MyTab', 'Tab', 'BarPayment', 'Analytics', function($scope, $modal, MyTab, Tab, BarPayment, Analytics) {

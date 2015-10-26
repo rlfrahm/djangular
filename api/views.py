@@ -230,9 +230,8 @@ class BarHandler(APIView):
 			'avatar': b.avatar_url,
 		}
 		# Check if we need to add any action items
-		if b.owner == request.user:
-			# The user has set up a merchant account through Stripe
-			bar['merchant'] = hasattr(request.user, 'merchant')
+		# The user has set up a merchant account through Stripe
+		bar['merchant'] = hasattr(b.owner, 'merchant')
 		return Response(bar)
 
 	# Update bar details
@@ -555,6 +554,10 @@ class TabsHandler(APIView):
 			amount = serializer.validated_data['amount']
 			# The user's payment source
 			source = serializer.validated_data['source']
+			# The user(s) who are receiving the tab(s)
+			users = serializer.validated_data.get('users')
+			print users
+			return Response()
 			# The email associated with the receiver
 			receiver_email = serializer.validated_data['email']
 			# The note added to the tab

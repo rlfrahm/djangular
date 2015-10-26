@@ -1,5 +1,5 @@
 <form name="form" ng-cloak>
-  <div class="list-group-item media clearfix" ng-repeat="user in tabUsers">
+  <div class="list-group-item media clearfix" ng-repeat="user in tab.users">
     <div class="col-xs-2">
       <div class="row">
         <img class="media-object" ng-src="{[{ user.avatar }]}" height="40px">
@@ -14,9 +14,9 @@
   </div>
   <div class="list-group-item">
     <div class="form-group" dropdown is-open="searching">
-      <input type="text" class="form-control input-lg" placeholder="Search..." ng-model="term" ng-model-options="{ debounce: 500 }" ng-change="search(term)" dropdown-toggle>
+      <input type="text" class="form-control input-lg" placeholder="Search For Users..." ng-model="term" ng-model-options="{ debounce: 500 }" ng-change="search(term)" dropdown-toggle>
       <div class="list-group dropdown-menu" style="width:100%" ng-show="users">
-        <a class="list-group-item media pointer" ng-repeat="user in users" ng-click="selectUser(user)">
+        <a class="list-group-item media pointer" ng-repeat="user in users | filter:filterOutUserRepeats" ng-click="selectUser(user)">
           <div class="col-xs-3">
             <img class="media-object" ng-src="{[{ user.avatar }]}" height="40px">
           </div>
@@ -24,6 +24,9 @@
             <h4 class="media-heading">{[{ user.first_name }]} {[{ user.last_name }]}</h4>
           </div>
         </a>
+        <div class="list-group-item" ng-show="users.length < 1">
+          <p class="text-center"><small>Start typing to search.</small></p>
+        </div>
       </div>
     </div>
   </div>

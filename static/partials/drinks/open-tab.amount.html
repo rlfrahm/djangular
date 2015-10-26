@@ -2,7 +2,7 @@
 	<div class="form-group">
 		<div class="input-group">
 			<span class="input-group-addon">$</span>
-			<input type="number" min="10" step="1" class="form-control input-lg" value="20" ng-model="tab.amount" focus>
+			<input type="number" min="10" step="1" class="form-control input-lg" value="20" ng-model="tab.amount" focus ng-blur="total()">
 		</div>
 	</div>
 </div>
