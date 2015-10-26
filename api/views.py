@@ -556,32 +556,44 @@ class TabsHandler(APIView):
 			source = serializer.validated_data['source']
 			# The user(s) who are receiving the tab(s)
 			users = serializer.validated_data.get('users')
-			print users
-			return Response()
-			# The email associated with the receiver
-			receiver_email = serializer.validated_data['email']
-			# The note added to the tab
-			note = serializer.validated_data.get('note')
-			# Create a new note
-			try:
-				tab = Tab.new(amount, receiver_email, source, request.user, request=request, note=note)
-			except Exception, e:
-				return Response({
-					'status': 400,
-					'message': 'Authorization of the payment source failed'
-				}, status=status.HTTP_400_BAD_REQUEST)
-
-			d = {
-				'id': tab.pk,
-				'sender': tab.sender.pk,
-				'amount': tab.amount,
-			}
-			if tab.email:
-				d['email'] = tab.email
-			if tab.receiver:
-				d['receiver'] = tab.receiver.pk
-
-			return Response(d)
+			# The response data
+			response = {'tabs': []}
+			for u in users:
+				uid = u.get('id')
+				if not uid:
+					email = u.get('email')
+				else:
+					user = User.objects.get(pk=u['id'])
+					if not user:
+						# User with this id was not found
+						# TODO: fail better than this
+						continue
+					email = user.email
+				# The email associated with the receiver
+				receiver_email = email
+				# The note added to the tab
+				note = serializer.validated_data.get('note')
+				# Create a new note
+				try:
+					tab = Tab.new(amount, receiver_email, source, request.user, request=request, note=note)
+				except Exception, e:
+					# TODO: fail better than this
+					return Response({
+						'status': 400,
+						'message': 'Authorization of the payment source failed'
+					}, status=status.HTTP_400_BAD_REQUEST)
+				d = {
+					'id': tab.pk,
+					'sender': tab.sender.pk,
+					'amount': tab.amount,
+				}
+				if tab.email:
+					d['email'] = tab.email
+				if tab.receiver:
+					d['receiver'] = tab.receiver.pk
+				response['tabs'].append(d)
+			response['amount'] = amount
+			return Response(response)
 
 class TabsAccepted(APIView):
 	authentication_classes = (SessionAuthentication,)

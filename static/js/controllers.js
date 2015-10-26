@@ -352,11 +352,10 @@ angular.module('App')
 
 		t.$save(function() {
 			$scope.loading = false;
-			if (t.users.length > 1)
+			if ($scope.tab.users.length > 1)
 				toastr.success('Tabs successfully created!', 'The users have been notified.');
 			else
 			 	toastr.success('Tab successfully created for ' + $scope.tab.users[0].first_name, 'They have been notified');
-			return;
 			$state.go('tab');
 		});
 	};

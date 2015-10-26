@@ -185,9 +185,9 @@ class Tab(models.Model):
 		if not charge:
 			# The authorization failed
 			raise Exception()
-		tab = Tab(amount=amount, source=source, sender=user, note=note, email=email, charge=charge.get('id'))
+		tab = cls(amount=amount, source=source, sender=user, note=note, email=email, charge=charge.get('id'))
 		invite = None
-		if user.email is email:
+		if user.email == email:
 			# The user is buying themselves a tab
 			tab.receiver = user
 			tab.accepted = True

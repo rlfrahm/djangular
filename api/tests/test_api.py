@@ -106,14 +106,35 @@ class ApiTests(APITestCase):
         d = {
             'amount': 20,
             'source': '123',
-            'email': self.user.email,
+            'users': [{'id':self.user.pk}],
             'note': 'Testy test notes!'
         }
         mock_bar_models_authorize_source.return_value = {'id': 'jnsdflkgj34r'}
         response = self.client.post(url, d, format='json')
-        self.assertIsNotNone(response.data.get('id'))
-        self.assertEqual(response.data.get('receiver'), self.user.pk)
+        tabs = response.data.get('tabs')
+        self.assertEqual(len(tabs), 1)
+        self.assertEqual(tabs[0]['receiver'], self.user.pk)
         self.assertEqual(response.data.get('amount'), d['amount'])
+
+    @mock.patch('bars.models.authorize_source')
+    def test_tab_create_for_myself_is_auto_accepted(self, mock_bar_models_authorize_source):
+        """
+        Ensure we can create a tab for ourselves
+        """
+        url = reverse('api:tabs')
+        d = {
+            'amount': 20,
+            'source': '123',
+            'users': [{'id':self.user.pk}],
+            'note': 'Testy test notes!'
+        }
+        mock_bar_models_authorize_source.return_value = {'id': 'jnsdflkgj34r'}
+        response = self.client.post(url, d, format='json')
+        tabs = response.data.get('tabs')
+        # Get the new tab
+        tab = Tab.objects.get(pk=tabs[0]['id'])
+        # Check the accepted value
+        self.assertTrue(tab.accepted)
 
     @mock.patch('bars.models.authorize_source')
     def test_tab_create_for_another_user(self, mock_bar_models_authorize_source):
@@ -127,13 +148,14 @@ class ApiTests(APITestCase):
         d = {
             'amount': 20,
             'source': '123',
-            'email': user.email,
+            'users': [{'id':user.pk}],
             'note': 'Testy test notes!'
         }
         mock_bar_models_authorize_source.return_value = {'id': 'jnsdflkgj34r'}
         response = self.client.post(url, d, format='json')
-        self.assertIsNotNone(response.data.get('id'))
-        self.assertEqual(response.data.get('receiver'), 2)
+        tabs = response.data.get('tabs')
+        self.assertEqual(len(tabs), 1)
+        self.assertEqual(tabs[0]['receiver'], user.pk)
         self.assertEqual(response.data.get('amount'), d['amount'])
 
     @mock.patch('bars.models.send_tab_invite')
@@ -146,13 +168,14 @@ class ApiTests(APITestCase):
         d = {
             'amount': 20,
             'source': '123',
-            'email': 'email@localhost.com',
+            'users': [{'email':'email@localhost.com'}],
             'note': 'Testy test notes!'
         }
         mock_bar_models_authorize_source.return_value = {'id': 'jnsdflkgj34r'}
         response = self.client.post(url, d, format='json')
-        self.assertIsNotNone(response.data.get('id'))
-        self.assertEqual(response.data.get('email'), d['email'])
+        tabs = response.data.get('tabs')
+        self.assertEqual(len(tabs), 1)
+        self.assertEqual(tabs[0]['email'], 'email@localhost.com')
         self.assertEqual(response.data.get('amount'), d['amount'])
 
     @mock.patch('bars.models.authorize_source')
@@ -164,7 +187,7 @@ class ApiTests(APITestCase):
         d = {
             'amount': 20,
             'source': '123',
-            'email': self.user.email,
+            'users': [{'id':self.user.pk}],
             'note': 'Testy test notes!'
         }
         err = {}
@@ -181,7 +204,7 @@ class ApiTests(APITestCase):
         d = {
             'amount': settings.MIN_CARD_COST - 0.01,
             'source': '123',
-            'email': self.user.email,
+            'users': [{'id':self.user.pk}],
             'note': 'Testy test notes!'
         }
         mock_bar_models_authorize_source.return_value = {'id': 'jnsdflkgj34r'}

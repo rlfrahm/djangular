@@ -10,10 +10,6 @@ textarea {
 	resize: vertical;
 }
 
-img {
-  max-width: 100%;
-}
-
 .navbar-default, .btn-primary {
   background-color: #3d4254;
 }
