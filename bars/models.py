@@ -96,7 +96,17 @@ class Bar(models.Model):
 	def get_absolute_url(self):
 		return 'bars:bar-detail', (self.slug,)
 
-	def is_owner(self, user_id):
+	def is_owner(self, user_id, user=None):
+		# If a user is provided, use more advanced lookup
+		# if user:
+		# 	role = user.role_set.filter(bar_id=self.pk)[:1]
+		# 	if not role:
+		# 		# No role!
+		# 		return False
+		# 	else:
+		# 		return ('owner' in role[0].roles)
+		# else:
+		# 	# Do a simple comparison
 		return self.owner.pk == user_id
 
 	@classmethod

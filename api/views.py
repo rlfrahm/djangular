@@ -392,13 +392,15 @@ class RolesHandler(APIView):
 	def post(self, request, bar_id, format=None):
 		serializer = RoleSerializer(data=request.data)
 		if serializer.is_valid(raise_exception=True):
-			new_roles = serializer.validated_data.get('role').split(',')
+			new_roles = serializer.validated_data.get('role').lower().split(',')
 			email = serializer.validated_data.get('email')
 			uid = serializer.validated_data.get('uid')
-			if not email or not uid:
+			if not email and not uid:
 				return Response(status=status.HTTP_400_BAD_REQUEST)
 			# Get the bar
 			bar = get_object_or_404(Bar, pk=bar_id)
+			if not bar.is_owner(request.user.pk):
+				return Response(status=status.HTTP_400_BAD_REQUEST)
 			user = None
 			if uid:
 				user = User.objects.get(pk=uid)
@@ -426,11 +428,12 @@ class RolesHandler(APIView):
 				invite = BartenderInvite(bar=bar, email=request.data.get('email'), token=uuid.uuid4())
 				invite.save()
 				send_bartender_invite(request, invite)
+				# 'bar_id': invite.bar.pk,
+				# 'email': invite.email,
+				# 'token': invite.token,
 			return Response({
-				'bar_id': invite.bar.pk,
-				'email': invite.email,
-				'token': invite.token,
-				})
+				'role': serializer.validated_data.get('role')
+				}, status=status.HTTP_201_CREATED)
 
 class BartenderHandler(APIView):
 	"""
