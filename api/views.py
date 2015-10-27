@@ -16,7 +16,7 @@ from .serializers import RegisterSerializer, LoginSerializer, BarSerializer, Rol
 from .decorators import HasGroupPermission, is_in_group, BAR_OWNERS, DRINKERS
 
 from account.models import UserProfile, USER_PROFILE_DEFAULT
-from bars.models import Bar, Bartender, BartenderInvite, Checkin, Tab, Sale, Transaction, authorize_source, Role
+from bars.models import Bar, Bartender, RoleInvite, Checkin, Tab, Sale, Transaction, authorize_source, Role
 from notifications.emails import send_bartender_invite, send_bar_creation_email
 
 import uuid, datetime, stripe
@@ -175,7 +175,7 @@ class UserBarsHandler(APIView):
 				'province': bar.province,
 				'owner': bar.owner.pk,
 				})
-		ub = request.user.bartender_set.all()
+		ub = request.user.role_set.all()
 		for b in ub:
 			bars.append({
 				'id': b.bar.pk,
@@ -399,7 +399,7 @@ class RolesHandler(APIView):
 				return Response(status=status.HTTP_400_BAD_REQUEST)
 			# Get the bar
 			bar = get_object_or_404(Bar, pk=bar_id)
-			if not bar.is_owner(request.user.pk):
+			if not bar.is_admin(request.user.pk):
 				return Response(status=status.HTTP_400_BAD_REQUEST)
 			user = None
 			if uid:
@@ -425,7 +425,7 @@ class RolesHandler(APIView):
 					user_role.save()
 			else:
 				# Send an email invite
-				invite = BartenderInvite(bar=bar, email=request.data.get('email'), token=uuid.uuid4())
+				invite = RoleInvite(bar=bar, email=request.data.get('email'), token=uuid.uuid4(), roles=''.join(new_roles))
 				invite.save()
 				send_bartender_invite(request, invite)
 				# 'bar_id': invite.bar.pk,
@@ -434,6 +434,28 @@ class RolesHandler(APIView):
 			return Response({
 				'role': serializer.validated_data.get('role')
 				}, status=status.HTTP_201_CREATED)
+
+		# Update an existing role
+		def put(self, request, bar_id, format=None):
+			print "I should do role things"
+
+class BartendersHandler(APIView):
+	"""
+	CRUD operations for a bar's bartenders
+	"""
+	authentication_classes = (SessionAuthentication,)
+	permission_classes = (IsAuthenticated,)
+
+	def get(self, request, bar_id, format=None):
+		bartenders = Role.objects.filter(bar_id=bar_id, roles__icontains='bartender')
+		bs = []
+		for b in bartenders:
+			bs.append({
+				'user': b.user.pk,
+				'user_first_name': b.user.first_name,
+				'user_last_name': b.user.last_name
+			})
+		return Response(bs, status=status.HTTP_200_OK)
 
 class BartenderHandler(APIView):
 	"""

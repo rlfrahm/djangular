@@ -17,6 +17,7 @@ urlpatterns = [
   # url(r'^bars/(?P<bar_id>[0-9]+)/bartenders/invite/(?P<invite_id>.+)$', views.BartenderInviteHandler.as_view(), name='bartender-invite'),
   # url(r'^bars/(?P<bar_id>[0-9]+)/bartenders/(?P<bartender_id>[0-9]+)$', views.BartenderHandler.as_view(), name='bartender'),
   url(r'^bars/(?P<bar_id>[0-9]+)/roles$', views.RolesHandler.as_view(), name='bar-roles'),
+  url(r'^bars/(?P<bar_id>[0-9]+)/bartenders$', views.BartendersHandler.as_view(), name='bar-bartenders'),
   url(r'^bars/(?P<bar_id>[0-9]+)/checkin$', views.BarCheckinHandler.as_view(), name='bar-checkin'),
   url(r'^bars/(?P<bar_id>[0-9]+)/pay$', views.PayBarHandler.as_view(), name='bar-pay'),
   url(r'^bars/(?P<bar_id>[0-9]+)/avatar$', views.BarAvatarHandler.as_view(), name='bar-avatar'),

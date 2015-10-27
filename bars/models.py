@@ -109,6 +109,16 @@ class Bar(models.Model):
 		# 	# Do a simple comparison
 		return self.owner.pk == user_id
 
+	def is_admin(self, user_id):
+		# Check if user is either 'admin' or 'owner' role
+		# Get this role
+		if self.owner.pk == user_id:
+			return True
+		roles = self.role_set.filter(user_id=user_id)[:1]
+		if len(roles) < 1:
+			return False
+		return ('admin' in roles[0])
+
 	@classmethod
 	def get_all_within_distance(cls, lat, lng, distance):
 		print lat
@@ -140,10 +150,11 @@ class Bartender(models.Model):
 	user = models.OneToOneField(settings.AUTH_USER_MODEL)
 	working = models.BooleanField(default=False)
 
-class BartenderInvite(models.Model):
+class RoleInvite(models.Model):
 	bar = models.ForeignKey('Bar')
 	email = models.EmailField()
 	token = models.CharField(max_length=100)
+	roles = models.CharField(max_length=100)
 
 	@classmethod
 	def create(cls, bar, email):

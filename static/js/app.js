@@ -107,9 +107,9 @@ angular.module('App', ['Init', 'Api', 'ui.bootstrap', 'ui.router', 'toastr'])
       url: '/financial',
       templateUrl: 'static/partials/bars/bar-settings-financial.html'
     })
-    .state('bar-settings.bartenders', {
-      url: '/bartenders',
-      templateUrl: 'static/partials/bars/bar-settings-bartenders.html'
+    .state('bar-settings.employees', {
+      url: '/employees',
+      templateUrl: 'static/partials/bars/bar-settings-employees.html'
     })
     .state('bar-settings.sales', {
       url: '/sales',

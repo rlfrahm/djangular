@@ -5,7 +5,7 @@ from django.shortcuts import get_object_or_404
 from django.conf import settings
 
 from account.models import UserProfile
-from bars.models import Bar, BartenderInvite
+from bars.models import Bar, RoleInvite
 
 class LoginSerializer(serializers.Serializer):
   username = serializers.CharField(max_length=255)

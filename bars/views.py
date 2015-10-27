@@ -8,7 +8,7 @@ from django.conf import settings
 from django.contrib import messages
 
 from .forms import RegisterForm, ContactForm
-from .models import Bar, Bartender, BartenderInvite
+from .models import Bar, Bartender, RoleInvite
 from notifications.emails import send_bartender_invite, send_us_bar_inquiry
 
 # Create your views here.
@@ -45,7 +45,7 @@ def barDetailHandler(request, bar_id, invite_id):
 
 @login_required
 def bartenderInviteHandler(request, bar_id, invite_id):
-  invite = get_object_or_404(BartenderInvite, token=invite_id)
+  invite = get_object_or_404(RoleInvite, token=invite_id)
   if request.user.email == invite.email:
     bartender = Bartender()
     bartender.user = request.user
