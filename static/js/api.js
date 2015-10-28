@@ -50,16 +50,11 @@ angular.module('Api', ['ngResource'])
 	return $resource('/api/v1/bars/:id/checkin');
 }])
 
-.factory('Bartender', ['$resource', function($resource) {
-	return $resource('/api/v1/bars/:id/bartenders/:bid', {}, {
+.factory('Employee', ['$resource', function($resource) {
+	return $resource('/api/v1/bars/:id/employees/:bid', {}, {
 		working: {
 			method: 'PUT'
-		}
-	});
-}])
-
-.factory('Bartenders', ['$resource', function($resource) {
-	return $resource('/api/v1/bars/:id/bartenders', {}, {
+		},
 		invite: {
 			method: 'POST'
 		}

@@ -155,7 +155,7 @@ angular.module('App')
 	};
 }])
 
-.controller('BarSettingsCtrl', ['$rootScope', '$scope', '$state', '$stateParams', '$modal', '$http', 'Bar', 'Bartenders', 'UserSearch', 'Analytics', 'BarSale', 'buildAddress', function($rootScope, $scope, $state, $stateParams, $modal, $http, Bar, Bartenders, UserSearch, Analytics, BarSale, buildAddress) {
+.controller('BarSettingsCtrl', ['$rootScope', '$scope', '$state', '$stateParams', '$modal', '$http', 'Bar', 'Employee', 'UserSearch', 'Analytics', 'BarSale', 'buildAddress', function($rootScope, $scope, $state, $stateParams, $modal, $http, Bar, Employee, UserSearch, Analytics, BarSale, buildAddress) {
 	$scope.bar = Bar.get({id: $stateParams.id}, function() {
 		Analytics.pageview($scope.bar.name + ' Settings');
     if ($scope.bar.street && $scope.bar.postal)
@@ -168,11 +168,11 @@ angular.module('App')
 
 	$scope.shouldSave = false;
 
-	function refreshBartenders() {
-		$scope.bartenders = Bartenders.query({id: $stateParams.id});
+	function refreshEmployees() {
+		$scope.employees = Employee.query({id: $stateParams.id});
 	}
 
-	refreshBartenders();
+	refreshEmployees();
 
 	$scope.isState = function(s) {
 		return $state.is(s);
@@ -206,11 +206,6 @@ angular.module('App')
     });
   };
 
-  $scope.selectUser = function(u) {
-    $scope.search.term = (u.first_name)?u.first_name + ' ' + u.last_name:u.email;
-    $scope.invite = u;
-  };
-
 	$scope.confirmDelete = function() {
 		var m = $modal.open({
 			templateUrl: 'confirm-delete.html',
@@ -226,18 +221,47 @@ angular.module('App')
 		});
 	};
 
-	$scope.inviteBartender = function() {
+	$scope.inviteEmployee = function() {
+		var s = $scope.$new();
+
+		s.selectUser = function(u) {
+
+			if (!u) {
+				s.invite = {
+					email: s.search.term,
+					avatar: 'files/user_profile_default.png'
+				};
+			} else {
+				s.invite = u;
+			}
+			s.search.term = '';
+	  };
+
+		s.removeUser = function() {
+			s.invite = null;
+		};
+
+		s.submitInviteEmployee = function(form, e) {
+			if (form.$invalid) return;
+			s.loading = true;
+
+			var employee = new Employee();
+			if (e.id)
+				employee.id = e.id;
+			else
+				employee.email = e.email;
+			employee.$save({id: $stateParams.id}, function() {
+				s.loading = false;
+			});
+		};
+
 		var m = $modal.open({
-			templateUrl: 'invite-bartender.html',
-			size: 'sm',
-      scope: $scope
+			templateUrl: 'invite-employee.html',
+      scope: s
 		});
 
 		m.result.then(function(user) {
-      console.log(user);
-			var bartender = new Bartenders();
-			bartender.email = user.email;
-			bartender.$save({id: $stateParams.id});
+
 		});
 	};
 
