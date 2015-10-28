@@ -183,7 +183,7 @@ class TabInvite(models.Model):
 
 class Tab(models.Model):
 	bar = models.ForeignKey('Bar', blank=True, null=True)
-	amount = models.DecimalField(max_digits=6, decimal_places=2)
+	amount = models.DecimalField(max_digits=8, decimal_places=2)
 	sender = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='sender')
 	receiver = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='receiver', blank=True, null=True)
 	email = models.EmailField(blank=True, null=True)
@@ -234,16 +234,32 @@ class Tab(models.Model):
 		return tab
 
 class Sale(models.Model):
-	amount = models.DecimalField(max_digits=6, decimal_places=2)
+	amount = models.DecimalField(max_digits=8, decimal_places=2)
 	bar = models.ForeignKey('Bar')
 	customer = models.ForeignKey(settings.AUTH_USER_MODEL)
+	tip = models.DecimalField(max_digits=8, decimal_places=2, default=0)
 	created = models.DateTimeField(auto_now_add=True, auto_now=False)
 	updated = models.DateTimeField(auto_now_add=False, auto_now=True)
+
+	def is_valid(self, tip):
+		ts = self.transaction_set.filter(processed=False)
+		if len(ts) > 1:
+			# There are more than 1 transactions still open
+			print 'more than 1 open transaction'
+		elif len(ts < 1):
+			# There are no open transactions, use the user's default_source
+			charge = charge_source(self.customer.customer.customer_id, self.customer.customer.default_source, self.bar.merchant.account_id)
+		else:
+			# Take the money from this transaction
+			print 'Take the money from this Transaction'
+
+	def complete(self):
+		print ''
 
 class Transaction(models.Model):
 	sale = models.ForeignKey('Sale', null=True, blank=True, default='')
 	owner = models.ForeignKey(settings.AUTH_USER_MODEL)
-	amount = models.DecimalField(max_digits=6, decimal_places=2)
+	amount = models.DecimalField(max_digits=8, decimal_places=2)
 	source = models.CharField(max_length=100, null=True, blank=True, default='')
 	processed = models.BooleanField(default=False)
 	charge = models.CharField(max_length=100, null=True, default='')

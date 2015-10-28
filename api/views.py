@@ -302,12 +302,17 @@ class BarSaleHandler(APIView):
 	required_groups = {
 		'PUT': [DRINKERS],
 	}
+
 	# Add a tip to a sale
 	def put(self, request, bar_id, sale_id, format=None):
 		serializer = TipSerializer(data=request.POST)
 		serializer.is_valid(raise_exception=True)
 		sale = get_object_or_404(Sale, pk=sale_id)
 		# Capture the sale with the tip amount
+		sale.tip = serializer.validated_data['tip']
+		sale.amount += sale.tip
+		sale.complete()
+		sale.save()
 		return Response({})
 
 class BarAvatarHandler(APIView):

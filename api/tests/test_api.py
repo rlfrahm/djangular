@@ -11,6 +11,11 @@ from account.models import UserProfile, StripeMerchant
 
 import datetime, mock, stripe
 
+# TODO: Check for 'owner' property
+# TODO: Check for 'roles' property
+# TODO: Check for 'merchant' property
+# TODO: Check for bar tip creation
+
 # Create your tests here.
 class ApiTests(APITestCase):
 
@@ -608,6 +613,3 @@ class ApiTests(APITestCase):
         response = self.client.post(url, d, format='json')
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertTrue(RoleInvite.objects.filter().exists())
-
-    # TODO: Test that an invite is created for new roles
-    # TODO: Test
