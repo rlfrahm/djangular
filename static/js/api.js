@@ -51,7 +51,7 @@ angular.module('Api', ['ngResource'])
 }])
 
 .factory('Employee', ['$resource', function($resource) {
-	return $resource('/api/v1/bars/:id/employees/:bid', {}, {
+	return $resource('/api/v1/bars/:id/roles/:bid', {}, {
 		working: {
 			method: 'PUT'
 		},

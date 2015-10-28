@@ -100,7 +100,7 @@ angular.module('App')
 	});
 }])
 
-.controller('BarCtrl', ['$rootScope', '$scope', '$state', '$stateParams', 'Bar', 'Bartenders', 'Checkin', 'Time', 'Analytics', function($rootScope, $scope, $state, $stateParams, Bar, Bartenders, Checkin, Time, Analytics) {
+.controller('BarCtrl', ['$rootScope', '$scope', '$state', '$stateParams', 'Bar', 'Employee', 'Checkin', 'Time', 'Analytics', function($rootScope, $scope, $state, $stateParams, Bar, Employee, Checkin, Time, Analytics) {
 	$scope.bar = Bar.get({id: $stateParams.id}, function() {
 		Analytics.pageview($scope.bar.name);
     var map = new google.maps.Map(document.getElementById('map'), {
@@ -117,11 +117,15 @@ angular.module('App')
     	animation: google.maps.Animation.DROP
 	  });
   });
-	$scope.bartenders = Bartenders.query({id: $stateParams.id});
+	$scope.bartenders = Employee.query({id: $stateParams.id});
 
 	$scope.checkin = function() {
 		var checkin = new Checkin();
 		checkin.$save({id: $scope.bar.id}, getCheckins);
+	};
+
+	$scope.isAdmin = function(bar) {
+		return (bar.owner || bar.roles.indexOf('admin') > -1 || bar.roles.indexOf('manager') > -1);
 	};
 
 	function getCheckins() {
@@ -155,7 +159,7 @@ angular.module('App')
 	};
 }])
 
-.controller('BarSettingsCtrl', ['$rootScope', '$scope', '$state', '$stateParams', '$modal', '$http', 'Bar', 'Employee', 'UserSearch', 'Analytics', 'BarSale', 'buildAddress', function($rootScope, $scope, $state, $stateParams, $modal, $http, Bar, Employee, UserSearch, Analytics, BarSale, buildAddress) {
+.controller('BarSettingsCtrl', ['$rootScope', '$scope', '$state', '$stateParams', '$modal', '$http', 'Bar', 'Employee', 'UserSearch', 'Analytics', 'BarSale', 'buildAddress', 'toastr', function($rootScope, $scope, $state, $stateParams, $modal, $http, Bar, Employee, UserSearch, Analytics, BarSale, buildAddress, toastr) {
 	$scope.bar = Bar.get({id: $stateParams.id}, function() {
 		Analytics.pageview($scope.bar.name + ' Settings');
     if ($scope.bar.street && $scope.bar.postal)
@@ -183,7 +187,6 @@ angular.module('App')
 	};
 
 	$scope.locationChange = function() {
-		console.log($scope.bar);
 		submitSave();
 	};
 
@@ -193,7 +196,6 @@ angular.module('App')
 	};
 
 	function submitSave() {
-		console.log($scope.bar);
 		$scope.bar.$save({id: $scope.bar.id}, function() {
 			$scope.bar.address = buildAddress($scope.bar);
 		});
@@ -224,6 +226,11 @@ angular.module('App')
 	$scope.inviteEmployee = function() {
 		var s = $scope.$new();
 
+		s.isValidEmail = function(text) {
+			var re = /^([\w-]+(?:\.[\w-]+)*)@((?:[\w-]+\.)*\w[\w-]{0,66})\.([a-z]{2,6}(?:\.[a-z]{2})?)$/i;
+    	return re.test(text);
+		};
+
 		s.selectUser = function(u) {
 
 			if (!u) {
@@ -241,17 +248,21 @@ angular.module('App')
 			s.invite = null;
 		};
 
-		s.submitInviteEmployee = function(form, e) {
+		s.submitInviteEmployee = function(form, e, close) {
 			if (form.$invalid) return;
 			s.loading = true;
 
 			var employee = new Employee();
 			if (e.id)
-				employee.id = e.id;
+				employee.uid = e.id;
 			else
 				employee.email = e.email;
+			employee.role = e.role;
 			employee.$save({id: $stateParams.id}, function() {
+				refreshEmployees();
 				s.loading = false;
+				close(employee);
+				toastr.success(e.first_name + ' ' + e.last_name + ' has been added as a ' + e.role);
 			});
 		};
 
@@ -263,6 +274,10 @@ angular.module('App')
 		m.result.then(function(user) {
 
 		});
+	};
+
+	$scope.isRole = function(role) {
+		if (role == 'owner') return $scope.bar.owner;
 	};
 
 	$scope.$watch('bar.avatarFile', function(newval) {

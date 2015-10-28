@@ -1,6 +1,10 @@
 <div class="row">
   <div class="col-xs-12 col-sm-6 col-md-4" ng-repeat="employee in employees">
-    <a href class="thumbnail">{[{ employee.first_name + ' ' + employee.last_name }]}</a>
+    <a href class="thumbnail text-center">
+      <img ng-src="{[{ employee.user_avatar }]}" height="100px" style="margin: 0 auto">
+      <p>{[{ employee.user_firstname + ' ' + employee.user_lastname }]}</p>
+      <span ng-repeat="role in employee.roles" class="label label-info">{[{ role }]}</span>
+    </a>
   </div>
   <div class="col-xs-12 col-sm-6 col-md-4">
     <a href class="thumbnail text-center" ng-click="inviteEmployee()">
@@ -10,7 +14,7 @@
   </div>
 </div>
 <script type="text/ng-template" id="invite-employee.html">
-  <form name="form" ng-submit="$close(invite)">
+  <form name="form" ng-submit="submitInviteEmployee(form, invite, $close)">
     <div class="modal-header">
         <h3 class="modal-title">Invite Employee</h3>
     </div>
@@ -23,11 +27,11 @@
         </div>
         <div class="col-xs-8">
           <h4 class="media-heading">{[{ (invite.email) ? invite.email : invite.first_name + ' ' + invite.last_name }]}</h4>
-          <p>
-            <select class="form-control input-sm" ng-model="invite.role" ng-init="invite.role=2" required>
-              <option value="2">Bartender</option>
-              <option value="1">Manager</option>
-              <option value="0">Admin</option>
+          <p ng-class="{'has-error':form.role.$invalid}">
+            <select class="form-control input-sm" name="role" value="" ng-model="invite.role" ng-init="invite.role=''" required style="width:125px">
+              <option value="" disabled selected>Select role</option>
+              <option value="bartender">Bartender</option>
+              <option value="manager">Manager</option>
             </select>
           </p>
         </div>
@@ -41,7 +45,7 @@
         <input type="text" class="form-control input-lg" placeholder="Search..." ng-model="search.term" ng-model-options="{ debounce: 500 }" ng-change="search(search.term)" dropdown-toggle>
         <div class="dropdown-menu list-group" style="width:100%" ng-show="users">
           <a class="list-group-item pointer" ng-click="selectUser()" style="padding-top:20px;padding-bottom:20px">
-            <h4 class="list-group-item-heading text-center">Invite new user: {[{ search.term }]}</h4>
+            <p class="text-center" ng-class="{'text-success': isValidEmail(search.term), 'text-danger': !isValidEmail(search.term)}">Invite new user: {[{ search.term }]}</p>
           </a>
           <a ng-repeat="result in users" class="list-group-item pointer" ng-click="selectUser(result)">
             <div class="media">
@@ -59,7 +63,7 @@
     <div class="modal-footer clearfix">
       <loader class="pull-left"></loader>
       <button class="btn btn-link btn-lg" type="button" ng-click="$dismiss('cancel')">Cancel</button>
-      <button class="btn btn-primary btn-lg" type="submit">Invite</button>
+      <button class="btn btn-primary btn-lg" type="submit" ng-disabled="!invite">Invite</button>
     </div>
   </form>
 </script>

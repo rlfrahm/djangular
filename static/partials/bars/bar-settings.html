@@ -6,7 +6,7 @@
 		<div class="list-group">
 			<a ui-sref="bar-settings.general({id: bar.id})" class="list-group-item" ng-class="{'active':isState('bar-settings.general')}">General</a>
 			<a ui-sref="bar-settings.employees({id: bar.id})" class="list-group-item" ng-class="{'active':isState('bar-settings.employees')}">Employees</a>
-			<a ui-sref="bar-settings.financial({id: bar.id})" class="list-group-item" ng-class="{'active':isState('bar-settings.financial')}">Financial</a>
+			<a ui-sref="bar-settings.financial({id: bar.id})" ng-if="isRole('owner')" class="list-group-item" ng-class="{'active':isState('bar-settings.financial')}">Financial</a>
 			<a ui-sref="bar-settings.sales({id: bar.id})" class="list-group-item" ng-class="{'active':isState('bar-settings.sales')}">Sales</a>
 		</div>
 		<div ui-sref="bar-settings.financial({id: bar.id})" class="alert alert-warning pointer text-center" ng-if="!bar.merchant" ng-cloak>

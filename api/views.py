@@ -226,12 +226,18 @@ class BarHandler(APIView):
 			'lat': b.lat,
 			'lng': b.lng,
 			'id': b.pk,
-			'owner': b.owner.pk,
 			'avatar': b.avatar_url,
 		}
 		# Check if we need to add any action items
 		# The user has set up a merchant account through Stripe
 		bar['merchant'] = hasattr(b.owner, 'merchant')
+		# Check if this user has any roles in this bar
+		roles = request.user.role_set.filter(bar_id=bar_id)
+		if len(roles) > 0:
+			bar['roles'] = roles[0].roles_array
+		# Check if this user is the owner
+		if b.owner.pk == request.user.pk:
+			bar['owner'] = True
 		return Response(bar)
 
 	# Update bar details
@@ -377,16 +383,18 @@ class RolesHandler(APIView):
 
 	def get(self, request, bar_id, format=None):
 		bar = get_object_or_404(Bar, pk=bar_id)
-		bartenders = []
-		for b in bar.bartender_set.all():
-			bartenders.append({
-				'email': b.user.email,
-				'firstname': b.user.first_name,
-				'lastname': b.user.last_name,
-				'avatar': b.user.profile.avatar_url or USER_PROFILE_DEFAULT,
-				'id': b.user.pk,
-				})
-		return Response(bartenders)
+		rs = bar.role_set.all()
+		roles = []
+		for role in rs:
+			roles.append({
+				'id': role.pk,
+				'user': role.user.pk,
+				'user_firstname': role.user.first_name,
+				'user_lastname': role.user.last_name,
+				'user_avatar': role.user.profile.avatar_url,
+				'roles': role.roles.split(',')
+			})
+		return Response(roles)
 
 	# Creates a role and returns an invite if needed
 	def post(self, request, bar_id, format=None):
@@ -421,7 +429,7 @@ class RolesHandler(APIView):
 							user_role.append(r)
 				else:
 					# A role does not exist, create a new one
-					user_role = Role(user=request.user, bar=bar, roles=''.join(new_roles))
+					user_role = Role(user=user, bar=bar, roles=''.join(new_roles))
 					user_role.save()
 			else:
 				# Send an email invite
@@ -432,7 +440,8 @@ class RolesHandler(APIView):
 				# 'email': invite.email,
 				# 'token': invite.token,
 			return Response({
-				'role': serializer.validated_data.get('role')
+				'role': serializer.validated_data.get('role'),
+				'uid': uid
 				}, status=status.HTTP_201_CREATED)
 
 		# Update an existing role

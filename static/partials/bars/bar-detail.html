@@ -5,7 +5,7 @@
 <ul class="list-inline list-unstyled" buy-drinks>
 	<li ng-cloak ng-if="bar.merchant"><button type="button" class="btn btn-success btn-lg" ng-click="payForDrinkHere(bar)"><span ng-cloak ng-if="!user.sources"><img src="/static/images/high_priority.png" height="20px">&nbsp;&nbsp;</span>Pay Here</button></li>
 	<li><button type="button" class="btn btn-danger btn-lg" ng-click="checkin()">Check-in</button></li>
-	<li ng-if="bar.owner==user.id"><a ui-sref="bar-settings.general({id: bar.id})" class="btn btn-default btn-lg"><i class="fa fa-cog"></i></a></li>
+	<li ng-if="isAdmin(bar)"><a ui-sref="bar-settings.general({id: bar.id})" class="btn btn-default btn-lg"><i class="fa fa-cog"></i></a></li>
 </ul>
 <div class="row">
 	<div class="col-xs-12">
@@ -38,12 +38,12 @@
 				<h3>Bartenders</h3>
 			</div>
 			<div class="list-group">
-				<a ui-sref="user({id: bartender.id})" class="list-group-item media" ng-repeat="bartender in bartenders">
+				<a ui-sref="user({id: bartender.user})" class="list-group-item media" ng-repeat="bartender in bartenders">
 					<div class="media-left">
-						<img class="media-object" ng-src="{[{ bartender.avatar }]}" height="48px">
+						<img class="media-object" ng-src="{[{ bartender.user_avatar }]}" height="48px">
 					</div>
 					<div class="media-body">
-						<h4 class="media-heading">{[{ bartender.firstname || 'Joe Blow' }]}</h4>
+						<h4 class="media-heading">{[{ bartender.user_firstname + ' ' + bartender.user_lastname }]}</h4>
 					</div>
 				</a>
 			</div>
