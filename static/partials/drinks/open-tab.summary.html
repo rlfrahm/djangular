@@ -6,7 +6,7 @@
       </div>
     </div>
     <div class="col-xs-8">
-      <h4 class="media-heading">{[{ user.first_name }]} {[{ user.last_name }]}</h4>
+      <h4 class="media-heading">{[{ (user.email) ? user.email : user.first_name + ' ' + user.last_name }]}</h4>
       <p class="text-success">{[{ tab.amount | currency }]}</p>
     </div>
     <div class="col-xs-2">
@@ -47,7 +47,7 @@
     </dl>
   </div>
   <div class="list-group-item" max-length="140">
-    <textarea rows="4" ng-model="tab.note" class="form-control" ng-change="calc(tab.note)" placeholder="Add a note.."></textarea>
+    <textarea rows="4" ng-model="tab.note" class="form-control input-lg" ng-change="calc(tab.note)" placeholder="Add a note.."></textarea>
     <p ng-class="{'text-danger': length > maxLength}">{[{ length || 0 }]} / {[{ maxLength }]}</p>
   </div>
   <div class="list-group-item clearfix">

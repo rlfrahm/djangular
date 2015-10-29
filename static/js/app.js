@@ -191,6 +191,11 @@ angular.module('App', ['Init', 'Api', 'ui.bootstrap', 'ui.router', 'toastr'])
     $rootScope.s.searching = false;
     $rootScope.s.q = '';
   };
+
+  $rootScope.isValidEmail = function(text) {
+    var re = /^([\w-]+(?:\.[\w-]+)*)@((?:[\w-]+\.)*\w[\w-]{0,66})\.([a-z]{2,6}(?:\.[a-z]{2})?)$/i;
+    return re.test(text);
+  };
 }])
 
 .service('Authorization', ['$rootScope', function($rootScope) {

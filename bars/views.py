@@ -8,7 +8,7 @@ from django.conf import settings
 from django.contrib import messages
 
 from .forms import RegisterForm, ContactForm
-from .models import Bar, Bartender, RoleInvite
+from .models import Bar, Bartender, RoleInvite, TabInvite
 from notifications.emails import send_bartender_invite, send_us_bar_inquiry
 
 # Create your views here.
@@ -68,3 +68,14 @@ def barsContactHandler(request):
 @staff_member_required
 def barOnboardingHandler(request):
     return render(request, 'admin/newbar.html')
+
+@login_required
+def tabInviteHandler(request, token):
+	if request.method == 'GET':
+		invite = get_object_or_404(TabInvite, pk=token)
+        if invite.email != request.user.email:
+            return redirect(reverse('core:home'))
+        invite.tab.receiver = request.user
+        invite.tab.save()
+        invite.delete()
+        return redirect(reverse('core:home'))

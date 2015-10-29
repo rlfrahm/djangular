@@ -226,11 +226,6 @@ angular.module('App')
 	$scope.inviteEmployee = function() {
 		var s = $scope.$new();
 
-		s.isValidEmail = function(text) {
-			var re = /^([\w-]+(?:\.[\w-]+)*)@((?:[\w-]+\.)*\w[\w-]{0,66})\.([a-z]{2,6}(?:\.[a-z]{2})?)$/i;
-    	return re.test(text);
-		};
-
 		s.selectUser = function(u) {
 
 			if (!u) {
@@ -306,7 +301,6 @@ angular.module('App')
 	$scope.buyingType = 'tab';
 	$scope.tab = {};
 	$scope.tab.users = [];
-	console.log($location.search().id);
   if ($location.search().id) {
 		var u = User.get({id: $location.search().id}, function() {
 			$scope.tab.users.push(u);
@@ -350,11 +344,22 @@ angular.module('App')
 	};
 
 	$scope.selectUser = function(user) {
-		if ($scope.tab.users.indexOf(user) > -1) return;
-		$scope.searching = false;
-		$scope.tab.users.push(user);
-		$scope.term = '';
-		$scope.total();
+		if ($rootScope.isValidEmail(user)) {
+			// Check to make sure the search term is a valid email
+			$scope.tab.users.push({
+				email: user,
+				avatar: 'files/user_profile_default.png'
+			});
+			$scope.term = '';
+			$scope.total();
+			$scope.searching = false;
+		} else {
+			if ($scope.tab.users.indexOf(user) > -1) return;
+			$scope.searching = false;
+			$scope.tab.users.push(user);
+			$scope.term = '';
+			$scope.total();
+		}
 	};
 
 	$scope.total = function() {

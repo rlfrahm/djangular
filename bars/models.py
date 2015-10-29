@@ -177,7 +177,7 @@ class Checkin(models.Model):
 		return checkin
 
 class TabInvite(models.Model):
-	tab = models.ForeignKey('Tab')
+	tab = models.OneToOneField('Tab')
 	email = models.EmailField()
 	token = models.CharField(max_length=100)
 
