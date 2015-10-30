@@ -25,12 +25,21 @@ body {
 	background-color: rgba(0,0,0,0.4);
 }
 
-.how-it-works {
+.how-it-works, .action-statement {
 	padding-bottom: 40px;
 }
 
 .how-it-works>section img {
 	height: 200px;
+}
+
+.action-statement {
+	background-color: #3d4254;
+	padding-top: 20px;
+}
+
+.action-statement h2 {
+	color: #fff;
 }
 
 .page .content {
@@ -51,6 +60,12 @@ body {
 
 .page .footer {
 	min-height: 70px;
+	padding-top: 40px;
+}
+
+.footer a,
+.footer a:hover {
+	color: #5a6b7c;
 }
 
 .navbar-transparent .navbar-brand {
