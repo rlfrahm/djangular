@@ -2,7 +2,7 @@ html, body, .page {
 	height: 100%;
 }
 
-h1, h2, h3, h4 {
+.header h1, .header h2, .header h3, .header h4 {
 	color: #fff;
 }
 
@@ -13,10 +13,20 @@ body {
 
 .content {
 	text-shadow: 1px 1px 1px rgba(0,0,0,1);
+	position: relative;
 }
 
-.footer {
-	color: #aaa;
+.content .overlay {
+	position: absolute;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	background-color: rgba(0,0,0,0.4);
+}
+
+.how-it-works>section img {
+	height: 200px;
 }
 
 .page .content {
@@ -36,7 +46,6 @@ body {
 }
 
 .page .footer {
-	background: #333;
 	min-height: 70px;
 }
 

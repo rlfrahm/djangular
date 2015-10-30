@@ -5,7 +5,8 @@
 {% block page %}
 <link href="{% static 'css/front.css' %}" rel="stylesheet">
 <div class="content">
-    <nav class="navbar navbar-transparent" ng-init="navbarCollapsed=true">
+	<div class="overlay header">
+		<nav class="navbar navbar-transparent" ng-init="navbarCollapsed=true">
         <div class="container-fluid">
             <div class="navbar-header">
               <button type="button" class="navbar-toggle collapsed" ng-click="navbarCollapsed = !navbarCollapsed">
@@ -27,42 +28,90 @@
             </div>
         </div>
     </nav>
-    <div class="container-fluid header">
-        <h1 class="text-center">Cheers with friends across the world.</h1>
+    <div class="container-fluid header text-center">
+        <h1><strong>Cheers with friends across the world.</strong></h1>
         <br>
-        <h4 class="text-center">To Drinkers and Bartenders:</h4>
-        <h3 class="text-center">My Drink Nation is a drinking community to buy your friends a round.</h3>
+        <h4>To Drinkers and Bartenders:</h4>
+        <h3>My Drink Nation is a drinking community to buy your friends a round.</h3>
         <br><br><br>
-        <div id="mc_embed_signup" class="row">
-            <div class="col-xs-12 col-sm-8 col-md-6 col-centered">
-                <form action="//mydrinknation.us11.list-manage.com/subscribe/post?u=d0063121735d12da7eeabcc95&amp;id=bf5f9f5fe8" method="post" id="mc-embedded-subscribe-form" name="mc-embedded-subscribe-form" class="validate" target="_blank" novalidate>
-                    <div id="mc_embed_signup_scroll">
-                    <div class="row">
-                        <div class="mc-field-group form-group col-xs-12 col-sm-8 col-md-9">
-                            <input type="email" value="" name="EMAIL" class="required email form-control input-lg" placeholder="Email" id="mce-EMAIL">
-                        </div>
-                        <div class="form-group col-xs-12 col-sm-4 col-md-3">
-                            <input type="submit" value="Subscribe" name="subscribe" id="mc-embedded-subscribe" class="btn btn-danger btn-block btn-lg">
-                        </div>
-                    </div>
-                    <div id="mce-responses" class="clear">
-                        <div class="response" id="mce-error-response" style="display:none"></div>
-                        <div class="response" id="mce-success-response" style="display:none"></div>
-                    </div>    <!-- real people should not fill this in and expect good things - do not remove this or risk form bot signups-->
-                    <div style="position: absolute; left: -5000px;"><input type="text" name="b_d0063121735d12da7eeabcc95_bf5f9f5fe8" tabindex="-1" value=""></div>
-                    <div class="clear"></div>
-                    </div>
-                </form>
-            </div>
-        </div>
+				<a href="{% url 'user:register' %}" class="btn btn-danger btn-lg text-uppercase">Sign Up Free</a>
         <br>
     </div>
+	</div>
 </div>
-<div class="footer">
+<div class="container how-it-works text-center">
+	<h2>How it works</h2>
+	<section class="step-1 row">
+		<div class="col-xs-6">
+			<br>
+			<h2>You pick a friend</h2>
+			<p>We help you find your friends, new and old, nearby.</p>
+		</div>
+		<div class="col-xs-6">
+			<img src="{% static 'images/front/bar.png' %}">
+		</div>
+	</section>
+	<section class="step-2 row">
+		<div class="col-xs-6">
+			<img src="{% static 'images/front/send_money.png' %}">
+		</div>
+		<div class="col-xs-6">
+			<br>
+			<h2>You send money to your friends</h2>
+			<p>Sending money is easy. Just add your card and pick your friend(s)!</p>
+			<small class="text-muted">More than 1 friend? No problem!</small>
+		</div>
+	</section>
+	<section class="step-3 row">
+		<div class="col-xs-6">
+			<br>
+			<h2>Friends get a notification</h2>
+			<p>We notify your friends that they have money.</p>
+		</div>
+		<div class="col-xs-6">
+			<img src="{% static 'images/front/notification.png' %}">
+		</div>
+	</section>
+	<section class="step-4 row">
+		<div class="col-xs-6">
+			<img src="{% static 'images/front/payment.png' %}">
+		</div>
+		<div class="col-xs-6">
+			<br>
+			<h2>Friends buy drinks</h2>
+			<p>We provide an instant mobile payment option. Simply pick a bar to pay at, then show your phone to the bartender.</p>
+		</div>
+	</section>
+</div>
+<div class="footer" style="background-image:url('{% static 'images/front/background.png' %}')">
     <div class="container-fluid">
         <br>
         <ul class="list-inline list-unstyled pull-left">
             <li class="text-center">&copy; 2015 My Drink Nation</li>
+						<li>
+							<div id="mc_embed_signup" class="row">
+			            <div class="col-xs-12 col-sm-8 col-md-6 col-centered">
+			                <form action="//mydrinknation.us11.list-manage.com/subscribe/post?u=d0063121735d12da7eeabcc95&amp;id=bf5f9f5fe8" method="post" id="mc-embedded-subscribe-form" name="mc-embedded-subscribe-form" class="validate" target="_blank" novalidate>
+			                    <div id="mc_embed_signup_scroll">
+			                    <div class="row">
+			                        <div class="mc-field-group form-group col-xs-12 col-sm-8 col-md-9">
+			                            <input type="email" value="" name="EMAIL" class="required email form-control" placeholder="Email" id="mce-EMAIL">
+			                        </div>
+			                        <div class="form-group col-xs-12 col-sm-4 col-md-3">
+			                            <input type="submit" value="Subscribe" name="subscribe" id="mc-embedded-subscribe" class="btn btn-danger btn-block">
+			                        </div>
+			                    </div>
+			                    <div id="mce-responses" class="clear">
+			                        <div class="response" id="mce-error-response" style="display:none"></div>
+			                        <div class="response" id="mce-success-response" style="display:none"></div>
+			                    </div>    <!-- real people should not fill this in and expect good things - do not remove this or risk form bot signups-->
+			                    <div style="position: absolute; left: -5000px;"><input type="text" name="b_d0063121735d12da7eeabcc95_bf5f9f5fe8" tabindex="-1" value=""></div>
+			                    <div class="clear"></div>
+			                    </div>
+			                </form>
+			            </div>
+			        </div>
+						</li>
         </ul>
         <ul class="list-inline list-unstyled pull-right">
             <li><a href="https://twitter.com/home?status=Tweet%20%40mydrinknation"><i class="fa fa-twitter fa-2x" style="color:#4099FF"></i></a></li>
