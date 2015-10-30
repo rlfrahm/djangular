@@ -646,6 +646,7 @@ class TabsHandler(APIView):
 					tab = Tab.new(amount, receiver_email, source, request.user, request=request, note=note)
 				except Exception, e:
 					# TODO: fail better than this
+					print e
 					return Response({
 						'status': 400,
 						'message': 'Authorization of the payment source failed'

@@ -34,7 +34,7 @@ def send_tab_invite(request, tab, invite):
   Thanks,
   The My Drink Nation team
   %s
-  """ % (tab.sender.first_name, tab.amount, request.build_absolute_uri(reverse('bars:bartender-invite', args=(tab.pk, invite.token,))), request.build_absolute_uri(reverse('core:home')))
+  """ % (tab.sender.first_name, tab.amount, request.build_absolute_uri(reverse('bars:tab-invite', args=(invite.token,))), request.build_absolute_uri(reverse('core:home')))
   msg.from_email = settings.EMAIL_FROM_EMAIL
   msg.to = [invite.email]
   msg.send()

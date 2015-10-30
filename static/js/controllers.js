@@ -406,6 +406,9 @@ angular.module('App')
 			else
 			 	toastr.success('Tab successfully created for ' + $scope.tab.users[0].first_name, 'They have been notified');
 			$state.go('tab');
+		}, function(e) {
+			$scope.loading = false;
+			toastr.error(e.data.message);
 		});
 	};
 

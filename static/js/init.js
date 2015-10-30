@@ -135,7 +135,7 @@ angular.module('Init', ['ui.bootstrap'])
 			      // c.token = token;
 			      // c.$save();
 			    }
-  				scope.form.loading = true;
+  				// scope.form.loading = true;
 			  }
 			};
 		}

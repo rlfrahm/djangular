@@ -13,6 +13,5 @@ urlpatterns = [
   url(r'^reset_password$', views.resetPasswordFormHandler, name='reset-password-form'),
   # url(r'^user/(?P<user_id>[0-9]+)$', views.userHandler, name='user'),
   # url(r'^user/$', views.profileHandler, name='profile'),
-  url(r'^invites/(?P<token>.+)$', views.tabInviteHandler, name='tab-invite'),
   url(r'^settings/financial/stripe/connect$', views.stripeConnectRedirectHandler, name='stripe-connect'),
 ]
