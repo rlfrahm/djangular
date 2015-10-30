@@ -125,7 +125,7 @@ angular.module('App')
 	};
 
 	$scope.isAdmin = function(bar) {
-		return (bar.owner || bar.roles.indexOf('admin') > -1 || bar.roles.indexOf('manager') > -1);
+		return (bar.owner || (bar.roles && (bar.roles.indexOf('admin') > -1 || bar.roles.indexOf('manager') > -1)));
 	};
 
 	function getCheckins() {

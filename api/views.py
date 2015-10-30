@@ -79,6 +79,8 @@ class UserHandler(APIView):
 		}
 		if request.user.customer.default_source:
 			d['sources'] = True
+		if d['bar_owner']:
+			d['stripe_cid'] = settings.STRIPE_CLIENT_ID
 		return Response(d)
 
 	def post(self, request, format=None):

@@ -68,3 +68,8 @@ SIGN_UP_LOCKED = False
 
 # Set this to true if you want to include google analytics
 ANALYTICS = False
+
+# Stripe
+STRIPE_API_KEY = 'sk_test_ZiCnD4NjSPmIzQ5Bvk67kR7k'
+STRIPE_PUB_API_KEY = 'pk_test_qaFAo6YehAQXe4Bvd03pE1zu'
+STRIPE_CLIENT_ID = 'ca_6m86ozehkURqszIoojH2o0jY7gT3A2Er'
