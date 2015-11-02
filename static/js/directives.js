@@ -203,8 +203,9 @@ angular.module('App')
 					$scope.loading = false;
 					$scope.processed = true;
 					$scope.payment.sale = p.sale;
-					console.log(res);
 					$scope.payment.transactions = res.transactions;
+					$scope.payment.total = res.total;
+					$scope.payment.tipPercent = 20;
 					if ($scope.getMyTab)
 						$scope.getMyTab();
 				});
@@ -223,11 +224,41 @@ angular.module('App')
 				$scope.showPaymentSummaryModal();
 			};
 
+			$scope.addToTip = function() {
+				$scope.payment.tipPercent++;
+			};
+
+			$scope.removeFromTip = function() {
+				if ($scope.payment.tipPercent > 1)
+					$scope.payment.tipPercent--;
+			};
+
+			$scope.$watch('payment.tipPercent', function(newval) {
+				if (!newval) return;
+				$scope.tipChanged();
+			});
+
+			$scope.tipChanged = function() {
+				if ($scope.payment.transactions[$scope.payment.transactions.length - 1].type == 'user') {
+					// If the last transaction is using the user's source
+					// add the tip to it
+					$scope.payment.transactions[$scope.payment.transactions.length - 1].tip = $scope.getTotalTip();
+				}
+			};
+
+			$scope.getTotalTip = function() {
+				return $scope.payment.total * $scope.payment.tipPercent / 100;
+			}
+
+			$scope.getPaymentTotal = function() {
+				return $scope.payment.total * (1 + ($scope.payment.tipPercent/100));
+			};
+
 			$scope.submitTip = function(form, close) {
 				if (form.$invalid) return;
 
 				var bs = new BarSale();
-				bs.tip = $scope.payment.tipPercent;
+				bs.tip = $scope.getTotalTip();
 				// bs.put({id: $scope.payment.bar.id, sid: $scope.payment.sale});
 				console.log(bs);
 				close();

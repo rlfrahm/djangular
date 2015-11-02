@@ -912,4 +912,4 @@ class PayBarHandler(APIView):
 				t['transaction_id'] = transaction.pk
 				tabs_used.append(t)
 				# authorize_source(amount_left, request.user.customer.customer_id, request.user.customer.default_source, request.user.email, bar.owner.merchant.account_id)
-		return Response({'tab': total_tab, 'sale': sale.pk, 'transactions': tabs_used, 'removed': tabs_deleted})
+		return Response({'tab': total_tab, 'sale': sale.pk, 'transactions': tabs_used, 'removed': tabs_deleted, 'total': amount})
