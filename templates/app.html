@@ -114,11 +114,20 @@
 			<button class="btn btn-link btn-lg" type="button" ng-click="$dismiss()">Cancel</button>
       <button class="btn btn-success btn-lg" type="submit">Process</button>
     </div>
-    <div class="modal-approval bg-success" ng-if="processed">
+    <div class="modal-approval bg-success" ng-if="payment.status=='success'">
       <img ng-src="static/images/approval.png" height="100px">
       <h2 class="text-white">Success!</h2>
       <h4 class="text-white">Payment has been processed.</h4>
+      <br>
       <button type="button" class="btn btn-primary btn-lg text-white" ng-click="showTipModal($close)" style="margin:0 auto">Next</button>
+    </div>
+    <div class="modal-failure bg-danger" ng-if="payment.status=='fail'">
+      <img ng-src="static/images/error.png" height="100px">
+      <h2 class="text-white">Payment failed</h2>
+      <h4 class="text-white">Something went wrong. Please try again.</h4>
+      <br>
+      <button type="button" class="btn btn-link btn-lg text-white" ng-click="$dismiss()" style="margin:0 auto">Cancel</button>
+      <button type="button" class="btn btn-primary btn-lg text-white" ng-click="tryPaymentProcessAgain()" style="margin:0 auto">Try Again</button>
     </div>
   </form>
 </script>
