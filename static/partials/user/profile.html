@@ -102,8 +102,30 @@
       <div create-card-form-body></div>
     </div>
     <div class="modal-footer">
+			<div class="pull-left" style="position:relative">
+			<div class="grid-row">
+<div class="col">
+
+	<ul class="loading">
+		<li></li>
+		<li></li>
+		<li></li>
+	</ul>
+
+</div>
+<div class="col">
+
+	<ul class="loading reversed">
+		<li></li>
+		<li></li>
+		<li></li>
+	</ul>
+
+</div>
+</div>
+			</div>
       <button type="button" class="btn btn-link btn-lg" ng-click="$dismiss()">Cancel</button>
-      <button type="submit" class="btn btn-primary btn-lg" ng-click="$close('adding')">Add</button>
+      <button type="submit" class="btn btn-primary btn-lg" ng-click="$close()">Add</button>
     </div>
   </form>
 </script>
