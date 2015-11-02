@@ -786,7 +786,7 @@ class PayBarHandler(APIView):
 		sale.save()
 
 		# This is the amount of money in the user's tab
-		total_tab = request.user.profile.tab
+		total_tab = float(request.user.profile.tab)
 		# Track the each tab used in this transaction
 		tabs_used = []
 		tabs_deleted = []
@@ -862,8 +862,8 @@ class PayBarHandler(APIView):
 			if authorize:
 				# We want to only authorize this charge just in case
 				# the user adds a tip
-				status = transaction.authorize()
-				if status:
+				stat = transaction.authorize()
+				if stat:
 					t_data['status'] = 'authorized'
 				else:
 					# TODO: account for failed authorization
@@ -872,8 +872,8 @@ class PayBarHandler(APIView):
 			else:
 				# We want to charge the source
 				transaction.charge = tab.charge
-				status = transaction.process()
-				if status:
+				stat = transaction.process()
+				if stat:
 					t_data['status'] = 'charged'
 				else:
 					# TODO: account for failed charge
@@ -907,7 +907,7 @@ class PayBarHandler(APIView):
 					t['error'] = True
 				else:
 					t['status'] = 'authorized'
-					status = transaction.authorize()
+					stat = transaction.authorize()
 				transaction.save()
 				t['transaction_id'] = transaction.pk
 				tabs_used.append(t)

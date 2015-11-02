@@ -181,6 +181,7 @@ angular.module('App')
 			};
 
 			$scope.showPayForDrinkBartenderModal = function() {
+				$scope.payment.status = '';
 				var m = $modal.open({
 		      templateUrl: 'pay-for-drink-bartender.html',
 		      scope: $scope,
@@ -191,7 +192,7 @@ angular.module('App')
 		    });
 			};
 
-			$scope.processed = false;
+			$scope.payment.status = '';
 			$scope.processPayment = function(form, close) {
 				if (form.$invalid) return;
 
@@ -201,13 +202,22 @@ angular.module('App')
 		    payment.amount = $scope.payment.cost;
 		    var p = payment.$save({id: $scope.payment.bar.id}, function(res) {
 					$scope.loading = false;
-					$scope.processed = true;
+					$scope.payment.status = 'success';
 					$scope.payment.sale = p.sale;
 					console.log(res);
 					$scope.payment.transactions = res.transactions;
 					if ($scope.getMyTab)
 						$scope.getMyTab();
+				}, function(err) {
+					console.log(err);
+					$scope.payment.status = 'fail';
+					$scope.loading = false;
 				});
+			};
+
+			$scope.tryPaymentProcessAgain = function() {
+				$scope.payment.status = '';
+				$scope.loading = false;
 			};
 
 			$scope.showTipModal = function(close) {

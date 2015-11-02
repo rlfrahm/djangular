@@ -536,6 +536,37 @@ class ApiTests(APITestCase):
         self.assertEqual(float(transactions[0]['amount']), amount)
         self.assertEqual(len(response.data.get('removed')), 1)
 
+    @mock.patch('bars.models.authorize_source')
+    @mock.patch('bars.models.charge_source')
+    def test_bar_payment_same_amount_as_tab(self, mock_bar_models_charge_source, mock_bar_models_authorize_source):
+        """
+        Ensure that a user's tab is used even if it is the same size as the
+        amount
+        For this test you need:
+        - A bar
+        - A user
+        - A tab
+        """
+        self.user.customer.default_source = '123'
+        self.user.customer.save()
+        mock_bar_models_authorize_source.return_value = {'id': 'jnsdflkgj34r'}
+        mock_bar_models_charge_source.return_value = {'id': 'jnsdflkgj34r'}
+        # Create a tab
+        tab = Tab.new(20, self.user.email, 'ijbwflgkbsdf', self.user)
+        url = reverse('api:bar-pay', args=(1,))
+        amount = 20
+        d = {
+            'amount': amount
+        }
+        response = self.client.post(url, d, format='json')
+        self.assertEqual(len(response.data.get('transactions')), 1)
+        self.assertIsNotNone(response.data.get('sale'))
+        # The user's tab should now be $10
+        self.assertEqual(response.data.get('tab'), 0)
+        transactions = response.data.get('transactions')
+        self.assertEqual(transactions[0]['status'], 'charged')
+        self.assertEqual(transactions[0]['amount'], amount)
+
     def test_bar_checkin(self):
         """
         Ensure that we can checkin to a bar
