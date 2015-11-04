@@ -12,7 +12,7 @@ from django.db.models import Q
 from django.conf import settings
 from django.utils import timezone
 
-from .serializers import RegisterSerializer, LoginSerializer, BarSerializer, RoleSerializer, SearchSerializer, TabSerializer, CreditCardSerializer, PayBarSerializer, UserSerializer, AcceptTabSerializer, AvatarSerializer, UserPasswordSerializer, BarsWithinDistanceSerializer
+from .serializers import RegisterSerializer, LoginSerializer, BarSerializer, RoleSerializer, SearchSerializer, TabSerializer, CreditCardSerializer, PayBarSerializer, UserSerializer, AcceptTabSerializer, AvatarSerializer, UserPasswordSerializer, BarsWithinDistanceSerializer, TipSerializer
 from .decorators import HasGroupPermission, is_in_group, BAR_OWNERS, DRINKERS
 
 from account.models import UserProfile, USER_PROFILE_DEFAULT
@@ -302,12 +302,12 @@ class BarSaleHandler(APIView):
 	authentication_classes = (SessionAuthentication,)
 	permission_classes = (IsAuthenticated, HasGroupPermission,)
 	required_groups = {
-		'PUT': [DRINKERS],
+		'POST': [DRINKERS],
 	}
 
 	# Add a tip to a sale
 	def put(self, request, bar_id, sale_id, format=None):
-		serializer = TipSerializer(data=request.POST)
+		serializer = TipSerializer(data=request.data)
 		serializer.is_valid(raise_exception=True)
 		sale = get_object_or_404(Sale, pk=sale_id)
 		# Capture the sale with the tip amount
@@ -315,7 +315,7 @@ class BarSaleHandler(APIView):
 		sale.amount += sale.tip
 		sale.complete()
 		sale.save()
-		return Response({})
+		return Response(status=status.HTTP_201_CREATED)
 
 class BarAvatarHandler(APIView):
 	"""

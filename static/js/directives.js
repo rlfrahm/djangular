@@ -203,7 +203,7 @@ angular.module('App')
 		    var p = payment.$save({id: $scope.payment.bar.id}, function(res) {
 					$scope.loading = false;
 					$scope.payment.status = 'success';
-					$scope.payment.sale = p.sale;
+					$scope.payment.sale = res.sale;
 					$scope.payment.transactions = res.transactions;
 					$scope.payment.total = res.total;
 					$scope.payment.tipPercent = 20;
@@ -269,8 +269,8 @@ angular.module('App')
 
 				var bs = new BarSale();
 				bs.tip = $scope.getTotalTip();
-				// bs.put({id: $scope.payment.bar.id, sid: $scope.payment.sale});
 				console.log(bs);
+				bs.$put({id: $scope.payment.bar.id, sid: $scope.payment.sale});
 				close();
 				$scope.showPaymentSummaryModal();
 			};

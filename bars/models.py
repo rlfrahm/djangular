@@ -261,7 +261,7 @@ class Sale(models.Model):
 		if len(ts) > 1:
 			# There are more than 1 transactions still open
 			print 'more than 1 open transaction'
-		elif len(ts < 1):
+		elif len(ts) < 1:
 			# There are no open transactions, use the user's default_source
 			charge = charge_source(self.customer.customer.customer_id, self.customer.customer.default_source, self.bar.merchant.account_id)
 		else:
@@ -331,17 +331,17 @@ class Transaction(models.Model):
 
 def authorize_source(amount, customer_id, source, recipient_id=None):
 	try:
-		# charge = stripe.Charge.create(
-		# 	amount=int(amount * 100),
-		# 	currency='usd',
-		# 	customer=customer_id,
-		# 	source=source,
-		# 	capture=False,
-		# 	destination=recipient_id,
-		# 	application_fee=get_application_fee(amount) if recipient_id else None
-		# )
-		# return charge
-		return {'id': '13425432456'}
+		charge = stripe.Charge.create(
+			amount=int(amount * 100),
+			currency='usd',
+			customer=customer_id,
+			source=source,
+			capture=False,
+			destination=recipient_id,
+			application_fee=get_application_fee(amount) if recipient_id else None
+		)
+		return charge
+		# return {'id': '13425432456'}
 	except stripe.error.CardError, e:
 		# Since it's a decline, stripe.error.CardError will be caughtbody = e.json_body
 	  	err  = e.json_body['error']

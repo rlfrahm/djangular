@@ -150,7 +150,7 @@
 						<td>{[{ (transaction.type == 'user') ? 'Me' : transaction.sender_first_name + ' ' + transaction.sender_last_name }]}</td>
 						<td class="text-right">
 							{[{ transaction.amount | currency }]}
-							<p ng-show="transaction.tip" class="text-success">{[{ transaction.tip | currency }]}</p>
+							<p ng-show="transaction.tip" class="text-success">+ {[{ transaction.tip | currency }]}</p>
 						</td>
 					</tr>
 				</tbody>
