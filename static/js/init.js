@@ -102,6 +102,7 @@ angular.module('Init', ['ui.bootstrap'])
 			function createNewCard() {
 				if (scope.form.$invalid) return;
 				scope.form.loading = true;
+				scope.$digest();
         var form = scope.form,
           newcard = scope.newcard;
 
@@ -135,7 +136,8 @@ angular.module('Init', ['ui.bootstrap'])
 			      // c.token = token;
 			      // c.$save();
 			    }
-  				// scope.form.loading = true;
+  				scope.form.loading = false;
+					scope.$digest();
 			  }
 			};
 		}

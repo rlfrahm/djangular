@@ -537,6 +537,8 @@ angular.module('App')
 			toastr.success('Success!', 'Your card has been added!');
 			$scope.getCards();
 			$rootScope.user.sources = true;
+			console.log($scope);
+			$scope.$close();
 		});
 	};
 
@@ -557,7 +559,7 @@ angular.module('App')
 
 		var m = $modal.open({
       templateUrl: 'credit-card-form.html',
-      size: 'sm',
+      size: 'md',
       scope: s
     });
 

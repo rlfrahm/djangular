@@ -43,7 +43,7 @@ body {
 }
 
 .page .content {
-	min-height: 100%;
+	min-height: 600px;
 	background-image: url('/static/images/Happy-group-of-friends-go-clubbing-1400x933.png');
 	background-repeat: no-repeat;
 	background-position: center;
@@ -83,4 +83,14 @@ body {
 
 .navbar-transparent .navbar-toggle .icon-bar {
 	background-color: #fff;
+}
+
+@media (min-height: 700px) {
+	.page .content {
+		min-height: 100%;
+	}
+
+	.tagline {
+		margin-top:30%
+	}
 }
