@@ -227,6 +227,7 @@ angular.module('App')
 		      templateUrl: 'pay-for-drink-tip.html',
 		      scope: $scope
 		    });
+				$scope.payment.status = '';
 			};
 
 			$scope.skipTip = function(dismiss) {
@@ -270,9 +271,15 @@ angular.module('App')
 				var bs = new BarSale();
 				bs.tip = $scope.getTotalTip();
 				console.log(bs);
-				bs.$put({id: $scope.payment.bar.id, sid: $scope.payment.sale});
-				close();
-				$scope.showPaymentSummaryModal();
+				bs.$put({id: $scope.payment.bar.id, sid: $scope.payment.sale}, function(res) {
+					console.log(res);
+					$scope.payment.status = 'success';
+				}, function(err) {
+					console.log(err);
+					$scope.payment.status = 'fail';
+				});
+				// close();
+				// $scope.showPaymentSummaryModal();
 			};
 
 			$scope.showPaymentSummaryModal = function() {

@@ -2,7 +2,7 @@ from django.contrib import admin
 from django.shortcuts import render
 from django.conf.urls import patterns
 
-from .models import Bar, Bartender, RoleInvite, Tab, TabInvite, Role
+from .models import Bar, Bartender, RoleInvite, Tab, TabInvite, Role, Sale
 
 # Register your models here.
 admin.site.register(Bar)
@@ -11,6 +11,7 @@ admin.site.register(RoleInvite)
 admin.site.register(Tab)
 admin.site.register(TabInvite)
 admin.site.register(Role)
+admin.site.register(Sale)
 
 # class BarOnboardingAdmin(admin.ModelAdmin):
 #
