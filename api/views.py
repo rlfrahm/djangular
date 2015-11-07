@@ -795,6 +795,10 @@ class PayBarHandler(APIView):
 		tabs_used = []
 		tabs_deleted = []
 		for tab in open_tabs:
+			if tab.amount < settings.MIN_CARD_COST:
+				tab.active = False
+				tab.save()
+				continue
 			# Iterate through open tabs until we
 			# 1) Run out of tabs to extract money from
 			# 2) Suffice the amount of money needed to be withdrawn

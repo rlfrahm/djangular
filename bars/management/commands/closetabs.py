@@ -1,11 +1,11 @@
 from django.core.management.base import BaseCommand, CommandError
-from bars.models import Sale
+from bars.models import Tab
 
 from datetime import timedelta
 from django.utils import timezone
 
 class Command(BaseCommand):
-	help = 'Completes sales that have been left open'
+	help = 'Deactivate tabs that are less than the minimum amount'
 
 	def handle(self, *args, **options):
 		try:

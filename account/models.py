@@ -68,6 +68,8 @@ class UserProfile(models.Model):
 			self.id=existing.id
 		except UserProfile.DoesNotExist:
 			pass
+		# if self.tab < 0:
+		# 	self.tab = 0
 		models.Model.save(self, *args, **kwargs)
 
 	def is_birthday(self):

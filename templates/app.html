@@ -173,6 +173,7 @@
 			</dl>
 		</div>
     <div class="modal-footer clearfix">
+			<loader class="pull-left"></loader>
 			<button class="btn btn-link btn-lg text-danger" type="button" ng-click="skipTip($dismiss)">No Thanks</button>
       <button class="btn btn-success btn-lg" type="submit">Yes!</button>
     </div>
@@ -181,7 +182,7 @@
       <h2 class="text-white">Success!</h2>
       <h4 class="text-white">A tip has been added!</h4>
       <br>
-      <button type="button" class="btn btn-primary btn-lg text-white" ng-click="showTipModal($close)" style="margin:0 auto">Next</button>
+      <button type="button" class="btn btn-primary btn-lg text-white" ng-click="closeTipModal($close)" style="margin:0 auto">Next</button>
     </div>
     <div class="modal-failure bg-danger" ng-if="payment.status=='fail'">
       <img ng-src="static/images/error.png" height="100px">

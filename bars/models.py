@@ -304,7 +304,9 @@ class Sale(models.Model):
 					# greater than tab max. Use the rest of the tab, then create
 					# another transaction.
 					tip_left_over = t.amount + self.tip - t.tab.amount
+					print tip_left_over
 					if tip_left_over < settings.MIN_CARD_COST:
+						print 'error'
 						raise MinimumAmountError()
 					t.amount = t.tab.amount
 					amount = t.amount
