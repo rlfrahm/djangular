@@ -733,7 +733,10 @@ class SourcesHandler(APIView):
 		serializer = CreditCardSerializer(data=request.data)
 		serializer.is_valid(raise_exception=True)
 		customer = stripe.Customer.retrieve(request.user.customer.customer_id)
-		source = customer.sources.create(source=serializer.validated_data['token'])
+		try:
+			source = customer.sources.create(source=serializer.validated_data['token'])
+		except Exception, e:
+			return Response(e.json_body['error'], status=status.HTTP_400_BAD_REQUEST)
 		if request.user.customer.default_source == '':
 			request.user.customer.default_source = source.get('id')
 			request.user.customer.save()

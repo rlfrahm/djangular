@@ -534,18 +534,6 @@ angular.module('App')
     });
   });
 
-	$scope.saveNewCard = function(token) {
-		var source = new Source();
-		source.token = token;
-		source.$save(function() {
-			toastr.success('Success!', 'Your card has been added!');
-			$scope.getCards();
-			$rootScope.user.sources = true;
-			console.log($scope);
-			$scope.$close();
-		});
-	};
-
 	$scope.setDefaultCard = function(card) {
 		var source = new Source();
 		source.$save({id: card.id}, function() {
@@ -564,7 +552,8 @@ angular.module('App')
 		var m = $modal.open({
       templateUrl: 'credit-card-form.html',
       size: 'md',
-      scope: s
+      scope: s,
+			controller: 'CreditCardFormController'
     });
 
     m.result.then(function(email) {
