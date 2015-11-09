@@ -272,18 +272,13 @@ angular.module('App')
 
 				var bs = new BarSale();
 				bs.tip = $scope.getTotalTip();
-				console.log(bs);
 				bs.$put({id: $scope.payment.bar.id, sid: $scope.payment.sale}, function(res) {
-					console.log(res);
 					$scope.payment.status = 'success';
 					$scope.loading = false;
 				}, function(err) {
-					console.log(err);
 					$scope.payment.status = 'fail';
 					$scope.loading = false;
 				});
-				// close();
-				// $scope.showPaymentSummaryModal();
 			};
 
 			$scope.closeTipModal = function(close) {

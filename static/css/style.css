@@ -245,7 +245,7 @@ a.list-group-item:hover, button.list-group-item:hover, a.list-group-item:focus, 
 
 .dl-horizontal.dl-right dt {
     float: left;
-    width: 70%;
+    width: 50%;
     clear: left;
     text-align: right;
     overflow: hidden;
@@ -254,5 +254,15 @@ a.list-group-item:hover, button.list-group-item:hover, a.list-group-item:focus, 
 }
 
 .dl-horizontal.dl-right dd {
-	margin-left: 73%;
+	margin-left: 53%;
+}
+
+@media (min-width: 768px) {
+	.dl-horizontal.dl-right dt {
+		width: 70%;
+	}
+
+	.dl-horizontal.dl-right dd {
+		margin-left: 73%;
+	}
 }
