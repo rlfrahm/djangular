@@ -101,7 +101,7 @@ angular.module('Init', ['ui.bootstrap'])
 
 			function createNewCard() {
 				if (scope.form.$invalid) return;
-				scope.form.loading = true;
+				scope.loading = true;
 				scope.$digest();
         var form = scope.form,
           newcard = scope.newcard;
@@ -125,18 +125,15 @@ angular.module('Init', ['ui.bootstrap'])
 			    } else {
 			      // response contains id and card, which contains additional card details
 			      var token = response.id;
-            console.log(token);
 			      scope.newcard.token = token;
             scope.$digest();
             if (attrs.submit)
               element[0].submit();
             else if (scope.saveNewCard)
               scope.saveNewCard(token);
-			      // var c = new Source();
-			      // c.token = token;
-			      // c.$save();
+						else
+							scope.loading = false;
 			    }
-  				scope.form.loading = false;
 					scope.$digest();
 			  }
 			};

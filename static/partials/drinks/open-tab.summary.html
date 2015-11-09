@@ -40,8 +40,8 @@
         <a href dropdown-toggle>{[{ (selectedSource)?selectedSource.object + ' *' + selectedSource.last4 : 'Select' }]}&nbsp;<span class="caret"></span></a>
         <ul class="dropdown-menu">
           <li ng-repeat="source in sources"><a href ng-click="selectSource(source)">{[{ source.object }]} *{[{ source.last4 }]}</a></li>
-          <li class="divider"></li>
-          <li><a href ui-sref="profile">Add New</a></li>
+          <!-- <li class="divider"></li> -->
+          <!-- <li><a href ui-sref="profile">Add New</a></li> -->
         </ul>
       </dd>
     </dl>

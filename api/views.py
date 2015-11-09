@@ -12,11 +12,12 @@ from django.db.models import Q
 from django.conf import settings
 from django.utils import timezone
 
-from .serializers import RegisterSerializer, LoginSerializer, BarSerializer, RoleSerializer, SearchSerializer, TabSerializer, CreditCardSerializer, PayBarSerializer, UserSerializer, AcceptTabSerializer, AvatarSerializer, UserPasswordSerializer, BarsWithinDistanceSerializer
+from .serializers import RegisterSerializer, LoginSerializer, BarSerializer, RoleSerializer, SearchSerializer, TabSerializer, CreditCardSerializer, PayBarSerializer, UserSerializer, AcceptTabSerializer, AvatarSerializer, UserPasswordSerializer, BarsWithinDistanceSerializer, TipSerializer
 from .decorators import HasGroupPermission, is_in_group, BAR_OWNERS, DRINKERS
 
 from account.models import UserProfile, USER_PROFILE_DEFAULT
 from bars.models import Bar, Bartender, RoleInvite, Checkin, Tab, Sale, Transaction, authorize_source, Role
+from bars.exceptions import MinimumAmountError
 from notifications.emails import send_bartender_invite, send_bar_creation_email
 
 import uuid, datetime, stripe
@@ -302,20 +303,23 @@ class BarSaleHandler(APIView):
 	authentication_classes = (SessionAuthentication,)
 	permission_classes = (IsAuthenticated, HasGroupPermission,)
 	required_groups = {
-		'PUT': [DRINKERS],
+		'POST': [DRINKERS],
 	}
 
 	# Add a tip to a sale
 	def put(self, request, bar_id, sale_id, format=None):
-		serializer = TipSerializer(data=request.POST)
+		serializer = TipSerializer(data=request.data)
 		serializer.is_valid(raise_exception=True)
 		sale = get_object_or_404(Sale, pk=sale_id)
 		# Capture the sale with the tip amount
 		sale.tip = serializer.validated_data['tip']
 		sale.amount += sale.tip
-		sale.complete()
-		sale.save()
-		return Response({})
+		try:
+			sale.complete()
+		except MinimumAmountError, e:
+			print e
+			return Response(status=status.HTTP_400_BAD_REQUEST)
+		return Response(status=status.HTTP_201_CREATED)
 
 class BarAvatarHandler(APIView):
 	"""
@@ -600,7 +604,7 @@ class TabsHandler(APIView):
 	permission_classes = (IsAuthenticated,)
 
 	def get(self, request, format=None):
-		tabs = Tab.objects.filter(receiver=request.user).order_by('accepted', '-created')
+		tabs = Tab.objects.filter(receiver=request.user, active=True).order_by('accepted', '-created')
 		t = []
 		for tab in tabs:
 			t.append({
@@ -729,7 +733,10 @@ class SourcesHandler(APIView):
 		serializer = CreditCardSerializer(data=request.data)
 		serializer.is_valid(raise_exception=True)
 		customer = stripe.Customer.retrieve(request.user.customer.customer_id)
-		source = customer.sources.create(source=serializer.validated_data['token'])
+		try:
+			source = customer.sources.create(source=serializer.validated_data['token'])
+		except Exception, e:
+			return Response(e.json_body['error'], status=status.HTTP_400_BAD_REQUEST)
 		if request.user.customer.default_source == '':
 			request.user.customer.default_source = source.get('id')
 			request.user.customer.save()
@@ -771,7 +778,7 @@ class PayBarHandler(APIView):
 		serializer = PayBarSerializer(data=request.data)
 		serializer.is_valid(raise_exception=True)
 		bar = get_object_or_404(Bar, pk=bar_id)
-		open_tabs = Tab.objects.filter(receiver=request.user, accepted=True).order_by('created')
+		open_tabs = Tab.objects.filter(receiver=request.user, accepted=True, active=True).order_by('created')
 		# Hold the last charge id so we know what source
 		# to charge the rest of the payment.
 		charge = None
@@ -791,6 +798,10 @@ class PayBarHandler(APIView):
 		tabs_used = []
 		tabs_deleted = []
 		for tab in open_tabs:
+			if tab.amount < settings.MIN_CARD_COST:
+				tab.active = False
+				tab.save()
+				continue
 			# Iterate through open tabs until we
 			# 1) Run out of tabs to extract money from
 			# 2) Suffice the amount of money needed to be withdrawn
@@ -826,7 +837,7 @@ class PayBarHandler(APIView):
 				# Adjust the amount left on this tab
 				tab.amount -= amount_left
 				# Adjust the user's total tab amount
-				total_tab -= float(tab.amount)
+				total_tab -= float(amount_left)
 				charge_amt = amount_left
 				# Adjust the amount_left
 				amount_left = 0
@@ -878,7 +889,7 @@ class PayBarHandler(APIView):
 				else:
 					# TODO: account for failed charge
 					print 'Charge failed for tab: %s' % tab.pk
-				tab.delete()
+				tab.active = False
 				# charge_source(tab.sender.customer.customer_id, tab.source, bar.owner.merchant.account_id, tab.amount, tab.charge)
 			if tab.amount < settings.MIN_CARD_COST:
 				tabs_deleted.append({
@@ -886,7 +897,7 @@ class PayBarHandler(APIView):
 					'sender_last_name': tab.sender.last_name,
 					'amount': tab.amount
 				})
-				tab.delete()
+				tab.active = False
 			transaction.save()
 			t_data['transaction_id'] = transaction.pk
 			tabs_used.append(t_data)
@@ -912,4 +923,4 @@ class PayBarHandler(APIView):
 				t['transaction_id'] = transaction.pk
 				tabs_used.append(t)
 				# authorize_source(amount_left, request.user.customer.customer_id, request.user.customer.default_source, request.user.email, bar.owner.merchant.account_id)
-		return Response({'tab': total_tab, 'sale': sale.pk, 'transactions': tabs_used, 'removed': tabs_deleted})
+		return Response({'tab': total_tab, 'sale': sale.pk, 'transactions': tabs_used, 'removed': tabs_deleted, 'total': amount})

@@ -10,6 +10,8 @@ import uuid, os, stripe
 
 from account.storage import OverwriteStorage
 
+from .exceptions import MinimumAmountError
+
 FILES_BASE = 'files'
 BAR_PREFIX = 'bar'
 
@@ -184,6 +186,9 @@ class TabInvite(models.Model):
 class Tab(models.Model):
 	bar = models.ForeignKey('Bar', blank=True, null=True)
 	amount = models.DecimalField(max_digits=8, decimal_places=2)
+	# 'amount' will drain down as the tab is used, so we need to keep track
+	# of the original amount
+	total = models.DecimalField(max_digits=8, decimal_places=2)
 	sender = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='sender')
 	receiver = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='receiver', blank=True, null=True)
 	email = models.EmailField(blank=True, null=True)
@@ -197,19 +202,20 @@ class Tab(models.Model):
 	# Note: Stripe puts a 7 day time limit on the charge so we need to expire
 	# tabs
 	charge = models.CharField(max_length=100, default='')
+	active = models.BooleanField(default=True)
 
 	@classmethod
-	def new(cls, amount, email, source, user, request=None, note=None):
+	def new(cls, amount, email, source, sender, request=None, note=None):
 		# Authorize the payment
-		charge = authorize_source(amount, user.customer.customer_id, source)
+		charge = authorize_source(amount, sender.customer.customer_id, source)
 		if not charge:
 			# The authorization failed
 			raise Exception()
-		tab = cls(amount=amount, source=source, sender=user, note=note, email=email, charge=charge.get('id'))
+		tab = cls(total=amount, amount=amount, source=source, sender=sender, note=note, email=email, charge=charge.get('id'))
 		invite = None
-		if user.email == email:
+		if sender.email == email:
 			# The user is buying themselves a tab
-			tab.receiver = user
+			tab.receiver = sender
 			tab.accepted = True
 		else:
 			# Figure out if this user is in the system
@@ -229,8 +235,8 @@ class Tab(models.Model):
 				send_tab_invite(request, tab, invite)
 		# Add the amount to the user's tab if the tab has been accepted
 		if tab.accepted:
-			user.profile.tab += tab.amount
-			user.profile.save()
+			sender.profile.tab += tab.amount
+			sender.profile.save()
 		return tab
 
 class Sale(models.Model):
@@ -241,24 +247,89 @@ class Sale(models.Model):
 	created = models.DateTimeField(auto_now_add=True, auto_now=False)
 	updated = models.DateTimeField(auto_now_add=False, auto_now=True)
 
-	def is_valid(self, tip):
+	PENDING_STATUS = 0
+	COMPLETE_STATUS = 1
+	FAILED_STATUS = 2
+	STATUS_CHOICES = (
+		(PENDING_STATUS, 'Pending'),
+		(COMPLETE_STATUS, 'Complete'),
+		(FAILED_STATUS, 'Failed'),
+	)
+	status = models.IntegerField(choices=STATUS_CHOICES, default=PENDING_STATUS)
+
+	# def is_valid(self, tip):
+	# 	ts = self.transaction_set.filter(processed=False)
+	# 	if len(ts) > 1:
+	# 		# There are more than 1 transactions still open
+	# 		print 'more than 1 open transaction'
+	# 	elif len(ts < 1):
+	# 		# There are no open transactions, use the user's default_source
+	# 		charge = charge_source(self.customer.customer.customer_id, self.customer.customer.default_source, self.bar.merchant.account_id)
+	# 	else:
+	# 		# Take the money from this transaction
+	# 		print 'Take the money from this Transaction'
+
+	def complete(self):
 		ts = self.transaction_set.filter(processed=False)
+		trans = []
 		if len(ts) > 1:
 			# There are more than 1 transactions still open
 			print 'more than 1 open transaction'
-		elif len(ts < 1):
+		elif len(ts) < 1:
 			# There are no open transactions, use the user's default_source
-			charge = charge_source(self.customer.customer.customer_id, self.customer.customer.default_source, self.bar.merchant.account_id)
+			tran = Transaction(sale=self, owner=self.customer, source=self.customer.customer.default_source, amount=self.amount)
+			tran.process()
+			trans.append(tran)
 		else:
 			# Take the money from this transaction
-			print 'Take the money from this Transaction'
-
-	def complete(self):
-		print ''
+			t = ts[0]
+			amount = None
+			customer_id = None
+			source = None
+			account_id = self.bar.owner.merchant.account_id
+			charge = None
+			if t.tab:
+				# This transaction has a tab and therefore has a max allowed amt
+				if t.amount + self.tip <= t.tab.amount:
+					# Adding the tip to this tab is still under the amount left
+					# on the tab. Use the rest.
+					t.amount += self.tip
+					amount = t.amount
+					customer_id = t.owner.customer.customer_id
+					source = t.source
+					t.process()
+					t.save()
+				else:
+					# Adding the tip to this tab will cause the amount to be
+					# greater than tab max. Use the rest of the tab, then create
+					# another transaction.
+					tip_left_over = t.amount + self.tip - t.tab.amount
+					print tip_left_over
+					if tip_left_over < settings.MIN_CARD_COST:
+						print 'error'
+						raise MinimumAmountError()
+					t.amount = t.tab.amount
+					amount = t.amount
+					t.process()
+					t.save()
+					transaction = Transaction(sale=self, owner=self.customer, source=self.customer.customer.default_source, amount=tip_left_over)
+					transaction.process()
+					trans.append(transaction)
+			else:
+				# This transaction does not have a tab, and therefore has no max
+				# amount allowed
+				t.amount += self.tip
+				t.process()
+				t.save()
+		self.status = Sale.COMPLETE_STATUS
+		self.save()
+		for tr in trans:
+			tr.save()
 
 class Transaction(models.Model):
 	sale = models.ForeignKey('Sale', null=True, blank=True, default='')
 	owner = models.ForeignKey(settings.AUTH_USER_MODEL)
+	tab = models.ForeignKey('Tab', null=True, blank=True, default='')
 	amount = models.DecimalField(max_digits=8, decimal_places=2)
 	source = models.CharField(max_length=100, null=True, blank=True, default='')
 	processed = models.BooleanField(default=False)
@@ -267,9 +338,11 @@ class Transaction(models.Model):
 	updated = models.DateTimeField(auto_now_add=False, auto_now=True)
 
 	def process(self):
-		if not self.charge:
-			return False
+		if self.amount < settings.MIN_CARD_COST:
+			print 'error'
+			raise MinimumAmountError()
 		charge = charge_source(self.amount, self.owner.customer.customer_id, self.source, self.sale.bar.owner.merchant.account_id, self.charge)
+		self.processed = True
 		# TODO: Account for failed charge
 		return True
 
@@ -278,6 +351,9 @@ class Transaction(models.Model):
 		# TODO: Account for failed authorization
 		self.charge = charge.get('id')
 		return True
+
+	def is_valid(self):
+		return not (self.amount < settings.MIN_CARD_COST)
 
 def authorize_source(amount, customer_id, source, recipient_id=None):
 	try:
@@ -291,6 +367,7 @@ def authorize_source(amount, customer_id, source, recipient_id=None):
 			application_fee=get_application_fee(amount) if recipient_id else None
 		)
 		return charge
+		# return {'id': '13425432456'}
 	except stripe.error.CardError, e:
 		# Since it's a decline, stripe.error.CardError will be caughtbody = e.json_body
 	  	err  = e.json_body['error']
@@ -322,21 +399,25 @@ def authorize_source(amount, customer_id, source, recipient_id=None):
 	  	err  = e.json_body['error']
 		return err
 
-def charge_source(amount, customer_id, source, recipient_id, charge):
+def charge_source(amount, customer_id, source, recipient_id, charge=None):
 	application_fee = get_application_fee(amount)
 	amount = int(amount * 100)
-	charge = stripe.Charge.retrieve(charge)
-	# res = stripe.Charge.create(
-	# 	amount=amount,
-	# 	currency='usd',
-	# 	customer=customer_id,
-	# 	source=source,
-	# 	description='Charge for tab',
-	# 	destination=recipient_id,
-	# 	application_fee=application_fee
-	# )
+	if not charge:
+		# This is not a preauthorized charge
+		charge = stripe.Charge.create(
+			amount=amount,
+			currency='usd',
+			customer=customer_id,
+			source=source,
+			description='Charge for tab',
+			destination=recipient_id,
+			application_fee=application_fee
+		)
+	else:
+		charge = stripe.Charge.retrieve(charge)
+		charge = charge.capture()
 	# TODO: Send notification to this user!
-	return charge.capture()
+	return charge
 
 def get_application_fee(amount):
 	return int(float(amount) * 0.1 * 100.00)

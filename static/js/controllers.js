@@ -159,7 +159,7 @@ angular.module('App')
 	};
 }])
 
-.controller('BarSettingsCtrl', ['$rootScope', '$scope', '$state', '$stateParams', '$modal', '$http', 'Bar', 'Employee', 'UserSearch', 'Analytics', 'BarSale', 'buildAddress', 'toastr', function($rootScope, $scope, $state, $stateParams, $modal, $http, Bar, Employee, UserSearch, Analytics, BarSale, buildAddress, toastr) {
+.controller('BarSettingsCtrl', ['$rootScope', '$scope', '$state', '$stateParams', '$modal', '$http', 'Bar', 'Employee', 'UserSearch', 'Analytics', 'BarSale', 'buildAddress', 'toastr', 'Time', function($rootScope, $scope, $state, $stateParams, $modal, $http, Bar, Employee, UserSearch, Analytics, BarSale, buildAddress, toastr, Time) {
 	$scope.bar = Bar.get({id: $stateParams.id}, function() {
 		Analytics.pageview($scope.bar.name + ' Settings');
     if ($scope.bar.street && $scope.bar.postal)
@@ -168,7 +168,11 @@ angular.module('App')
   });
   $scope.search = {term:null};
 
-	$scope.sales = BarSale.query({id: $stateParams.id});
+	$scope.sales = BarSale.query({id: $stateParams.id}, function() {
+		$scope.sales.forEach(function(e) {
+			e.when = new Date(e.when).toLocaleString();
+		});
+	});
 
 	$scope.shouldSave = false;
 
@@ -530,18 +534,6 @@ angular.module('App')
     });
   });
 
-	$scope.saveNewCard = function(token) {
-		var source = new Source();
-		source.token = token;
-		source.$save(function() {
-			toastr.success('Success!', 'Your card has been added!');
-			$scope.getCards();
-			$rootScope.user.sources = true;
-			console.log($scope);
-			$scope.$close();
-		});
-	};
-
 	$scope.setDefaultCard = function(card) {
 		var source = new Source();
 		source.$save({id: card.id}, function() {
@@ -560,7 +552,8 @@ angular.module('App')
 		var m = $modal.open({
       templateUrl: 'credit-card-form.html',
       size: 'md',
-      scope: s
+      scope: s,
+			controller: 'CreditCardFormController'
     });
 
     m.result.then(function(email) {
