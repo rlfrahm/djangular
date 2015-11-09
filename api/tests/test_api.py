@@ -6,7 +6,7 @@ from django.contrib.auth.models import User
 from django.contrib.auth.models import Group
 from django.conf import settings
 
-from bars.models import Bar, Tab, Checkin, Role, RoleInvite
+from bars.models import Bar, Tab, Checkin, Role, RoleInvite, Sale, Transaction
 from account.models import UserProfile, StripeMerchant
 
 import datetime, mock, stripe
@@ -53,6 +53,7 @@ class ApiTests(APITestCase):
 		}
 		bar = Bar.new('Test Bar 1', d, self.user)
 		bar.save()
+		self.bar = bar
 		m = StripeMerchant(user=self.user, account_id='123', pub_key='123', refresh_token='123', access_token='123')
 		m.save()
 
@@ -483,6 +484,34 @@ class ApiTests(APITestCase):
 		self.assertEqual(transactions[1]['status'], 'authorized')
 		self.assertEqual(transactions[1]['amount'], 10.00)
 		self.assertEqual(transactions[1]['type'], 'user')
+
+	@mock.patch('bars.models.authorize_source')
+	@mock.patch('bars.models.charge_source')
+	def test_bar_payment_user_uses_tab_and_their_money_fails(self, mock_bar_models_charge_source, mock_bar_models_authorize_source):
+		"""
+		Ensure that a request to tip fails if the next transaction is less than
+		the minimum
+		Scenario: I have a $20 tab. I buy a $19 drink. I tip $5.
+		"""
+		self.user.customer.default_source = '123'
+		self.user.customer.save()
+		mock_bar_models_authorize_source.return_value = {'id': 'jnsdflkgj34r'}
+		mock_bar_models_charge_source.return_value = {'id': 'jnsdflkgj34r'}
+		# Create a tab
+		tab1 = Tab.new(20.00, self.user.email, 'ijbwflgkbsdf', self.user)
+		url = reverse('api:bar-sale', args=(1,1))
+		amount = 19
+		tip = 5
+		d = {
+			'tip': tip
+		}
+		sale = Sale(amount=amount, bar=self.bar, customer=self.user, tip=5)
+		sale.save()
+		t = Transaction(sale=sale, owner=self.user, tab=tab1, amount=amount, source='123')
+		t.save()
+		response = self.client.put(url, d, format='json')
+		self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+		self.assertEqual(response.data.get('add'), 1.00)
 
 	@mock.patch('bars.models.authorize_source')
 	@mock.patch('bars.models.charge_source')

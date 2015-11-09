@@ -241,6 +241,7 @@ class BarModelsTests(TestCase):
 		try:
 			sale.complete()
 		except MinimumAmountError, e:
+			print 'error'
 			self.assertTrue(True)
 		self.assertEqual(Sale.PENDING_STATUS, sale.status)
 		transactions = Transaction.objects.all()

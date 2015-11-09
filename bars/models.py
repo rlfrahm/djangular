@@ -304,10 +304,8 @@ class Sale(models.Model):
 					# greater than tab max. Use the rest of the tab, then create
 					# another transaction.
 					tip_left_over = t.amount + self.tip - t.tab.amount
-					print tip_left_over
 					if tip_left_over < settings.MIN_CARD_COST:
-						print 'error'
-						raise MinimumAmountError()
+						raise MinimumAmountError(settings.MIN_CARD_COST - tip_left_over)
 					t.amount = t.tab.amount
 					amount = t.amount
 					t.process()
@@ -339,7 +337,6 @@ class Transaction(models.Model):
 
 	def process(self):
 		if self.amount < settings.MIN_CARD_COST:
-			print 'error'
 			raise MinimumAmountError()
 		charge = charge_source(self.amount, self.owner.customer.customer_id, self.source, self.sale.bar.owner.merchant.account_id, self.charge)
 		self.processed = True

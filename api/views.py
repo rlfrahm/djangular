@@ -313,13 +313,12 @@ class BarSaleHandler(APIView):
 		sale = get_object_or_404(Sale, pk=sale_id)
 		# Capture the sale with the tip amount
 		sale.tip = serializer.validated_data['tip']
-		sale.amount += sale.tip
+		# sale.amount += sale.tip
 		try:
 			sale.complete()
 		except MinimumAmountError, e:
-			print e
-			return Response(status=status.HTTP_400_BAD_REQUEST)
-		return Response(status=status.HTTP_201_CREATED)
+			return Response({'add': e[0]}, status=status.HTTP_400_BAD_REQUEST)
+		return Response({'total': sale.amount, 'tip':sale.tip}, status=status.HTTP_201_CREATED)
 
 class BarAvatarHandler(APIView):
 	"""
