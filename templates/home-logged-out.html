@@ -3,143 +3,27 @@
 {% load staticfiles %}
 
 {% block page %}
-<link href="{% static 'css/front.css' %}" rel="stylesheet">
-<div class="content">
-	<div class="overlay header">
-		<nav class="navbar navbar-transparent" ng-init="navbarCollapsed=true">
-        <div class="container-fluid">
-            <div class="navbar-header">
-              <button type="button" class="navbar-toggle collapsed" ng-click="navbarCollapsed = !navbarCollapsed">
-                <span class="sr-only">Toggle navigation</span>
-                <span class="icon-bar"></span>
-                <span class="icon-bar"></span>
-                <span class="icon-bar"></span>
-              </button>
-              <a class="navbar-brand" href="{% url 'core:home' %}">Home</a>
-            </div>
-
-            <div class="collapse navbar-collapse" collapse="navbarCollapsed" ng-click="navbarCollapsed = !navbarCollapsed">
-              <ul class="nav navbar-nav navbar-right">
-                <li><a href="#how-it-works">What we do</a></li>
-                <li><a href="{% url 'bars:bar-contact' %}">For Bars</a></li>
-                <li><a href="{% url 'user:register' %}">Register</a></li>
-                <li><a href="{% url 'user:login' %}">Login</a></li>
-              </ul>
-            </div>
-        </div>
-    </nav>
-    <div class="container-fluid header text-center">
-        <h1 class="tagline" style="font-size:60px"><strong>Buy drinks for friends anywhere.</strong></h1>
-        <!-- <h1 style="font-size:60px;margin-top:150px"><strong>Connecting friends, one drink at a time</strong></h1> -->
-        <!-- <br>
-        <h4>To Drinkers and Bartenders:</h4>
-        <h3>My Drink Nation is a drinking community to buy your friends a round.</h3> -->
-        <br><br><br>
-				<a href="{% url 'user:register' %}" class="btn btn-danger btn-lg text-uppercase">Sign Up Free</a>
-        <br>
-    </div>
-	</div>
-</div>
-<div class="container how-it-works text-center" id="how-it-works">
-	<h2>What we do</h2>
-	<section class="step-1 row">
-		<div class="col-xs-12 col-sm-6 pull-right">
-			<img src="{% static 'images/front/bar.png' %}">
-		</div>
-		<div class="col-xs-12 col-sm-6">
-			<br>
-			<h2>Buy drinks for friends when you can't be there in person</h2>
-			<p>You can still be at the celebration in spirit!</p>
-		</div>
-	</section>
-	<section class="step-2 row">
-		<div class="col-xs-12 col-sm-6">
-			<img src="{% static 'images/front/send_money.png' %}">
-		</div>
-		<div class="col-xs-12 col-sm-6">
-			<br>
-			<h2>Buy drinks for friends you'd like to get to know</h2>
-			<p>Because opening up conversations in a loud bar is hard!</p>
-		</div>
-	</section>
-	<section class="step-3 row">
-		<div class="col-xs-12 col-sm-6 pull-right">
-			<img src="{% static 'images/front/notification.png' %}">
-		</div>
-		<div class="col-xs-12 col-sm-6">
-			<br>
-			<h2>Buy drinks for friends when they aren't full price</h2>
-			<p>You go to your favorite bar on Thursday because it’s Mojito night.</p>
-		</div>
-	</section>
-	<section class="step-4 row">
-		<div class="col-xs-12 col-sm-6">
-			<img src="{% static 'images/front/payment.png' %}">
-		</div>
-		<div class="col-xs-12 col-sm-6">
-			<br>
-			<h2>Buy drinks from your favorite bartenders</h2>
-			<p>Your drink starts with knowing they're made well</p>
-		</div>
-	</section>
-</div>
-<div class="action-statement text-center">
-	<h2 class="text-uppercase">Ready to join your friends?</h2>
-	<a href="{% url 'user:register' %}" class="btn btn-danger btn-lg text-uppercase">Sign Up Free</a>
-</div>
-<div class="footer" style="background-image:url('{% static 'images/front/background.png' %}')">
-    <div class="container">
-			<div class="row">
-				<div class="col-xs-12 col-sm-6">
-					<ul class="list-inline list-unstyled">
-	            <li class="text-center">&copy; 2015 My Drink Nation</li>
-	        </ul>
-					<ul class="list-inline list-unstyled">
-						<li><a href="{% url 'core:about' %}">About</a></li>
-						<li><a href="#how-it-works">How It Works</a></li>
-						<li><a href="{% url 'bars:bar-contact' %}">For Bars</a></li>
-						<li><a href="{% url 'user:register' %}">Register</a></li>
-						<li><a href="{% url 'user:login' %}">Login</a></li>
-					</ul>
-				</div>
-				<div class="col-xs-12 col-sm-6">
-					<ul class="list-inline list-unstyled pull-right">
-	            <li><a href="https://twitter.com/home?status=Tweet%20%40core"><i class="fa fa-twitter fa-2x" style="color:#4099FF"></i></a></li>
-	            <li><a href="https://plus.google.com/share?url=www.core.com/"><i class="fa fa-google-plus fa-2x" style="color:#dd4b39"></i></a></li>
-	            <li><a href="https://www.facebook.com/core"><i class="fa fa-facebook fa-2x" style="color:#3B5998"></i></a></li>
-	        </ul>
-					<ul class="list-unstyled">
-						<li>
-							<div id="mc_embed_signup" class="row">
-									<div class="col-xs-12">
-										<p>Interested in our email updates?</p>
-											<form action="//core.us11.list-manage.com/subscribe/post?u=d0063121735d12da7eeabcc95&amp;id=bf5f9f5fe8" method="post" id="mc-embedded-subscribe-form" name="mc-embedded-subscribe-form" class="validate" target="_blank" novalidate>
-													<div id="mc_embed_signup_scroll">
-													<div class="row">
-															<div class="mc-field-group form-group col-xs-8">
-																	<input type="email" value="" name="EMAIL" class="required email form-control" placeholder="Email" id="mce-EMAIL">
-															</div>
-															<div class="form-group col-xs-4">
-																	<input type="submit" value="Subscribe" name="subscribe" id="mc-embedded-subscribe" class="btn btn-danger btn-block">
-															</div>
-													</div>
-													<div id="mce-responses" class="clear">
-															<div class="response" id="mce-error-response" style="display:none"></div>
-															<div class="response" id="mce-success-response" style="display:none"></div>
-													</div>    <!-- real people should not fill this in and expect good things - do not remove this or risk form bot signups-->
-													<div style="position: absolute; left: -5000px;"><input type="text" name="b_d0063121735d12da7eeabcc95_bf5f9f5fe8" tabindex="-1" value=""></div>
-													<div class="clear"></div>
-													</div>
-											</form>
-									</div>
-							</div>
-						</li>
-
-					</ul>
-				</div>
-			</div>
-    </div>
-</div>
+<nav class="navbar navbar-light bg-faded">
+  <a class="navbar-brand" href="#">Navbar</a>
+  <ul class="nav navbar-nav">
+    <li class="nav-item active">
+      <a class="nav-link" href="#">Home <span class="sr-only">(current)</span></a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" href="#">Features</a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" href="#">Pricing</a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" href="{% url 'user:register' %}">Register</a>
+    </li>
+  </ul>
+  <form class="form-inline navbar-form pull-right">
+    <input class="form-control" type="text" placeholder="Search">
+    <button class="btn btn-success-outline" type="submit">Search</button>
+  </form>
+</nav>
 {% endblock %}
 
 {% block scripts %}

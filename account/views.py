@@ -14,9 +14,9 @@ from .forms import LoginForm, RegisterForm, ProfileForm, Step1Form, EmailForm, S
 from .models import UserProfile, PasswordResetToken, AccountActivationToken
 from notifications.emails import send_password_reset_email, send_account_activate_email
 
-from parts.decorators import anonymous_required
+from core.decorators import anonymous_required
 
-import stripe, urllib, urllib2, json, uuid
+import urllib, urllib2, json, uuid
 
 def loginHandler(request):
 	form = None

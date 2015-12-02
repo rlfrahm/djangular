@@ -20,8 +20,6 @@ from . import views
 
 urlpatterns = [
     url(r'^admin/', include(admin.site.urls)),
-    url(r'^about$', views.aboutHandler, name='about'),
-    url(r'^', views.homeHandler, name='home'),
 ]
 
 from django.conf import settings
@@ -34,6 +32,9 @@ if settings.DEBUG:
         }))
 
 urlpatterns.append(url(r'^api/v1/', include('api.urls', namespace='api')))
+urlpatterns.append(url(r'^about$', views.aboutHandler, name='about'))
 urlpatterns.append(url(r'^', include('account.urls', namespace='user')))
 urlpatterns.append(url(r'^', include('core.urls', namespace='core')))
+urlpatterns.append(url(r'^', views.homeHandler, name='home'))
+
     # url('^', include('django.contrib.auth.urls')),

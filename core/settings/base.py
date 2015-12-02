@@ -32,7 +32,6 @@ INSTALLED_APPS = (
     'django.contrib.staticfiles',
 
     # Added
-    'haystack',
     'widget_tweaks',
     'rest_framework',
     'rest_framework.authtoken',
@@ -40,10 +39,7 @@ INSTALLED_APPS = (
     'test_without_migrations',
 
     # App
-    'core',
     'notifications',
-    'recipes',
-    'bars',
     'account',
 )
 
