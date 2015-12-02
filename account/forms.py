@@ -27,9 +27,6 @@ class PasswordForm(forms.Form):
 class EmailForm(forms.Form):
   email = forms.EmailField(label='Email')
 
-class StripeConnectRedirectForm(forms.Form):
-  code = forms.CharField(max_length=100)
-
 class Step1Form(forms.Form):
   avatar = forms.ImageField(label='Avatar')
 

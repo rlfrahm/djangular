@@ -10,15 +10,13 @@ from django.core.exceptions import ValidationError
 from django.contrib import messages
 from django.views.decorators.http import require_GET
 
-from .forms import LoginForm, RegisterForm, ProfileForm, StripeConnectRedirectForm, Step1Form, EmailForm, Step2Form
-from .models import UserProfile, StripeCustomer, StripeMerchant, PasswordResetToken, AccountActivationToken
+from .forms import LoginForm, RegisterForm, ProfileForm, Step1Form, EmailForm, Step2Form
+from .models import UserProfile, PasswordResetToken, AccountActivationToken
 from notifications.emails import send_password_reset_email, send_account_activate_email
 
-from mydrinknation.decorators import anonymous_required
+from parts.decorators import anonymous_required
 
 import stripe, urllib, urllib2, json, uuid
-
-stripe.api_key = settings.STRIPE_API_KEY
 
 def loginHandler(request):
 	form = None
@@ -112,13 +110,11 @@ def step1Handler(request):
 def step2Handler(request):
 	if request.method == 'POST':
 		form = Step2Form(request.POST)
-		print request.POST
-		if form.is_valid():
-			customer = stripe.Customer.retrieve(request.user.customer.customer_id)
-			source = customer.sources.create(source=form.cleaned_data['token'])
-			if request.user.customer.default_source == '':
-				request.user.customer.default_source = source.get('id')
-				request.user.customer.save()
+		# if form.is_valid():
+		# 	source = customer.sources.create(source=form.cleaned_data['token'])
+		# 	if request.user.customer.default_source == '':
+		# 		request.user.customer.default_source = source.get('id')
+		# 		request.user.customer.save()
 		return redirect(reverse('core:home'))
 	else:
 			form = Step1Form()
@@ -137,32 +133,6 @@ def profileHandler(request):
 def userHandler(request, user_id):
 	user = get_object_or_404(User, pk=user_id)
 	return render(request, 'user/user.html', {'user': user})
-
-@login_required
-def stripeConnectRedirectHandler(request):
-	form = StripeConnectRedirectForm(request.GET)
-	if form.is_valid():
-		data = {
-			'client_secret': settings.STRIPE_API_KEY,
-			'code': request.GET['code'],
-			'grant_type': 'authorization_code',
-		}
-		data = urllib.urlencode(data)
-		url = 'https://connect.stripe.com/oauth/token'
-		res = urllib2.urlopen(url, data)
-		# TODO: Error checking
-		data = json.loads(res.read())
-		merchant = StripeMerchant()
-		merchant.user = request.user
-		merchant.account_id = data.get('stripe_user_id')
-		merchant.pub_key = data.get('stripe_publishable_key')
-		merchant.refresh_token = data.get('refresh_token')
-		merchant.access_token = data.get('access_token')
-		merchant.save()
-		return redirect(reverse('core:home') + '#/bars/mine')
-	else:
-		# Something went wrong
-		return redirect(reverse('core:home'))
 
 def resetPasswordFormHandler(request):
 	if request.method == 'POST':

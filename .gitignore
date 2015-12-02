@@ -2,7 +2,7 @@ migrations/
 db.sqlite3
 .DS_Store
 
-mydrinknation/settings/site.py
+core/settings/site.py
 
 files/
 

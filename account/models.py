@@ -3,11 +3,7 @@ from django.contrib.auth.models import User
 from django.conf import settings
 from django.contrib.auth.models import Group
 
-import datetime, os, uuid, stripe
-
-stripe.api_key = settings.STRIPE_API_KEY
-
-from bars.models import Bar
+import datetime, os, uuid
 
 from .storage import OverwriteStorage
 
@@ -41,10 +37,6 @@ class UserProfile(models.Model):
 	dob = models.DateField(default=datetime.date.today)
 	ip_address = models.CharField(max_length=120, default='ABC')
 	avatar = models.ImageField(upload_to=path_and_rename, blank=True, storage=OverwriteStorage(), default=USER_PROFILE_DEFAULT)
-
-	# The user's tab is the amount of money that has been given to them
-	# and not used yet.
-	tab = models.DecimalField(max_digits=6, decimal_places=2, default=0)
 
 	# The Django User model provides an "active" attribute,
 	# but using said attribute causes DRF to return a 403
@@ -107,46 +99,12 @@ class UserProfile(models.Model):
 		user.last_name = lastname
 		user.save()
 
-		group = Group.objects.get(name='Drinkers')
-		user.groups.add(group)
-
 		profile = UserProfile(user=user, dob=dob, active=False)
 		profile.save()
-
-		# Stripe
-		if add_stripe:
-			cus = stripe.Customer.create(
-				description=user.email,
-				email=user.email
-			)
-			stripe_customer = StripeCustomer(user=user, customer_id=cus.get('id'))
-			stripe_customer.save()
 		return user
 
 	class Meta:
 		unique_together = ("user",)
-
-class StripeMerchant(models.Model):
-	user = models.OneToOneField(settings.AUTH_USER_MODEL, related_name='merchant')
-	account_id = models.CharField(max_length=100)
-	pub_key = models.CharField(max_length=100)
-	refresh_token = models.CharField(max_length=100)
-	access_token = models.CharField(max_length=100)
-
-	def __unicode__(self):
-		return self.user.username
-
-class StripeCustomer(models.Model):
-	user = models.OneToOneField(settings.AUTH_USER_MODEL, related_name='customer')
-	customer_id = models.CharField(max_length=100)
-	# This is the default source to use for things like:
-	# 	- Paying for tabs
-	# The default value for this field is the first source the user adds,
-	# however, the user can change the default if they choose
-	default_source = models.CharField(max_length=100, null=True, blank=True, default='')
-
-	def __unicode__(self):
-		return self.user.username
 
 class PasswordResetToken(models.Model):
 	user = models.OneToOneField(settings.AUTH_USER_MODEL)

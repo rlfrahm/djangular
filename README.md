@@ -13,7 +13,7 @@ My Drink Nation
  * `sudo apt-get install git`
  * Reference: https://www.digitalocean.com/community/tutorials/how-to-install-git-on-ubuntu-14-04
 4. Clone repo to `/home/django/`
-5. Create site specific settings file at `mydrinknation/settings/site.py`
+5. Create site specific settings file at `core/settings/site.py`
 6. Upgrade Django to 1.8
  1. Remove system Django `rm -rf /usr/local/lib/python2.7/dist-packages/django`
  2. Install new Django `pip install django`

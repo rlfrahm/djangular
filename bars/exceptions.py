@@ -1,2 +1,0 @@
-class MinimumAmountError(Exception):
-	pass
