@@ -1,26 +1,21 @@
-Parts
-===
+Django / AngularJS Boilerplate (djangular) - THE INFOS
+======================================================
 
-## Setup
+This is meant as a starting point for your next Django / AngularJS project. Mostly what this consists of is common setup things you would do when starting your app. Some out of the box functionality/configuration that this adds are:
 
-### Local
+- Register / Login functionality and templates templates
+- A user profile model that allows you to add custom attributes about a user
+- AngularJs setup and ready to go
+- A production ready settings configuration
+- Django Rest Framework ready to go
+- ... to be continued
 
-### Digital Ocean
-1. Modify `/etc/nginx/sites-enabled/django`
-2. Modify `/etc/init/gunicorn.conf`
-3. Install git:
- * `sudo apt-get update`
- * `sudo apt-get install git`
- * Reference: https://www.digitalocean.com/community/tutorials/how-to-install-git-on-ubuntu-14-04
-4. Clone repo to `/home/django/`
-5. Create site specific settings file at `core/settings/site.py`
-6. Upgrade Django to 1.8
- 1. Remove system Django `rm -rf /usr/local/lib/python2.7/dist-packages/django`
- 2. Install new Django `pip install django`
-7. Install project dependencies using `pip install -r requirements.txt`
-8. Migrate the database
-9. Restart gunicorn `service gunicorn restart`
+Installation
+------------
 
-### Logs
-* Gunicorn `/var/log/upstart/gunicorn.log`
-* Nginx `/var/log/nginx/error.log`
+1. Fork this repository and then clone it locally
+2. Create a `virtualenv`
+3. Navigate to the root of this directory, and install the requirements `pip install -r requirements.txt`
+4. Cope & paste `core/settings/default.site.py` to `core/settings/site.py`
+5. Migrate the db `python manage.py migrate`
+6. Run the server `python manage.py runserver`
