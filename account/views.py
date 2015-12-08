@@ -25,7 +25,7 @@ def loginHandler(request):
 	if request.method == 'POST':
 		form = LoginForm(request.POST)
 		if form.is_valid():
-			username = form.cleaned_data['email'][:30]
+			username = form.cleaned_data['username']
 			password = form.cleaned_data['password']
 			user = authenticate(username=username, password=password)
 			if user is not None:
@@ -56,6 +56,7 @@ def registerHandler(request):
 		if form.is_valid():
 			# Check for dupe users
 			email = form.cleaned_data['email']
+			username = form.cleaned_data['username']
 			users = User.objects.filter(email=email)
 			if len(users) > 0:
 				# User already exists with this email
@@ -65,10 +66,9 @@ def registerHandler(request):
 			lastname = form.cleaned_data['lastname']
 			username = form.cleaned_data['email'][:30]
 			password = form.cleaned_data['password']
-			dob = form.cleaned_data['dob']
 
 			# Shiny new saved user
-			user = UserProfile.new(email, password, firstname, lastname, dob)
+			user = UserProfile.new(username, email, password, firstname, lastname)
 
 			# Email activation
 			token = AccountActivationToken(user=user, token=uuid.uuid4())

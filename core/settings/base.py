@@ -119,7 +119,7 @@ LOGOUT_URL = '/logout'
 LOGIN_REDIRECT_URL = '/#/profile'
 
 # Emails
-EMAIL_FROM_EMAIL = 'My Drink Nation <no-reply@core.com>'
+EMAIL_FROM_EMAIL = 'Core <no-reply@core.com>'
 
 # App Constants
 # The minimum amount that is allowed to be charged to a source

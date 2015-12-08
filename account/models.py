@@ -32,9 +32,6 @@ class UserProfile(models.Model):
 	created = models.DateTimeField(auto_now_add=True, auto_now=False)
 	updated = models.DateTimeField(auto_now_add=False, auto_now=True)
 	location = models.CharField(max_length=100, blank=True)
-	# age = models.PositiveIntegerField(blank=True,null=True)
-	# birthday = models.DateField()
-	dob = models.DateField(default=datetime.date.today)
 	ip_address = models.CharField(max_length=120, default='ABC')
 	avatar = models.ImageField(upload_to=path_and_rename, blank=True, storage=OverwriteStorage(), default=USER_PROFILE_DEFAULT)
 
@@ -92,14 +89,13 @@ class UserProfile(models.Model):
 		return self.user.username
 
 	@classmethod
-	def new(cls, email, password, firstname, lastname, dob, add_stripe=True):
-		username = email[:30]
+	def new(cls, username, email, password, firstname, lastname):
 		user = User.objects.create_user(username, email, password)
 		user.first_name = firstname
 		user.last_name = lastname
 		user.save()
 
-		profile = UserProfile(user=user, dob=dob, active=False)
+		profile = UserProfile(user=user, active=False)
 		profile.save()
 		return user
 
