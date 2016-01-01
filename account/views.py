@@ -118,7 +118,7 @@ def step2Handler(request):
 		return redirect(reverse('core:home'))
 	else:
 			form = Step1Form()
-	return render(request, 'registration/step-2.html', {'stripe_pk': settings.STRIPE_PUB_API_KEY})
+	return render(request, 'registration/step-2.html')
 
 def logoutHandler(request):
 	logout(request)
