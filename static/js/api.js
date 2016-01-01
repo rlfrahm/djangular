@@ -4,20 +4,12 @@ angular.module('Api', ['ngResource'])
 	return $resource('/api/v1/users/:id');
 }])
 
-.factory('UserBars', ['$resource', function($resource) {
-	return $resource('/api/v1/user/bars');
-}])
-
 .factory('Me', ['$resource', function($resource) {
 	return $resource('/api/v1/user');
 }])
 
 .factory('MePassword', ['$resource', function($resource) {
 	return $resource('/api/v1/user/password');
-}])
-
-.factory('MyTab', ['$resource', function($resource){
-	return $resource('/api/v1/user/tab');
 }])
 
 .factory('UserAvatar', ['$resource', function($resource) {
@@ -28,41 +20,6 @@ angular.module('Api', ['ngResource'])
         headers: {'Content-Type': undefined}
     }
   });
-}])
-
-.factory('Bar', ['$resource', function($resource) {
-	return $resource('/api/v1/bars/:id');
-}])
-
-.factory('BarSale', ['$resource', function($resource) {
-	return $resource('/api/v1/bars/:id/sales/:sid', {}, {
-		put: {
-			method: 'PUT'
-		}
-	});
-}])
-
-.factory('BarPayment', ['$resource', function($resource) {
-	return $resource('/api/v1/bars/:id/pay');
-}])
-
-.factory('Checkin', ['$resource', function($resource) {
-	return $resource('/api/v1/bars/:id/checkin');
-}])
-
-.factory('Employee', ['$resource', function($resource) {
-	return $resource('/api/v1/bars/:id/roles/:bid', {}, {
-		working: {
-			method: 'PUT'
-		},
-		invite: {
-			method: 'POST'
-		}
-	});
-}])
-
-.factory('Bars', ['$resource', function($resource) {
-	return $resource('/api/v1/bars');
 }])
 
 .factory('Auth', ['$resource', function($resource) {
@@ -79,20 +36,4 @@ angular.module('Api', ['ngResource'])
 
 .factory('UserSearch', ['$resource', function($resource) {
 	return $resource('/api/v1/search/users', {term: '@term'});
-}])
-
-.factory('BarSearch', ['$resource', function($resource) {
-	return $resource('/api/v1/search/bars', {term: '@term'});
-}])
-
-.factory('Tab', ['$resource', function($resource) {
-	return $resource('/api/v1/tabs/:id');
-}])
-
-.factory('TabAccept', ['$resource', function($resource) {
-	return $resource('/api/v1/tabs/:id/accept');
-}])
-
-.factory('Source', ['$resource', function($resource) {
-	return $resource('/api/v1/user/sources/:id');
 }]);

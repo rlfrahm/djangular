@@ -31,10 +31,10 @@ angular.module('App')
 		if (title)
 			document.title = title + ' - ';
 		document.title += 'My Drink Nation';
-		ga('send', 'pageview');
+		// ga('send', 'pageview');
 	};
 
 	this.event = function(c, a, l ,v) {
-		ga('send', 'event', c, a, l, v);
+		// ga('send', 'event', c, a, l, v);
 	};
 });
